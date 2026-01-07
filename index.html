@@ -921,7 +921,25 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
 
         <div class="card col-8">
           <h2>Create ADMENSION Link</h2>
+          <div class="notice goodNote" style="margin-bottom:12px">
+            Create a trackable short link that sends visitors through a 3-step interstitial before reaching your destination. Ads shown during steps earn you pool contributions.
+          </div>
           <div class="stack">
+            <div class="col-12">
+              <label class="mini">Link Name</label>
+              <input id="admLinkName" placeholder="Give your link a name (e.g. 'My Referral Link')" />
+              <div class="mini">This is what visitors will see on the first step.</div>
+            </div>
+            <div class="col-12">
+              <label class="mini">Destination URL</label>
+              <input id="admDestUrl" placeholder="https://example.com/your-page" />
+              <div class="mini">Where visitors will be redirected after completing 3 steps.</div>
+            </div>
+            <div class="col-12">
+              <label class="mini">Custom Message (optional)</label>
+              <textarea id="admMessage" placeholder="Add a personal message or instructions for your visitors..." style="min-height:80px"></textarea>
+              <div class="mini">Shown to visitors on Step 1 (optional greeting or context).</div>
+            </div>
             <div class="col-6">
               <label class="mini">Payout Network</label>
               <select id="admChain">
@@ -934,10 +952,18 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
               <label class="mini">Wallet Address (optional)</label>
               <input id="admAddr" placeholder="TRON / ETH / BTC address (optional)" />
             </div>
-            <div class="col-12 row" style="margin-top:6px">
-              <button class="btn primary" id="admCreate">Create Link</button>
-              <button class="btn" id="admCopy">Copy Link</button>
-              <span class="badge" id="admOut">—</span>
+            <div class="col-12 row" style="margin-top:10px">
+              <button class="btn primary" id="admCreate">Generate Short Link</button>
+              <button class="btn" id="admCopy">Copy Short Link</button>
+              <button class="btn" id="admCopyFull">Copy Full Link</button>
+            </div>
+            <div class="col-12" style="margin-top:10px">
+              <label class="mini">Short Link</label>
+              <div class="code" id="admOut" style="padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;word-break:break-all;">—</div>
+            </div>
+            <div class="col-12" style="margin-top:6px">
+              <label class="mini">Full Tracking Link</label>
+              <div class="code" id="admOutFull" style="padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;word-break:break-all;font-size:11px;">—</div>
             </div>
           </div>
 
@@ -2342,7 +2368,11 @@ if(btnReset){
 /* ===== ADMENSION create ===== */
 const admAddrEl = document.getElementById("admAddr");
 const admChainEl = document.getElementById("admChain");
+const admLinkNameEl = document.getElementById("admLinkName");
+const admDestUrlEl = document.getElementById("admDestUrl");
+const admMessageEl = document.getElementById("admMessage");
 const admOutEl = document.getElementById("admOut");
+const admOutFullEl = document.getElementById("admOutFull");
 const admWarnEl = document.getElementById("admWarn");
 function genAdmCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
 function makeAdmLink(code){
@@ -2351,6 +2381,12 @@ function makeAdmLink(code){
   nu.searchParams.set("s","1");
   nu.searchParams.set("seed", String(Date.now()));
   return nu.toString();
+}
+function makeShortLink(code){
+  // Short link format: routes to interstitial.html with ?code=CODE
+  const base = new URL(location.href);
+  const basePath = base.pathname.replace(/\/[^/]*$/, '');
+  return `${base.origin}${basePath}/interstitial.html?code=${code}`;
 }
 function saveAdmRefs(){ localStorage.setItem(K.adm_refs, JSON.stringify(admRefs)); }
 function renderManageList(){
@@ -2366,17 +2402,43 @@ function renderManageList(){
 }
 const admCreateBtn = document.getElementById("admCreate");
 const admCopyBtn = document.getElementById("admCopy");
+const admCopyFullBtn = document.getElementById("admCopyFull");
 if(admCreateBtn){
   admCreateBtn.onclick = async () => {
+    const linkName = (admLinkNameEl?.value || "").trim();
+    const destUrl = (admDestUrlEl?.value || "").trim();
+    const message = (admMessageEl?.value || "").trim();
     const chain = admChainEl.value;
     const addr = (admAddrEl.value||"").trim();
+    
+    // Validation
+    if(!linkName){ alert("Please enter a link name."); return; }
+    if(!destUrl){ alert("Please enter a destination URL."); return; }
+    if(!destUrl.startsWith("http://") && !destUrl.startsWith("https://")){
+      alert("Destination URL must start with http:// or https://"); return;
+    }
+    
     const code = genAdmCode();
-    const rec = { code, chain, addr: addr || "", created: Date.now(), addr_set: !!addr };
+    const rec = { 
+      code, 
+      chain, 
+      addr: addr || "", 
+      created: Date.now(), 
+      addr_set: !!addr,
+      linkName,
+      destUrl,
+      message
+    };
     admRefs.push(rec); saveAdmRefs();
-    const link = makeAdmLink(code);
-    admOutEl.textContent = link;
-    try{ await navigator.clipboard.writeText(link); }catch(e){}
-    logEvent("adm_create",{code, chain, has_addr: !!addr});
+    
+    const shortLink = makeShortLink(code);
+    const fullLink = makeAdmLink(code);
+    
+    admOutEl.textContent = shortLink;
+    if(admOutFullEl) admOutFullEl.textContent = fullLink;
+    
+    try{ await navigator.clipboard.writeText(shortLink); }catch(e){}
+    logEvent("adm_create",{code, chain, has_addr: !!addr, has_dest: !!destUrl});
     
     // Engagement system: validate link and track creation
     if(window.ADMENSION_ENGAGEMENT) {
@@ -2401,6 +2463,14 @@ if(admCopyBtn){
     if(!link || link==="—"){ alert("Create a link first."); return; }
     try{ await navigator.clipboard.writeText(link); alert("Copied ✅"); }catch(e){ prompt("Copy link:", link); }
     logEvent("adm_copy",{link});
+  };
+}
+if(admCopyFullBtn){
+  admCopyFullBtn.onclick = async () => {
+    const link = admOutFullEl?.textContent;
+    if(!link || link==="—"){ alert("Create a link first."); return; }
+    try{ await navigator.clipboard.writeText(link); alert("Full link copied ✅"); }catch(e){ prompt("Copy link:", link); }
+    logEvent("adm_copy_full",{link});
   };
 }
 

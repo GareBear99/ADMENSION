@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ADMENSION Redirect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./universal-ads/admension-ads.css"/>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; }
+    body {
+      font-family:'Space Grotesk', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      overflow-x:hidden;
+    }
+    #mainCard {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter:blur(10px);
+      border-radius:16px;
+      padding:2rem;
+      max-width:600px;
+      width:90%;
+      box-shadow:0 8px 32px rgba(0,0,0,0.3);
+      text-align:center;
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    h1 {
+      font-size:1.8rem;
+      margin-bottom:1rem;
+      background:linear-gradient(90deg,#6ee7b7,#3b82f6);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .message {
+      background:rgba(255,255,255,0.08);
+      padding:1rem;
+      border-radius:8px;
+      margin:1rem 0;
+      font-size:1rem;
+      line-height:1.5;
+      color:#e5e7eb;
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    .instructions {
+      background:rgba(59,130,246,0.15);
+      padding:1rem;
+      border-radius:8px;
+      margin:1rem 0;
+      font-size:0.95rem;
+      line-height:1.6;
+      color:#93c5fd;
+      border:1px solid rgba(59,130,246,0.3);
+      text-align:left;
+    }
+    .instructions ol {
+      padding-left:1.5rem;
+      margin-top:0.5rem;
+    }
+    .instructions li {
+      margin:0.5rem 0;
+    }
+    .countdown {
+      font-size:3rem;
+      font-weight:700;
+      margin:1.5rem 0;
+      background:linear-gradient(90deg,#f59e0b,#ef4444);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .progress {
+      display:flex;
+      justify-content:center;
+      gap:0.75rem;
+      margin:1.5rem 0;
+    }
+    .dot {
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.2);
+      transition:background 0.3s;
+    }
+    .dot.active {
+      background:linear-gradient(90deg,#6ee7b7,#3b82f6);
+      box-shadow:0 0 12px rgba(110,231,183,0.6);
+    }
+    .btn {
+      background:linear-gradient(90deg,#6ee7b7,#3b82f6);
+      color:#111;
+      border:none;
+      padding:0.9rem 2rem;
+      font-size:1rem;
+      font-weight:600;
+      border-radius:8px;
+      cursor:pointer;
+      transition:transform 0.2s, opacity 0.3s;
+      font-family:inherit;
+      margin-top:1rem;
+    }
+    .btn:hover:not(:disabled) {
+      transform:scale(1.05);
+    }
+    .btn:disabled {
+      opacity:0.4;
+      cursor:not-allowed;
+    }
+    .footer {
+      margin-top:2rem;
+      font-size:0.85rem;
+      color:#9ca3af;
+    }
+    .footer a {
+      color:#6ee7b7;
+      text-decoration:none;
+    }
+    .footer a:hover {
+      text-decoration:underline;
+    }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+
+<!-- Step 1: Link name + custom message -->
+<div id="step1" class="hidden">
+  <div id="mainCard">
+    <h1 id="linkName">—</h1>
+    <div class="message" id="customMessage">—</div>
+    <div class="progress">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="countdown" id="timer1">3</div>
+    <button class="btn" id="btn1" disabled>Next</button>
+    <div class="footer">Powered by <a href="./">ADMENSION</a></div>
+  </div>
+</div>
+
+<!-- Step 2: Instructions -->
+<div id="step2" class="hidden">
+  <div id="mainCard">
+    <h1>Almost there…</h1>
+    <div class="instructions">
+      <strong>How this works:</strong>
+      <ol>
+        <li>You're viewing a shortened link created via ADMENSION</li>
+        <li>This brief interstitial helps support the link creator</li>
+        <li>Wait for the timer to complete on each step</li>
+        <li>Click "Next" to continue</li>
+      </ol>
+    </div>
+    <div class="progress">
+      <div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="countdown" id="timer2">3</div>
+    <button class="btn" id="btn2" disabled>Next</button>
+    <div class="footer">Powered by <a href="./">ADMENSION</a></div>
+  </div>
+</div>
+
+<!-- Step 3: Final countdown -->
+<div id="step3" class="hidden">
+  <div id="mainCard">
+    <h1>Preparing your destination…</h1>
+    <div class="message">Your link will be ready in <span id="timer3">10</span> seconds.</div>
+    <div class="progress">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot active"></div>
+    </div>
+    <div class="countdown" id="timer3Big">10</div>
+    <button class="btn" id="btn3" disabled>Continue to destination</button>
+    <div class="footer">Powered by <a href="./">ADMENSION</a></div>
+  </div>
+</div>
+
+<script src="./universal-ads/admension-ads.js"></script>
+<script>
+/* ===== ADMENSION Interstitial Page ===== */
+// localStorage keys (sync with main index.html)
+const K = { adm_refs: 'cfamm.adm_refs' };
+
+// Parse URL to get code
+const params = new URLSearchParams(location.search);
+const code = params.get('code') || '';
+
+// Load link data from localStorage
+let linkData = null;
+try {
+  const refs = JSON.parse(localStorage.getItem(K.adm_refs) || '[]');
+  linkData = refs.find(r => r.code === code.toUpperCase());
+} catch(e) {
+  console.error('Failed to load link data:', e);
+}
+
+// If no link data found, redirect to home
+if(!linkData) {
+  alert('Invalid or expired link code.');
+  location.href = './';
+}
+
+// Track attribution (if ?adm=CODE present)
+const admCode = params.get('adm');
+if(admCode) {
+  sessionStorage.setItem('admension_code', admCode);
+}
+
+// DOM elements
+const step1El = document.getElementById('step1');
+const step2El = document.getElementById('step2');
+const step3El = document.getElementById('step3');
+const linkNameEl = document.getElementById('linkName');
+const customMessageEl = document.getElementById('customMessage');
+const timer1El = document.getElementById('timer1');
+const timer2El = document.getElementById('timer2');
+const timer3El = document.getElementById('timer3');
+const timer3BigEl = document.getElementById('timer3Big');
+const btn1 = document.getElementById('btn1');
+const btn2 = document.getElementById('btn2');
+const btn3 = document.getElementById('btn3');
+
+// Populate step 1 with link data
+if(linkNameEl && linkData.linkName) {
+  linkNameEl.textContent = linkData.linkName;
+}
+if(customMessageEl && linkData.message) {
+  customMessageEl.textContent = linkData.message;
+} else if(customMessageEl) {
+  customMessageEl.textContent = 'No custom message provided.';
+}
+
+let currentStep = 1;
+
+// Analytics: log page load
+if(window.ADMENSION_ENGAGEMENT) {
+  try {
+    window.ADMENSION_ENGAGEMENT.logEvent('interstitial_load', {
+      code: code,
+      adm_code: admCode || 'none',
+      step: 1,
+      linkName: linkData.linkName,
+      hasMessage: !!linkData.message
+    });
+  } catch(e) {}
+}
+
+// Show step 1
+step1El.classList.remove('hidden');
+
+// Timer for step 1 (3 seconds)
+let countdown1 = 3;
+timer1El.textContent = countdown1;
+const interval1 = setInterval(() => {
+  countdown1--;
+  if(countdown1 < 0) countdown1 = 0;
+  timer1El.textContent = countdown1;
+  if(countdown1 === 0) {
+    clearInterval(interval1);
+    btn1.disabled = false;
+  }
+}, 1000);
+
+btn1.onclick = () => {
+  // Log step 1 completion
+  if(window.ADMENSION_ENGAGEMENT) {
+    try {
+      window.ADMENSION_ENGAGEMENT.logEvent('interstitial_step1_complete', {
+        code: code,
+        adm_code: admCode || 'none'
+      });
+    } catch(e) {}
+  }
+  
+  step1El.classList.add('hidden');
+  step2El.classList.remove('hidden');
+  currentStep = 2;
+  
+  // Timer for step 2 (3 seconds)
+  let countdown2 = 3;
+  timer2El.textContent = countdown2;
+  const interval2 = setInterval(() => {
+    countdown2--;
+    if(countdown2 < 0) countdown2 = 0;
+    timer2El.textContent = countdown2;
+    if(countdown2 === 0) {
+      clearInterval(interval2);
+      btn2.disabled = false;
+    }
+  }, 1000);
+};
+
+btn2.onclick = () => {
+  // Log step 2 completion
+  if(window.ADMENSION_ENGAGEMENT) {
+    try {
+      window.ADMENSION_ENGAGEMENT.logEvent('interstitial_step2_complete', {
+        code: code,
+        adm_code: admCode || 'none'
+      });
+    } catch(e) {}
+  }
+  
+  step2El.classList.add('hidden');
+  step3El.classList.remove('hidden');
+  currentStep = 3;
+  
+  // Timer for step 3 (10 seconds)
+  let countdown3 = 10;
+  timer3El.textContent = countdown3;
+  timer3BigEl.textContent = countdown3;
+  const interval3 = setInterval(() => {
+    countdown3--;
+    if(countdown3 < 0) countdown3 = 0;
+    timer3El.textContent = countdown3;
+    timer3BigEl.textContent = countdown3;
+    if(countdown3 === 0) {
+      clearInterval(interval3);
+      btn3.disabled = false;
+    }
+  }, 1000);
+};
+
+btn3.onclick = () => {
+  // Log final step completion and redirect
+  if(window.ADMENSION_ENGAGEMENT) {
+    try {
+      window.ADMENSION_ENGAGEMENT.logEvent('interstitial_complete', {
+        code: code,
+        adm_code: admCode || 'none',
+        destUrl: linkData.destUrl,
+        chain: linkData.chain,
+        hasAddr: !!linkData.addr
+      });
+    } catch(e) {}
+  }
+  
+  // Redirect to destination URL
+  if(linkData && linkData.destUrl) {
+    location.href = linkData.destUrl;
+  } else {
+    alert('No destination URL found.');
+    location.href = './';
+  }
+};
+</script>
+
+</body>
+</html>

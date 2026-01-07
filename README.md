@@ -11,7 +11,8 @@ No signup. No dashboard. No referrals. Share a link → people browse → ads ru
 ## Features
 
 ### ✨ Core Functionality
-- **🔗 Link Shortening:** Create trackable links with both long and short URL options
+- **🔗 Link Shortening:** Create trackable links with 3-step timed interstitial (like AdFly)
+- **⏱️ Interstitial Flow:** 3s → 3s → 10s countdown before destination redirect
 - **💰 Automatic Payouts:** Monthly revenue distribution on the 1st (for prior month)
 - **📊 Transparent Stats:** Real-time tracking of impressions, engagement, and revenue
 - **🛡️ Anti-Abuse:** IVT filtering, viewability validation, engagement scoring
@@ -41,10 +42,10 @@ No signup. No dashboard. No referrals. Share a link → people browse → ads ru
 
 1. Visit [garebear99.github.io/ADMENSION](https://garebear99.github.io/ADMENSION/)
 2. Go to **Create** page
-3. Enter destination URL + optional message
-4. Get both long and short links
+3. Enter link name, destination URL, custom message, and wallet address
+4. Get both short and full tracking links
 5. Share anywhere
-6. Go to **Manage** page to set your wallet address
+6. Visitors see 3-step interstitial (3s → 3s → 10s) with ads before destination
 7. Receive monthly payouts on the 1st
 
 ### For Developers (Deploy Your Own)
@@ -78,25 +79,25 @@ No signup. No dashboard. No referrals. Share a link → people browse → ads ru
 ### User Flow
 
 ```
-User creates link
+User creates link with name, URL, message
   ↓
-Visitor clicks link
+Visitor clicks short link
   ↓
-Arrives at root hub (garebear99.github.io)
+Arrives at interstitial page with ?code=ABC123
   ↓
-UTM/adm parameters captured
+Step 1 (3s): Link name + custom message shown
   ↓
-Redirected to ADMENSION 3-step flow
+Step 2 (3s): Instructions about how the system works
   ↓
-Step 1: Choose option A or B
+Step 3 (10s): Final countdown to destination
   ↓
-Step 2: View daily quote + engagement
+Redirect to destination URL
   ↓
-Step 3: See creator message + next steps
+Ads shown on all steps (sidebars + anchor bar)
   ↓
-Redirect to final destination
+Attribution tracked (?adm=CODE) throughout flow
   ↓
-Ad impressions logged (real vs placeholder tracked)
+Impressions logged and validated for payouts
 ```
 
 ### Payout Flow
@@ -130,13 +131,15 @@ Distributes payouts to qualified wallets
 ```
 ADMENSION/
 ├── index.html              # Main landing/flow page
-├── create.html             # Link creation page
+├── interstitial.html       # 3-step timed redirect page (AdFly-style)
+├── create.html             # Link creation page (DEPRECATED: merged into index.html)
 ├── manage.html             # Wallet + links management
 ├── stats.html              # Transparency statistics
 ├── docs.html               # Comprehensive documentation
 ├── admin.html              # Admin controls (PIN protected)
-├── consent.js              # GDPR/privacy consent logic
-├── ads-config.js           # AdSense & collector config
+├── universal-ads/
+│   ├── admension-ads.css   # Universal ad system CSS
+│   └── admension-ads.js    # Universal ad system JS (attribution tracking)
 ├── cloud/
 │   └── apps_script_collector.gs.txt  # Google Apps Script backend
 ├── scripts/
@@ -145,7 +148,6 @@ ADMENSION/
 │   └── workflows/
 │       └── monthly-payout.yml  # Automated payout GitHub Action
 ├── SETUP_GUIDE.md          # Comprehensive deployment guide
-├── DEPLOYMENT_COMPLETE.md  # Original deployment notes
 └── README.md               # This file
 ```
 
@@ -153,13 +155,15 @@ ADMENSION/
 
 ## Key Features Explained
 
-### 🔗 Link Shortening
+### 🔗 Link Shortening & Interstitial
 
-- **Long URL:** Full tracking with all parameters visible
-- **Short URL:** Clean `/r/CODE` format via root hub resolver
-- **Unified Tracking:** Both URLs track to the same link record
-- **Auto-Cleanup:** Links inactive for 90 days are auto-deleted
-- **Hit Tracking:** Every visit increments hit counter
+- **Short URL:** Clean `interstitial.html?code=CODE` format
+- **Full URL:** Tracking link with `?adm=CODE` attribution parameters
+- **3-Step Flow:** Timed interstitial (3s → 3s → 10s) before destination
+- **Custom Messages:** Link creator can add personalized message on Step 1
+- **Link Names:** Friendly display names shown to visitors
+- **Ad Display:** Sidebar ads + anchor bar on all 3 steps
+- **Attribution:** `?adm=CODE` tracked throughout entire flow
 
 ### 💰 Payout System
 

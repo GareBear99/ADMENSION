@@ -20,9 +20,10 @@ No signup. No dashboard. No referrals. Share a link → people browse → ads ru
 
 ### 💸 Revenue Model
 - **Ad Revenue:** Google AdSense integration with policy-compliant placement
-- **Pool Distribution:** 33% of net revenue allocated to user pool
+- **Pool Distribution:** 6.5% during bootstrap (Months 1-2), then 13% from Month 3
 - **Wallet Cap:** Max 1% per wallet with transparent overflow redistribution
 - **Walletless Rule:** Proceeds from links without wallets go to founder (not pool)
+- **Bootstrap Phase:** No payouts until Month 3 (first payout April 1, 2026)
 - **Daily Quotes:** Engagement-gated motivational content for session depth
 
 ### 🛠️ Technical Stack
@@ -230,6 +231,28 @@ ADMENSION/
 
 ---
 
+## Bootstrap Phase (January - March 2026)
+
+ADMENSION launched with a **3-month bootstrap phase** to ensure sustainable long-term payouts.
+
+**Bootstrap Policies:**
+- ⚠️ **No payouts during Months 1-2** (Jan-Feb 2026)
+- 📅 **First payout:** April 1, 2026 (for March activity)
+- 💰 **Pool rate:** 6.5% during bootstrap (50% of normal 13%)
+- 📈 **After Month 3:** Full 13% pool + monthly payouts resume
+- 🔢 **Units tracked:** All contribution tracked during bootstrap for transparency
+
+**Why Bootstrap?**
+1. Validate system stability with real traffic
+2. Confirm AdSense revenue consistency
+3. Test anti-abuse and IVT filters
+4. Build user confidence with proven model
+5. Ensure sustainable long-term payouts
+
+**Dynamic UI:** The homepage automatically shows bootstrap status and auto-hides the notice after Month 3.
+
+---
+
 ## Roadmap
 
 ### ✅ Completed (v1.0)
@@ -241,6 +264,7 @@ ADMENSION/
 - IVT filtering and viewability validation
 - Daily motivational quotes
 - Comprehensive documentation
+- **Bootstrap phase implementation**
 
 ### 🚧 In Progress (v1.1)
 - Real AdSense integration (pending approval)

@@ -597,7 +597,116 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <div class="notice warnNote">
 <b>Reminder:</b> Do not add timer-based refresh. Only refresh ads on user intent (page/nav/step).
           </div>
-</section></section><section class="page" id="page-create"><section class="card"><h1>Create</h1><p class="sub">Create a share link in this browser (signup‑free).</p></section><div class="ad" id="createRail"><div class="adLabel">CREATE — Desktop Rail</div></div></section><section class="page" id="page-manage"><section class="card"><h1>Manage</h1><p class="sub">View links created in this browser and manage local data.</p><pre class="codebox" id="admList">—</pre></section><div class="ad" id="manageRail"><div class="adLabel">MANAGE — Desktop Rail</div></div></section><section class="page" id="page-docs">
+</section>
+</section>
+
+<section class="page" id="page-create">
+  <section class="card">
+    <h1>Create Share Link</h1>
+    <p class="sub">Create a trackable link in this browser (signup‑free). No account required.</p>
+    
+    <div class="notice goodNote" style="margin-top:12px">
+      <b>How it works:</b><br/>
+      1) Enter a destination URL + optional message<br/>
+      2) Get both a long URL and short link (both work!)<br/>
+      3) Share either version — all tracking is unified<br/>
+      4) Links auto-delete after 90 days of no use
+    </div>
+
+    <div style="margin-top:16px">
+      <label class="mini">Destination URL (required)</label>
+      <input id="createUrl" placeholder="https://example.com" type="url"/>
+      <div class="mini" style="margin-top:4px">Where visitors will end up after the 3-step flow</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label class="mini">Custom message (optional)</label>
+      <textarea id="createMsg" placeholder="Your custom message shown on final step" rows="3"></textarea>
+      <div class="mini" style="margin-top:4px">Shown on step 3 with directions to other pages</div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button class="btn primary" id="btnCreateLink">Create Link</button>
+    </div>
+
+    <div id="createResult" style="display:none; margin-top:16px">
+      <div class="notice" style="margin-bottom:10px">
+        <b>✅ Link created successfully!</b>
+      </div>
+      
+      <label class="mini">Long URL (full tracking)</label>
+      <div style="display:flex; gap:8px; margin-top:6px; margin-bottom:12px">
+        <input id="createLongUrl" readonly style="flex:1" type="text"/>
+        <button class="btn" id="btnCopyLong">Copy</button>
+      </div>
+
+      <label class="mini">Short Link (same tracking)</label>
+      <div style="display:flex; gap:8px; margin-top:6px">
+        <input id="createShortUrl" readonly style="flex:1" type="text"/>
+        <button class="btn" id="btnCopyShort">Copy</button>
+      </div>
+
+      <div class="mini" style="margin-top:10px; opacity:0.8">
+        Both URLs track the same link. Use whichever is more convenient.
+      </div>
+    </div>
+  </section>
+  <div class="ad" id="createRail"><div class="adLabel">CREATE — Desktop Rail</div></div>
+</section>
+
+<section class="page" id="page-manage">
+  <section class="card">
+    <h1>Manage</h1>
+    <p class="sub">View your created links and set your payout wallet address.</p>
+
+    <h2 style="margin-top:20px">💰 Payout Wallet</h2>
+    <div class="notice warnNote">
+      <b>Important:</b> Set your wallet address to receive monthly payouts. Links without a wallet address will have their proceeds go to the founder wallet (not the pool).
+    </div>
+
+    <div style="margin-top:12px">
+      <label class="mini">Your ADM Code</label>
+      <input id="manageAdmCode" placeholder="ABCD12" type="text"/>
+      <div class="mini" style="margin-top:4px">Enter your ADM code from your share link</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label class="mini">Chain</label>
+      <select id="manageChain">
+        <option value="TRON">TRON (TRC-20)</option>
+        <option value="ETH">Ethereum (ERC-20)</option>
+        <option value="BTC">Bitcoin</option>
+      </select>
+    </div>
+
+    <div style="margin-top:12px">
+      <label class="mini">Wallet Address</label>
+      <input id="manageAddress" placeholder="Your wallet address" type="text"/>
+      <div class="mini" style="margin-top:4px">USDT payouts sent monthly on the 1st (for prior month)</div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button class="btn primary" id="btnSaveWallet">Save Wallet</button>
+      <button class="btn" id="btnClearWallet">Clear</button>
+    </div>
+
+    <div class="divider" style="margin:24px 0"></div>
+
+    <h2>📊 Your Links</h2>
+    <p class="sub">Links created in this browser. Synced to cloud collector.</p>
+    
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="btnRefreshLinks">Refresh</button>
+    </div>
+
+    <div id="linksList" style="margin-top:16px">
+      <div class="notice">Loading...</div>
+    </div>
+  </section>
+  <div class="ad" id="manageRail"><div class="adLabel">MANAGE — Desktop Rail</div></div>
+</section>
+
+<section class="page" id="page-docs">
 <section class="card">
 <h1>Docs</h1>
 <p class="sub"><b>Idiot-proof, blunt, and accurate.</b> If you read this page, you understand the whole system.</p>
@@ -1557,7 +1666,7 @@ function showPage(name){
   // route pageview event
   logEvent("route",{to:name});
   // update lists on manage
-  if(name==="manage") renderManageList();
+  if(name==="manage"){ renderManageList(); try{ refreshLinksList(); }catch(e){} }
   // update stats when entering stats
   if(name==="stats") refreshStatsUI();
   try{ spRenderSticky(); 
@@ -1772,6 +1881,180 @@ if(btnReset){
     alert("Reset complete.");
     location.reload();
   };
+}
+
+/* ===== ADMENSION Cloud Collector (v1.2 - Links + Wallets) ===== */
+const COLLECTOR_URL = window.ADMENSION_COLLECTOR_URL || '';
+const OWNER_TOKEN_KEY = 'admension_owner_token';
+let ownerToken = localStorage.getItem(OWNER_TOKEN_KEY) || cid();
+localStorage.setItem(OWNER_TOKEN_KEY, ownerToken);
+
+function genShortCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
+
+async function callCollector(type, payload){
+  if(!COLLECTOR_URL){ console.warn('COLLECTOR_URL not set'); return {ok:false, error:'no_url'}; }
+  try{
+    const res = await fetch(COLLECTOR_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({type, payload})
+    });
+    return await res.json();
+  }catch(e){ return {ok:false, error:String(e)}; }
+}
+
+/* ===== Wallet Management ===== */
+const btnSaveWallet = document.getElementById('btnSaveWallet');
+const btnClearWallet = document.getElementById('btnClearWallet');
+const manageAdmCode = document.getElementById('manageAdmCode');
+const manageChain = document.getElementById('manageChain');
+const manageAddress = document.getElementById('manageAddress');
+
+if(btnSaveWallet){
+  btnSaveWallet.onclick = async () => {
+    const code = (manageAdmCode.value||'').trim().toUpperCase();
+    const chain = manageChain.value;
+    const address = (manageAddress.value||'').trim();
+    if(!code){ alert('Enter your ADM code'); return; }
+    if(!address){ alert('Enter your wallet address'); return; }
+    
+    const res = await callCollector('wallet_submit', {
+      adm_code: code,
+      chain,
+      address,
+      signature: ''
+    });
+    
+    if(res.ok){
+      alert('✅ Wallet saved! Monthly payouts will be sent to this address.');
+      logEvent('wallet_submit', {code, chain, has_addr:true});
+    }else{
+      alert('❌ Failed to save wallet: ' + (res.error||'unknown'));
+    }
+  };
+}
+
+if(btnClearWallet){
+  btnClearWallet.onclick = () => {
+    manageAdmCode.value = '';
+    manageAddress.value = '';
+    alert('Cleared');
+  };
+}
+
+/* ===== Link Creation ===== */
+const btnCreateLink = document.getElementById('btnCreateLink');
+const createUrl = document.getElementById('createUrl');
+const createMsg = document.getElementById('createMsg');
+const createResult = document.getElementById('createResult');
+const createLongUrl = document.getElementById('createLongUrl');
+const createShortUrl = document.getElementById('createShortUrl');
+const btnCopyLong = document.getElementById('btnCopyLong');
+const btnCopyShort = document.getElementById('btnCopyShort');
+
+if(btnCreateLink){
+  btnCreateLink.onclick = async () => {
+    const url = (createUrl.value||'').trim();
+    const msg = (createMsg.value||'').trim();
+    if(!url){ alert('Enter a destination URL'); return; }
+    if(!/^https?:\/\//i.test(url)){ alert('URL must start with http:// or https://'); return; }
+    
+    const code = genShortCode();
+    const res = await callCollector('create_link', {
+      code,
+      url,
+      msg,
+      owner_token: ownerToken
+    });
+    
+    if(!res.ok){
+      if(res.error==='conflict'){
+        alert('Code conflict, retrying...');
+        btnCreateLink.onclick(); // retry
+        return;
+      }
+      alert('❌ Failed to create link: ' + (res.error||'unknown'));
+      return;
+    }
+    
+    // Generate both URLs
+    const rootBase = 'https://garebear99.github.io';
+    const longUrl = `${rootBase}/?adm=${code}&url=${encodeURIComponent(url)}&msg=${encodeURIComponent(msg)}&s=1`;
+    const shortUrl = `${rootBase}/r/${code}`;
+    
+    createLongUrl.value = longUrl;
+    createShortUrl.value = shortUrl;
+    createResult.style.display = 'block';
+    
+    logEvent('link_created', {code, url_length:url.length, has_msg:!!msg});
+  };
+}
+
+if(btnCopyLong){
+  btnCopyLong.onclick = async () => {
+    try{
+      await navigator.clipboard.writeText(createLongUrl.value);
+      alert('✅ Long URL copied!');
+    }catch(e){ prompt('Copy this URL:', createLongUrl.value); }
+  };
+}
+
+if(btnCopyShort){
+  btnCopyShort.onclick = async () => {
+    try{
+      await navigator.clipboard.writeText(createShortUrl.value);
+      alert('✅ Short link copied!');
+    }catch(e){ prompt('Copy this link:', createShortUrl.value); }
+  };
+}
+
+/* ===== Links List Management ===== */
+const btnRefreshLinks = document.getElementById('btnRefreshLinks');
+const linksList = document.getElementById('linksList');
+
+async function refreshLinksList(){
+  if(!linksList) return;
+  linksList.innerHTML = '<div class="notice">Loading...</div>';
+  
+  const res = await callCollector('list_links', { owner_token: ownerToken });
+  
+  if(!res.ok || !res.links || res.links.length===0){
+    linksList.innerHTML = '<div class="notice">No links yet. Create one on the Create page.</div>';
+    return;
+  }
+  
+  const html = res.links.map(link => {
+    const created = new Date(link.created_at).toLocaleDateString();
+    const hits = link.hits || 0;
+    const shortUrl = `https://garebear99.github.io/r/${link.code}`;
+    return `
+      <div class="card" style="margin-bottom:10px; padding:12px">
+        <div style="display:flex; justify-content:space-between; align-items:start; gap:10px">
+          <div style="flex:1">
+            <div class="mini" style="opacity:0.7">Code</div>
+            <div style="font-family:var(--mono); font-weight:800; font-size:16px">${escapeHtml(link.code)}</div>
+            <div class="mini" style="margin-top:6px; opacity:0.7">Destination</div>
+            <div style="word-break:break-all; font-size:13px">${escapeHtml(link.url)}</div>
+            ${link.msg ? `<div class="mini" style="margin-top:6px; opacity:0.7">Message</div><div style="font-size:13px">${escapeHtml(link.msg)}</div>` : ''}
+          </div>
+          <div style="text-align:right">
+            <div class="badge">${hits} hits</div>
+            <div class="mini" style="margin-top:4px">${created}</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" onclick="navigator.clipboard.writeText('${shortUrl}'); alert('✅ Copied!');">Copy Short</button>
+          <button class="btn" onclick="window.open('${shortUrl}', '_blank')">Open</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  linksList.innerHTML = html;
+}
+
+if(btnRefreshLinks){
+  btnRefreshLinks.onclick = refreshLinksList;
 }
 
 /* ===== ADMENSION create ===== */

@@ -2009,12 +2009,27 @@ function computeScore(){
 }
 const score = computeScore();
 
-pillStep.textContent = `s=${step}/3`;
-pillDev.textContent = `dev=${device}`;
-pillPv.textContent = `pv=${pvTotal}`;
-pillScore.textContent = `score=${score}`;
-pillAdm.textContent = `adm=${adm ? adm : "—"}`;
-anchorMeta.textContent = `sid ${sid.slice(0,8)} • seed ${seed.slice(-6)}`;
+// Declare pill elements
+const pillPage = document.getElementById("pillPage");
+const pillStep = document.getElementById("pillStep");
+const pillDev = document.getElementById("pillDev");
+const pillPv = document.getElementById("pillPv");
+const pillScore = document.getElementById("pillScore");
+const pillAds = document.getElementById("pillAds");
+const pillAdm = document.getElementById("pillAdm");
+const anchorMeta = document.getElementById("anchorMeta");
+
+// Update pills safely
+try{
+  if(pillStep) pillStep.textContent = `s=${step}/3`;
+  if(pillDev) pillDev.textContent = `dev=${device}`;
+  if(pillPv) pillPv.textContent = `pv=${pvTotal}`;
+  if(pillScore) pillScore.textContent = `score=${score}`;
+  if(pillAdm) pillAdm.textContent = `adm=${adm ? adm : "—"}`;
+  if(anchorMeta) anchorMeta.textContent = `sid ${sid.slice(0,8)} • seed ${seed.slice(-6)}`;
+}catch(e){
+  console.error('[ADMENSION] Error updating pills:', e);
+}
 
 /* ===== Routing ===== */
 function currentPage(){

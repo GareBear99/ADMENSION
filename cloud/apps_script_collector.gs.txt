@@ -1,0 +1,51 @@
+// Google Apps Script - Web App Collector
+// 1) Create a new Google Sheet (name: ADMENSION_EVENTS)
+// 2) Extensions -> Apps Script. Paste this code.
+// 3) Deploy -> New deployment -> Type: Web app
+//    - Execute as: Me
+//    - Who has access: Anyone with the link
+// 4) Copy the Web app URL and set it on the site as window.ADMENSION_COLLECTOR_URL
+// 5) (Optional) Add a second sheet named 'wallets' for wallet submissions
+
+const SHEET_EVENTS = 'events';
+const SHEET_WALLETS = 'wallets';
+
+function doPost(e) {
+  try {
+    const body = JSON.parse(e.postData.contents);
+    const type = body.type;
+    const p = body.payload || {};
+
+    const ss = SpreadsheetApp.getActive();
+
+    if (type === 'wallet_submit') {
+      const sh = ss.getSheetByName(SHEET_WALLETS) || ss.insertSheet(SHEET_WALLETS);
+      sh.appendRow([
+        new Date(),
+        p.adm_code || '',
+        p.chain || '',
+        p.address || '',
+        p.signature || ''
+      ]);
+      return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // default: log pageviews/ad events
+    const sh = ss.getSheetByName(SHEET_EVENTS) || ss.insertSheet(SHEET_EVENTS);
+    sh.appendRow([
+      new Date(),
+      type,
+      p.sid_hash || '',
+      p.page || '',
+      p.slot || '',
+      p.device || '',
+      p.utm ? JSON.stringify(p.utm) : '',
+      p.viewable || '',
+      p.ivt || ''
+    ]);
+
+    return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: String(err) })).setMimeType(ContentService.MimeType.JSON);
+  }
+}

@@ -1,0 +1,34 @@
+name: Monthly Payouts
+
+on:
+  schedule:
+    - cron: '30 0 1 * *' # 00:30 UTC on the 1st
+  workflow_dispatch: {}
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Compute payouts
+        env:
+          SHEET_EVENTS_CSV_URL: ${{ vars.SHEET_EVENTS_CSV_URL }}
+        run: |
+          node scripts/compute_payouts.mjs
+
+      - name: Commit ledger
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add payouts/
+          git commit -m "chore: add monthly payout ledger (auto)" || echo "Nothing to commit"
+          git push

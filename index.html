@@ -638,19 +638,58 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
 
           <div class="stack" style="margin-top:12px">
             <div class="col-12">
-              <h3>Interstitial Flow (Visitor Experience)</h3>
-              <div class="progress">
-                <div class="dot on" id="d1"></div>
-                <div class="dot on" id="d2"></div>
-                <div class="dot on" id="d3"></div>
-                <div class="bar"><div class="barFill" id="barFill" style="width:100%"></div></div>
-                <span class="mini">3 steps total</span>
+              <h3>Interactive Demo: 3-Step Interstitial</h3>
+              <div class="notice" style="margin-bottom:12px;background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3)">
+                <b>🎮 Try it now:</b> Click through the 3 steps to see what your visitors experience
               </div>
-              <div class="notice" style="margin-top:8px">
-                <b>Step 1 (3s):</b> Link name + timer instructions<br>
-                <b>Step 2 (3s):</b> Simple timer wait<br>
-                <b>Step 3 (10s):</b> Custom message + disclaimer + click to continue<br>
-                <span class="mini">Sidebar ads + anchor bar shown on all steps</span>
+              
+              <div class="progress">
+                <div class="dot" id="demo_d1"></div>
+                <div class="dot" id="demo_d2"></div>
+                <div class="dot" id="demo_d3"></div>
+                <div class="bar"><div class="barFill" id="demo_barFill" style="width:0%"></div></div>
+                <span class="mini" id="demo_stepText">Step 1 of 3</span>
+              </div>
+
+              <!-- Step 1 Demo -->
+              <div id="demo_step1" style="margin-top:12px">
+                <div class="notice goodNote">
+                  <h3 style="margin:0 0 8px 0">Demo Link Name</h3>
+                  <p style="margin:0;opacity:0.9">Step 1 of 3 - Wait for timer to complete</p>
+                  <div style="font-size:32px;font-weight:700;margin:12px 0;color:#f59e0b" id="demo_timer1">3</div>
+                  <button class="btn primary" id="demo_btn1" disabled>Next</button>
+                </div>
+              </div>
+
+              <!-- Step 2 Demo -->
+              <div id="demo_step2" style="margin-top:12px;display:none">
+                <div class="notice goodNote">
+                  <h3 style="margin:0 0 8px 0">Almost there...</h3>
+                  <p style="margin:0;opacity:0.9">Step 2 of 3 - Wait for timer to complete</p>
+                  <div style="font-size:32px;font-weight:700;margin:12px 0;color:#f59e0b" id="demo_timer2">3</div>
+                  <button class="btn primary" id="demo_btn2" disabled>Next</button>
+                </div>
+              </div>
+
+              <!-- Step 3 Demo -->
+              <div id="demo_step3" style="margin-top:12px;display:none">
+                <div class="notice goodNote">
+                  <h3 style="margin:0 0 8px 0">Demo Link Name</h3>
+                  <p style="margin:0 0 8px 0;opacity:0.9">This is your custom message area!</p>
+                  <div class="notice" style="background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.3);margin:8px 0">
+                    <b>Step 3 of 3 — How this works:</b><br>
+                    You're viewing a shortened link created via ADMENSION. This brief interstitial helps support the link creator through ad revenue. Wait for the timer to reach 0, then click the button below to continue to your destination.
+                  </div>
+                  <div style="font-size:32px;font-weight:700;margin:12px 0;color:#f59e0b" id="demo_timer3">10</div>
+                  <a href="https://garebear99.github.io/" class="btn primary" id="demo_btn3" style="pointer-events:none;opacity:0.5;text-decoration:none;display:inline-block" target="_blank">Click to continue to ROOT_SITE</a>
+                </div>
+              </div>
+
+              <div style="margin-top:12px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.1)">
+                <div class="mini" style="opacity:0.75">
+                  💡 <b>Note:</b> Step 1 (3s) → Step 2 (3s) → Step 3 (10s)<br>
+                  Sidebar ads + anchor bar shown on all steps in the real flow
+                </div>
               </div>
             </div>
           </div>
@@ -658,7 +697,7 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
           <div class="row" style="margin-top:12px">
             <a href="#create" class="btn primary">Create Your Link</a>
             <a href="#manage" class="btn">Manage Links</a>
-            <a href="#docs" class="btn">View Docs</a>
+            <a href="https://garebear99.github.io/" class="btn" target="_blank">Visit ROOT_SITE Hub</a>
           </div>
         </div>
         <div class="card col-4" id="homeRail">
@@ -2518,6 +2557,124 @@ if(admCopyLinkBtn){
     logEvent("adm_copy_for_code",{code, link});
   };
 }
+
+/* ===== Homepage Demo: Interactive 3-Step Timer ===== */
+(function(){
+  const demo_step1 = document.getElementById('demo_step1');
+  const demo_step2 = document.getElementById('demo_step2');
+  const demo_step3 = document.getElementById('demo_step3');
+  const demo_btn1 = document.getElementById('demo_btn1');
+  const demo_btn2 = document.getElementById('demo_btn2');
+  const demo_btn3 = document.getElementById('demo_btn3');
+  const demo_timer1 = document.getElementById('demo_timer1');
+  const demo_timer2 = document.getElementById('demo_timer2');
+  const demo_timer3 = document.getElementById('demo_timer3');
+  const demo_d1 = document.getElementById('demo_d1');
+  const demo_d2 = document.getElementById('demo_d2');
+  const demo_d3 = document.getElementById('demo_d3');
+  const demo_barFill = document.getElementById('demo_barFill');
+  const demo_stepText = document.getElementById('demo_stepText');
+
+  if(!demo_btn1) return; // Not on homepage
+
+  let currentStep = 1;
+  let timer = null;
+
+  function updateProgress(){
+    // Update dots
+    if(demo_d1) demo_d1.classList.toggle('on', currentStep >= 1);
+    if(demo_d2) demo_d2.classList.toggle('on', currentStep >= 2);
+    if(demo_d3) demo_d3.classList.toggle('on', currentStep >= 3);
+    
+    // Update bar
+    const width = ((currentStep - 1) / 2) * 100;
+    if(demo_barFill) demo_barFill.style.width = `${width}%`;
+    
+    // Update text
+    if(demo_stepText) demo_stepText.textContent = `Step ${currentStep} of 3`;
+  }
+
+  function startStep1(){
+    currentStep = 1;
+    updateProgress();
+    if(demo_step1) demo_step1.style.display = 'block';
+    if(demo_step2) demo_step2.style.display = 'none';
+    if(demo_step3) demo_step3.style.display = 'none';
+    
+    if(timer) clearInterval(timer);
+    let countdown = 3;
+    if(demo_timer1) demo_timer1.textContent = countdown;
+    if(demo_btn1) demo_btn1.disabled = true;
+    
+    timer = setInterval(() => {
+      countdown--;
+      if(countdown < 0) countdown = 0;
+      if(demo_timer1) demo_timer1.textContent = countdown;
+      if(countdown === 0){
+        clearInterval(timer);
+        if(demo_btn1) demo_btn1.disabled = false;
+      }
+    }, 1000);
+  }
+
+  function startStep2(){
+    currentStep = 2;
+    updateProgress();
+    if(demo_step1) demo_step1.style.display = 'none';
+    if(demo_step2) demo_step2.style.display = 'block';
+    if(demo_step3) demo_step3.style.display = 'none';
+    
+    if(timer) clearInterval(timer);
+    let countdown = 3;
+    if(demo_timer2) demo_timer2.textContent = countdown;
+    if(demo_btn2) demo_btn2.disabled = true;
+    
+    timer = setInterval(() => {
+      countdown--;
+      if(countdown < 0) countdown = 0;
+      if(demo_timer2) demo_timer2.textContent = countdown;
+      if(countdown === 0){
+        clearInterval(timer);
+        if(demo_btn2) demo_btn2.disabled = false;
+      }
+    }, 1000);
+  }
+
+  function startStep3(){
+    currentStep = 3;
+    updateProgress();
+    if(demo_step1) demo_step1.style.display = 'none';
+    if(demo_step2) demo_step2.style.display = 'none';
+    if(demo_step3) demo_step3.style.display = 'block';
+    
+    if(timer) clearInterval(timer);
+    let countdown = 10;
+    if(demo_timer3) demo_timer3.textContent = countdown;
+    if(demo_btn3){
+      demo_btn3.style.pointerEvents = 'none';
+      demo_btn3.style.opacity = '0.5';
+    }
+    
+    timer = setInterval(() => {
+      countdown--;
+      if(countdown < 0) countdown = 0;
+      if(demo_timer3) demo_timer3.textContent = countdown;
+      if(countdown === 0){
+        clearInterval(timer);
+        if(demo_btn3){
+          demo_btn3.style.pointerEvents = 'auto';
+          demo_btn3.style.opacity = '1';
+        }
+      }
+    }, 1000);
+  }
+
+  if(demo_btn1) demo_btn1.onclick = startStep2;
+  if(demo_btn2) demo_btn2.onclick = startStep3;
+
+  // Auto-start demo on page load
+  startStep1();
+})();
 
 /* ===== Mark baseline ad + show page ===== */
 

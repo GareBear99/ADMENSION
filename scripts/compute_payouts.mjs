@@ -131,14 +131,30 @@ async function main(){
     }
   }
   // Default: cap per adm_code if no wallet map
-  const walletKeyForAdm = (adm)=> walletByAdm.get(adm) || adm;
+  const walletKeyForAdm = (adm)=> walletByAdm.has(adm) ? walletByAdm.get(adm) : 'NO_WALLET';
 
   // Prepare allocations by units (initial)
-  const baseRows = Array.from(unitsByAdm.entries()).map(([adm_code, units])=>({
+  let baseRows = Array.from(unitsByAdm.entries()).map(([adm_code, units])=>({
     adm_code, units, wallet: walletKeyForAdm(adm_code)
   }));
 
-  const finalRows = enforceWalletCapWaterfill(baseRows, pool, WALLET_CAP_PCT, CREATOR_ADM_CODE);
+  // Extract "no wallet" rows: their entire share goes to founder (burn) and not to pool recipients
+  let poolAdjusted = pool;
+  const unitsTotalAll = baseRows.reduce((s,r)=>s+r.units,0) || 1;
+  const noWalletRows = baseRows.filter(r=>r.wallet==='NO_WALLET');
+  const withWalletRows = baseRows.filter(r=>r.wallet!=='NO_WALLET');
+  if(noWalletRows.length){
+    const shareNoWallet = noWalletRows.reduce((s,r)=>s + (r.units/unitsTotalAll), 0);
+    const amountNoWallet = pool * shareNoWallet;
+    // route to founder if provided; otherwise mark UNALLOCATED
+    if(CREATOR_ADM_CODE){
+      // record as separate row to founder
+      withWalletRows.push({ adm_code: CREATOR_ADM_CODE, wallet: CREATOR_ADM_CODE, units: 0, carry: amountNoWallet, capped:false, cap_reason:'no_wallet_redirect' });
+    }
+    poolAdjusted = pool - amountNoWallet;
+  }
+
+  const finalRows = enforceWalletCapWaterfill(withWalletRows, poolAdjusted, WALLET_CAP_PCT, CREATOR_ADM_CODE);
 
   writeLedger(tag, finalRows, pool, { totalUnits, received, poolCap, walletCapPct: WALLET_CAP_PCT, creatorRecipient: CREATOR_ADM_CODE||null });
   console.log(`Ledger for ${tag} written with ${finalRows.length} rows. Pool $${pool.toFixed(2)}.`);
@@ -156,8 +172,17 @@ function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
     unitsByWallet.set(r.wallet, (unitsByWallet.get(r.wallet)||0) + r.units);
   }
 
-  // water-filling
-  let remaining = rows.slice();
+  // Pre-assign any explicit carry amounts (e.g., redirected no-wallet proceeds)
+  const carryRows = rows.filter(r=>r.carry>EPS);
+  if(carryRows.length){
+    for(const r of carryRows){
+      const amount = Math.min(poolRemaining, r.carry);
+      out.push({ adm_code: r.adm_code, wallet: r.wallet, units: r.units||0, share: amount/pool, amount_usd: amount, capped:false, cap_reason:r.cap_reason||'carry' });
+      poolRemaining -= amount;
+    }
+  }
+  // water-filling across remaining (non-carry)
+  let remaining = rows.filter(r=>!(r.carry>EPS));
   while(remaining.length && poolRemaining > EPS){
     const unitsTotal = remaining.reduce((s,r)=>s+r.units,0) || 1;
     // proposed allocation

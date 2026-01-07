@@ -9,6 +9,7 @@
 
 const SHEET_EVENTS = 'events';
 const SHEET_WALLETS = 'wallets';
+const SHEET_LINKS = 'links';
 
 function doPost(e) {
   try {
@@ -30,6 +31,48 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
     }
 
+    if (type === 'create_link') {
+      const sh = ss.getSheetByName(SHEET_LINKS) || ss.insertSheet(SHEET_LINKS);
+      // Columns: ts, code, url, msg, owner_token, created_at, last_hit, hits, status
+      // Enforce unique code
+      const data = sh.getDataRange().getValues();
+      const code = (p.code||'').toUpperCase();
+      if(!code) throw new Error('Missing code');
+      for(let i=0;i<data.length;i++){
+        if(String(data[i][1]||'').toUpperCase() === code){
+          return ContentService.createTextOutput(JSON.stringify({ ok:false, error:'conflict' })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      sh.appendRow([
+        new Date(),
+        code,
+        p.url || '',
+        p.msg || '',
+        p.owner_token || '',
+        new Date(),
+        '',
+        0,
+        'active'
+      ]);
+      return ContentService.createTextOutput(JSON.stringify({ ok:true, code })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (type === 'list_links') {
+      const sh = ss.getSheetByName(SHEET_LINKS);
+      if(!sh) return ContentService.createTextOutput(JSON.stringify({ ok:true, links:[] })).setMimeType(ContentService.MimeType.JSON);
+      const data = sh.getDataRange().getValues();
+      const out = [];
+      const owner = p.owner_token || '';
+      for(let i=0;i<data.length;i++){
+        const row = data[i];
+        if(i===0 && String(row[0]).toLowerCase().includes('ts')) continue; // skip header if present
+        if(row[4]===owner){
+          out.push({ code:row[1], url:row[2], msg:row[3], created_at:row[5], last_hit:row[6], hits:row[7], status:row[8] });
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({ ok:true, links:out })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     // default: log pageviews/ad events
     const sh = ss.getSheetByName(SHEET_EVENTS) || ss.insertSheet(SHEET_EVENTS);
     sh.appendRow([
@@ -48,4 +91,48 @@ function doPost(e) {
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({ ok: false, error: String(err) })).setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function doGet(e){
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName(SHEET_LINKS);
+  const code = (e.parameter.code||'').toUpperCase();
+  if(!sh || !code){
+    return ContentService.createTextOutput(JSON.stringify({ ok:false, error:'not_found' })).setMimeType(ContentService.MimeType.JSON);
+  }
+  const data = sh.getDataRange().getValues();
+  for(let i=0;i<data.length;i++){
+    const row = data[i];
+    if(String(row[1]||'').toUpperCase()===code){
+      const status = row[8]||'active';
+      if(status!=='active'){
+        return ContentService.createTextOutput(JSON.stringify({ ok:false, error:'deleted' })).setMimeType(ContentService.MimeType.JSON);
+      }
+      // update last_hit and hits
+      sh.getRange(i+1,7).setValue(new Date()); // last_hit col=7 (indexing from 1)
+      sh.getRange(i+1,8).setValue(Number(row[7]||0)+1);
+      return ContentService.createTextOutput(JSON.stringify({ ok:true, code:row[1], url:row[2], msg:row[3] })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  return ContentService.createTextOutput(JSON.stringify({ ok:false, error:'not_found' })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function cleanupLinks(){
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName(SHEET_LINKS);
+  if(!sh) return 0;
+  const data = sh.getDataRange().getValues();
+  const now = new Date();
+  let count=0;
+  for(let i=1;i<data.length;i++){
+    const row = data[i];
+    const last = row[6] ? new Date(row[6]) : null;
+    const status = row[8]||'active';
+    if(status==='deleted') continue;
+    if(last){
+      const days = (now - last)/(1000*60*60*24);
+      if(days>90){ sh.getRange(i+1,9).setValue('deleted'); count++; }
+    }
+  }
+  return count;
 }

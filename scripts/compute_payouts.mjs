@@ -123,15 +123,30 @@ async function main(){
   const received = Number(settlement.received_revenue_usd)||0;
   const poolCap = 10000;
   
-  // Bootstrap phase: 6.5% pool (50% of 13%), no actual payouts until month 3
-  const poolPct = isBootstrap ? 0.065 : 0.13;
-  let pool = Math.min(received * poolPct, poolCap);
+  // Always calculate 13% pool
+  const fullPool = Math.min(received * 0.13, poolCap);
   
-  // During bootstrap (months 1-2), track units but set pool to 0 for actual payouts
+  // During bootstrap: split pool 50/50 between users and founder
+  // Users get 50% of pool (6.5% of revenue)
+  // Founder takes 50% of pool (6.5% of revenue) on top of their base 87%
+  let pool = fullPool;
+  let founderPoolShare = 0;
+  
+  if(isBootstrap){
+    pool = fullPool * 0.5; // Users get 50% of 13% = 6.5%
+    founderPoolShare = fullPool * 0.5; // Founder gets other 50%
+    console.log(`\n💰 BOOTSTRAP POOL SPLIT:`);
+    console.log(`   Full 13% Pool: $${fullPool.toFixed(2)}`);
+    console.log(`   User Pool (50%): $${pool.toFixed(2)} (6.5% of revenue)`);
+    console.log(`   Founder Pool (50%): $${founderPoolShare.toFixed(2)} (6.5% of revenue)`);
+    console.log(`   Founder Total: $${(received * 0.87 + founderPoolShare).toFixed(2)} (87% + 6.5% = 93.5%)\n`);
+  }
+  
+  // During bootstrap months 1-2, track units but set user pool to 0 for actual payouts
   if(monthsSinceLaunch < BOOTSTRAP_MONTHS){
-    console.log(`Bootstrap phase active: Pool calculated at ${poolPct*100}% = $${pool.toFixed(2)}`);
-    console.log(`Setting actual payout pool to $0 (units tracked for future reference)`);
-    pool = 0; // No actual distribution during bootstrap
+    console.log(`⚠️  Month ${monthsSinceLaunch}: No user payouts yet (first payout Month ${BOOTSTRAP_MONTHS})`);
+    console.log(`Setting user payout pool to $0 (units tracked for future reference)\n`);
+    pool = 0; // No actual distribution during months 1-2
   }
 
   // Optional wallet mapping
@@ -180,8 +195,25 @@ async function main(){
 
   const finalRows = enforceWalletCapWaterfill(withWalletRows, poolAdjusted, WALLET_CAP_PCT, CREATOR_ADM_CODE);
 
-  writeLedger(tag, finalRows, pool, { totalUnits, received, poolCap, walletCapPct: WALLET_CAP_PCT, creatorRecipient: CREATOR_ADM_CODE||null });
-  console.log(`Ledger for ${tag} written with ${finalRows.length} rows. Pool $${pool.toFixed(2)}.`);
+  const ledgerMeta = {
+    totalUnits,
+    received,
+    poolCap,
+    walletCapPct: WALLET_CAP_PCT,
+    creatorRecipient: CREATOR_ADM_CODE||null,
+    isBootstrap,
+    monthsSinceLaunch,
+    fullPool: isBootstrap ? fullPool : pool,
+    founderPoolShare: isBootstrap ? founderPoolShare : 0,
+    userPool: pool
+  };
+  
+  writeLedger(tag, finalRows, pool, ledgerMeta);
+  console.log(`\n✅ Ledger for ${tag} written with ${finalRows.length} rows.`);
+  console.log(`   User Pool Distributed: $${pool.toFixed(2)}`);
+  if(isBootstrap) console.log(`   Founder Pool Share: $${founderPoolShare.toFixed(2)}`);
+  console.log();
+}
 }
 
 function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){

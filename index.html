@@ -2756,8 +2756,10 @@ function admCap(){
 }
 function admPoolUSD(rev, cap){
   const c = Number(cap)||ADM.pool_cap_base;
-  const poolPct = admGetPoolPercent();
-  return Math.min(c, (Number(rev)||0) * poolPct);
+  // Always allocate 13% to pool
+  const fullPool = Math.min(c, (Number(rev)||0) * 0.13);
+  // During bootstrap, users only get 50% of pool (founder takes other 50%)
+  return admIsBootstrapPhase() ? fullPool * 0.5 : fullPool;
 }
 
 // Bootstrap phase: launched Jan 2026
@@ -2776,12 +2778,13 @@ function admIsBootstrapPhase(){
 }
 
 function admGetPoolPercent(){
-  // Bootstrap phase (months 1-3): 6.5% (50% of 13%)
-  // After bootstrap: 13%
-  return admIsBootstrapPhase() ? 0.065 : 0.13;
+  // Always 13% allocated to pool concept
+  // But users only get 50% during bootstrap (founder takes other 50%)
+  return 0.13;
 }
 
 function admGetPoolPercentDisplay(){
+  // Show user's share of pool
   return admIsBootstrapPhase() ? '6.5' : '13';
 }
 
@@ -2808,8 +2811,9 @@ function admUpdateBootstrapUI(){
       bootstrapNotice.innerHTML = `
         <b>⚠️ Bootstrap Phase (Months 1-3):</b><br>
         • <b>No payouts until Month 3</b> - First payout will occur on ${firstPayoutStr}<br>
-        • <b>Pool capped at 50% (${poolPct}% of revenue)</b> during bootstrap phase (currently Month ${monthNum})<br>
-        • After Month 3, pool increases to full 13% and payouts begin monthly<br>
+        • <b>Users receive 50% of pool (${poolPct}% of revenue)</b> during bootstrap phase (currently Month ${monthNum})<br>
+        • Founder retains other 50% of pool (6.5%) to support infrastructure<br>
+        • After Month 3, users receive full 13% pool and payouts resume monthly<br>
         • This ensures system stability and sustainable long-term payouts
       `;
     }

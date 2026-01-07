@@ -2133,46 +2133,74 @@ function setRail(id){
 const HEAD = ["No signup.", "Fast page.", "Done."];
 const SUB  = ["Choose one, then continue.", "Step 2 loads more.", "Final step. Loop or exit."];
 function renderStepUI(){
-  const h = document.getElementById("headline"); // may not exist on v8 home
-  // home page has d1/d2/d3 etc
-  d1.classList.toggle("on",step>=1); d2.classList.toggle("on",step>=2); d3.classList.toggle("on",step>=3);
-  barFill.style.width = `${(step/3)*100}%`;
-  stepText.textContent = `Step ${step} of 3`;
-  const choiceA = ["Agree","Curious","Continue"];
-  const choiceB = ["Disagree","Skeptical","Loop"];
-  btnChoiceA.textContent = choiceA[step-1];
-  btnChoiceB.textContent = choiceB[step-1];
-  pillStep.textContent = `s=${step}/3`;
+  try {
+    const h = document.getElementById("headline"); // may not exist on v8 home
+    // home page has d1/d2/d3 etc - only if they exist
+    const d1 = document.getElementById("d1");
+    const d2 = document.getElementById("d2");
+    const d3 = document.getElementById("d3");
+    const barFill = document.getElementById("barFill");
+    const stepText = document.getElementById("stepText");
+    const btnChoiceA = document.getElementById("btnChoiceA");
+    const btnChoiceB = document.getElementById("btnChoiceB");
+    
+    if(d1) d1.classList.toggle("on",step>=1);
+    if(d2) d2.classList.toggle("on",step>=2);
+    if(d3) d3.classList.toggle("on",step>=3);
+    if(barFill) barFill.style.width = `${(step/3)*100}%`;
+    if(stepText) stepText.textContent = `Step ${step} of 3`;
+    
+    const choiceA = ["Agree","Curious","Continue"];
+    const choiceB = ["Disagree","Skeptical","Loop"];
+    if(btnChoiceA) btnChoiceA.textContent = choiceA[step-1];
+    if(btnChoiceB) btnChoiceB.textContent = choiceB[step-1];
+    if(pillStep) pillStep.textContent = `s=${step}/3`;
+  } catch(e) {
+    console.warn('[ADMENSION] renderStepUI error:', e);
+  }
 }
 function setUtmContent(val){
   const nu = new URL(location.href);
   nu.searchParams.set("utm_content", val);
   location.href = nu.toString();
 }
-btnChoiceA.onclick = () => { logEvent("choice",{which:"A"}); setUtmContent(`choiceA_s${step}`); };
-btnChoiceB.onclick = () => { logEvent("choice",{which:"B"}); setUtmContent(`choiceB_s${step}`); };
+
 function navStep(nextStep, newSeed=false){
   const nu = new URL(location.href);
   nu.searchParams.set("s", String(nextStep));
   if(newSeed) nu.searchParams.set("seed", String(Date.now()));
   location.href = nu.toString();
 }
-btnNext.onclick = () => { logEvent("next",{}); navStep(step<3?step+1:1,false); };
-btnSeed.onclick = () => { logEvent("new_seed",{}); navStep(1,true); };
-btnCopy.onclick = async () => {
-  const nu = new URL(location.href);
-  nu.searchParams.set("s","1");
-  nu.searchParams.set("seed", String(Date.now()));
-  const keep = new Set(["s","seed","utm_source","utm_medium","utm_campaign","utm_content","utm_term","adm"]);
-  for(const k of Array.from(nu.searchParams.keys())) if(!keep.has(k)) nu.searchParams.delete(k);
-  const link = nu.toString();
-  try{ await navigator.clipboard.writeText(link); alert("Copied ✅"); }catch(e){ prompt("Copy link:", link); }
-  logEvent("copy_link",{link});
-};
+
+// Safely bind button events only if elements exist
+try {
+  const btnChoiceA = document.getElementById("btnChoiceA");
+  const btnChoiceB = document.getElementById("btnChoiceB");
+  const btnNext = document.getElementById("btnNext");
+  const btnSeed = document.getElementById("btnSeed");
+  const btnCopy = document.getElementById("btnCopy");
+  
+  if(btnChoiceA) btnChoiceA.onclick = () => { logEvent("choice",{which:"A"}); setUtmContent(`choiceA_s${step}`); };
+  if(btnChoiceB) btnChoiceB.onclick = () => { logEvent("choice",{which:"B"}); setUtmContent(`choiceB_s${step}`); };
+  if(btnNext) btnNext.onclick = () => { logEvent("next",{}); navStep(step<3?step+1:1,false); };
+  if(btnSeed) btnSeed.onclick = () => { logEvent("new_seed",{}); navStep(1,true); };
+  if(btnCopy) btnCopy.onclick = async () => {
+    const nu = new URL(location.href);
+    nu.searchParams.set("s","1");
+    nu.searchParams.set("seed", String(Date.now()));
+    const keep = new Set(["s","seed","utm_source","utm_medium","utm_campaign","utm_content","utm_term","adm"]);
+    for(const k of Array.from(nu.searchParams.keys())) if(!keep.has(k)) nu.searchParams.delete(k);
+    const link = nu.toString();
+    try{ await navigator.clipboard.writeText(link); alert("Copied ✅"); }catch(e){ prompt("Copy link:", link); }
+    logEvent("copy_link",{link});
+  };
+} catch(e) {
+  console.warn('[ADMENSION] Button binding error:', e);
+}
 
 /* ===== Base pageview ===== */
 logEvent("pageview",{adsShown:"route_marked",score,adm_present:!!adm});
-renderStepUI();
+try { renderStepUI(); } catch(e) { console.warn('[ADMENSION] renderStepUI failed:', e); }
 
 /* ===== Initial page load ===== */
 // Wrap in DOMContentLoaded to ensure DOM is ready

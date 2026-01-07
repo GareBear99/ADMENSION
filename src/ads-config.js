@@ -457,68 +457,11 @@ class AdManager {
       this.refreshOnNavigation();
     });
     
-    // Setup sponsor fallback monitoring
-    if (AD_CONFIG.sponsorFallback.enabled) {
-      this.setupSponsorFallback();
-    }
+    // Note: Sponsor fallback handled by Universal Ads (admension-ads.js) and index.html sponsor system
+    // Removed setupSponsorFallback() to prevent duplicate tracking
   }
   
-  setupSponsorFallback() {
-    console.log('[AdManager] Setting up sponsor fallback for side rails');
-    
-    // Check if sponsor boxes are empty/hidden, show ads if so
-    const checkSponsors = () => {
-      const sideLeftSponsor = document.getElementById('sideLeftWrap');
-      const sideRightSponsor = document.getElementById('sideRightWrap');
-      
-      // Check if sponsor content exists
-      const hasActiveSponsors = this.checkActiveSponsorContent();
-      
-      if (!hasActiveSponsors) {
-        // No sponsors active, show ad fallback
-        if (sideLeftSponsor) {
-          const adSlot = sideLeftSponsor.querySelector('[id^="ad-"]');
-          if (adSlot && !adSlot.dataset.sponsorFallbackLoaded) {
-            const unitId = 'side-left';
-            if (AD_UNITS[unitId] && !this.loadedUnits.has(unitId)) {
-              console.log('[AdManager] Loading sponsor fallback ad:', unitId);
-              this.loadAdUnit(unitId);
-              adSlot.dataset.sponsorFallbackLoaded = 'true';
-            }
-          }
-        }
-        
-        if (sideRightSponsor) {
-          const adSlot = sideRightSponsor.querySelector('[id^="ad-"]');
-          if (adSlot && !adSlot.dataset.sponsorFallbackLoaded) {
-            const unitId = 'side-right';
-            if (AD_UNITS[unitId] && !this.loadedUnits.has(unitId)) {
-              console.log('[AdManager] Loading sponsor fallback ad:', unitId);
-              this.loadAdUnit(unitId);
-              adSlot.dataset.sponsorFallbackLoaded = 'true';
-            }
-          }
-        }
-      }
-    };
-    
-    // Check on page load and periodically
-    checkSponsors();
-    setInterval(checkSponsors, AD_CONFIG.sponsorFallback.checkInterval);
-  }
-  
-  checkActiveSponsorContent() {
-    // Check if there's actual sponsor content rendered
-    try {
-      const sponsorTitle = document.getElementById('anchorTitle');
-      if (sponsorTitle && sponsorTitle.textContent.includes('Sponsored')) {
-        return true; // Sponsors are active
-      }
-      return false; // No active sponsors, use ad fallback
-    } catch (e) {
-      return false;
-    }
-  }
+  // Sponsor fallback removed - handled by Universal Ads system to prevent conflicts
   
   loadInitialAds() {
     console.log('[AdManager] Loading initial ads');

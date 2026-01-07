@@ -521,7 +521,6 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
   <div class="topbarInner">
     <div class="brand">
       ◼ CFAMM + ADMENSION <span class="badge" id="bVer">v1.2 Advanced Publisher Stack</span>
-      <span class="badge">Admin PIN 979899</span>
     </div>
     <nav class="nav" id="nav">
       <a href="#home" data-page="home">Home</a>
@@ -529,7 +528,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
       <a href="#create" data-page="create">Create</a>
       <a href="#manage" data-page="manage">Manage</a>
       <a href="#docs" data-page="docs">Docs</a>
-      <a href="#admin" data-page="admin">Admin</a>
+      <a href="#admin" data-page="admin" id="adminNavLink">🔒 Admin</a>
       <a href="#" onclick="captureFullPageScreenshot(); return false;" style="background: rgba(34,211,238,.15); border-color: rgba(34,211,238,.4);">📸 Screenshot</a>
     </nav>
   </div>
@@ -1931,6 +1930,8 @@ function adminUnlockFlow(){
   adminUnlocked = true;
   const st = document.getElementById("adminStatus");
   if(st) st.textContent = "unlocked";
+  const navLink = document.getElementById("adminNavLink");
+  if(navLink) navLink.innerHTML = "🔓 Admin";
   return true;
 }
 
@@ -1987,13 +1988,11 @@ function logEvent(type, payload){
   }
 }
 function markAd(slot){
-  // Legacy tracking (keep for backwards compatibility)
-  ads.push({ t: Date.now(), slot, step, device, utm, adm, page: currentPage() });
-  localStorage.setItem(K.ads, JSON.stringify(ads));
-  
-  // New validated tracking
+  // Single tracking point: Use AD_VALIDATOR if available, otherwise legacy tracking
+  // This prevents double-counting with AdManager's viewability tracking
   if (window.ADMENSION_AD_VALIDATOR) {
-    const imp = window.ADMENSION_AD_VALIDATOR.logAd(
+    // Centralized validated tracking (preferred)
+    window.ADMENSION_AD_VALIDATOR.logAd(
       slot,
       currentPage(),
       sid,
@@ -2001,10 +2000,14 @@ function markAd(slot){
       utm,
       ref
     );
-    // lightweight ad_request event for backend rollups
+    // Notify collector (single event)
     if(window.ADMENSION_COLLECTOR){
       try{ window.ADMENSION_COLLECTOR.ad_request({ sid_hash: sid.slice(0,8), slot, page: currentPage(), device }); }catch(e){}
     }
+  } else {
+    // Fallback: legacy local storage tracking only if validator not loaded
+    ads.push({ t: Date.now(), slot, step, device, utm, adm, page: currentPage() });
+    localStorage.setItem(K.ads, JSON.stringify(ads));
   }
 }
 function computeScore(){

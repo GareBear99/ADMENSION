@@ -75,8 +75,20 @@
     
     /**
      * Track ad impression (only if attributed)
+     * NOTE: For index.html integration, markAd() in index.html handles tracking
+     * via ADMENSION_AD_VALIDATOR to prevent double-counting.
+     * This trackImpression() is for standalone Universal Ads deployments.
      */
     trackImpression: function(placement, adType) {
+      // Check if centralized tracking system exists (index.html integration)
+      if (typeof markAd === 'function') {
+        // Delegate to centralized tracking in index.html (prevents double-counting)
+        console.log('[ADMENSION_ADS] Delegating tracking to centralized markAd():', placement);
+        markAd(placement);
+        return;
+      }
+      
+      // Standalone mode: track directly to collector
       const code = this.getAdmCode();
       if (!code) {
         console.log('[ADMENSION] No attribution - impression not pooled');

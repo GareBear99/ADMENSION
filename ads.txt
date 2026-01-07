@@ -1,0 +1,50 @@
+# ads.txt for ADMENSION
+# This file declares authorized sellers for your ad inventory
+# Deploy to root: https://yourdomain.com/ads.txt
+# Verify at: https://adstxt.guru/
+
+# ==============================================
+# WEEK 2: AFTER ADSENSE APPROVAL (REPLACE BELOW)
+# ==============================================
+
+# Google AdSense (PRIMARY - Week 2)
+# INSTRUCTION: After AdSense approval, replace XXXXXXXXXXXXXXXX with your 16-digit publisher ID
+# Example: google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0
+google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+
+# Google Ad Exchange (AdX) - If approved
+google.com, pub-XXXXXXXXXXXXXXXX, RESELLER, f08c47fec0942fa0
+
+# Index Exchange - After approval
+indexexchange.com, XXXXX, RESELLER, 50b1c356f2c5c8fc
+
+# OpenX - After approval
+openx.com, XXXXX, RESELLER, 6a698e2ec38604c6
+
+# Sovrn
+sovrn.com, XXXXX, RESELLER, fafdf38b16bf6b2b
+lijit.com, XXXXX, RESELLER, fafdf38b16bf6b2b
+
+# PubMatic
+pubmatic.com, XXXXX, RESELLER, 5d62403b186f2ace
+
+# 33Across
+33across.com, XXXXX, RESELLER, bbea06d9c4d2853c
+
+# Amazon (A9/TAM) - If approved
+amazon-adsystem.com, XXXXX, RESELLER
+
+# Magnite (Rubicon Project) - Premium tier
+rubiconproject.com, XXXXX, RESELLER, 0bfd66d529a55807
+
+# Xandr (AppNexus) - Premium tier  
+appnexus.com, XXXXX, RESELLER, f5ab79cb980f11d1
+xandr.com, XXXXX, RESELLER, f5ab79cb980f11d1
+
+# Instructions:
+# 1. Get approved by Google AdSense first
+# 2. Replace pub-XXXXXXXXXXXXXXXX with your actual AdSense publisher ID
+# 3. As you add more ad networks, get their publisher IDs and add lines here
+# 4. Deploy this file to your domain root
+# 5. Verify at https://adstxt.guru/ after deployment
+# 6. Wait 24-48 hours for ad networks to crawl and verify

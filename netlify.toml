@@ -1,0 +1,117 @@
+# Netlify Configuration for ADMENSION
+# Optimized for ad serving, SEO, and performance
+
+[build]
+  publish = "."
+  command = "echo 'Static site - no build required'"
+
+# Redirect rules
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/create"
+  to = "/create.html"
+  status = 200
+
+[[redirects]]
+  from = "/manage"
+  to = "/manage.html"
+  status = 200
+
+[[redirects]]
+  from = "/stats"
+  to = "/stats.html"
+  status = 200
+
+[[redirects]]
+  from = "/docs"
+  to = "/docs.html"
+  status = 200
+
+# Headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # CORS for ads
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    
+    # Cache control for HTML (don't cache - always fresh)
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# JavaScript files (cache for 1 year with content hash)
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "application/javascript; charset=utf-8"
+
+# CSS files (cache for 1 year)
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ads.txt must be served as plain text
+[[headers]]
+  for = "/ads.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+
+# Images
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# PDF documentation
+[[headers]]
+  for = "/*.pdf"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+    Content-Type = "application/pdf"
+
+# Disable caching for admin pages (sensitive)
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    Cache-Control = "private, no-cache, no-store, must-revalidate"
+    X-Robots-Tag = "noindex, nofollow"
+
+# Plugin configuration for speed optimization
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  
+  [plugins.inputs]
+    output_path = "lighthouse_reports"
+
+# Environment variables (set these in Netlify dashboard)
+# ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"
+# CONTEXT = "production"
+
+# Dev server settings
+[dev]
+  command = "python3 -m http.server 8888"
+  port = 8888
+  publish = "."
+  autoLaunch = true

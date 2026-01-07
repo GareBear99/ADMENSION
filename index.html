@@ -1,0 +1,3523 @@
+
+<!-- v1.6 Readiness:
+- Demand stacking ready: primary network + secondary fallback slots
+- Header bidding: integrate managed wrapper only after stable traffic (50-100 DAU)
+- Engagement gating: unlock secondary placements after Step 2
+- Viewability-first: avoid timers, refresh only on navigation
+-->
+
+<ul class="micro-proof">
+<li>✔ No signup, no accounts, no email</li>
+<li>✔ Ads only load on user intent (policy-safe)</li>
+<li>✔ Payouts are post-revenue only (no promises)</li>
+<li>✔ Works even at very low traffic</li>
+</ul>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta id="robotsMeta" name="robots" content="index,follow">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CFAMM + ADMENSION</title>
+<meta id="metaDesc" name="description" content="Single-file ad base + stats tracker + ADMENSION link creator." />
+<style>
+:root{
+  --bg:#0b0a10;--text:rgba(255,255,255,.92);--muted:rgba(255,255,255,.66);
+  --faint:rgba(255,255,255,.45);--line:rgba(255,255,255,.12);
+  --card:rgba(255,255,255,.06);--accent:#a855f7;--accent2:#22d3ee;--danger:#ef4444;--ok:#22c55e;--warn:#f59e0b;
+  --radius:18px;--shadow:0 18px 60px rgba(0,0,0,.55);--max:1100px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  --font:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:var(--font);color:var(--text);
+  background:
+    radial-gradient(950px 560px at 18% -10%, rgba(168,85,247,.22), transparent 60%),
+    radial-gradient(760px 520px at 90% 10%, rgba(34,211,238,.16), transparent 55%),
+    var(--bg);
+  padding-bottom:122px;
+}
+a{color:rgba(255,255,255,.9)}
+.wrap{max-width:var(--max);margin:0 auto;padding:12px 12px 78px}
+.card{border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+/* Topbar */
+.topbar{
+  position:sticky;top:0;z-index:999;
+  padding:10px 0 12px;
+  background:linear-gradient(to bottom, rgba(11,10,16,.94), rgba(11,10,16,.20));
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.topbarInner{max-width:var(--max);margin:0 auto;padding:0 12px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.brand{font-weight:950;display:flex;gap:10px;align-items:center}
+.badge{font-family:var(--mono);font-size:11px;border:1px solid rgba(255,255,255,.14);padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.75)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.nav a{
+  text-decoration:none;
+  font-weight:900;
+  font-size:12px;
+  padding:9px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);
+  color:rgba(255,255,255,.80);
+}
+.nav a.active{border-color:rgba(168,85,247,.6);background:rgba(168,85,247,.22);color:rgba(255,255,255,.92)}
+.pills{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
+h1{margin:0 0 6px;font-size:clamp(24px,3.1vw,40px)}
+h2{margin:0 0 10px;font-size:18px}
+.sub{margin:0 0 10px;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);padding:11px 14px;border-radius:14px;cursor:pointer;font-weight:950}
+.btn.primary{border-color:rgba(168,85,247,.6);background:rgba(168,85,247,.22)}
+.btn.danger{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.14)}
+.btn.good{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.12)}
+.mini{font-size:12px;color:var(--faint)}
+.divider{height:1px;background:rgba(255,255,255,.08);margin:10px 0}
+.stack{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:12px}
+.col-12{grid-column:span 12}.col-8{grid-column:span 8}.col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-3{grid-column:span 3}
+@media(max-width:980px){.col-8,.col-6,.col-4,.col-3{grid-column:span 12}.topbarInner{flex-direction:column;align-items:flex-start}.nav{justify-content:flex-start}}
+.kpi{display:flex;flex-direction:column;gap:6px}
+.kpi b{font-size:22px}
+.code{font-family:var(--mono)}
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th,.table td{border-bottom:1px solid rgba(255,255,255,.10);padding:8px 6px;text-align:left;color:rgba(255,255,255,.85)}
+.table th{color:rgba(255,255,255,.65);font-weight:950}
+.progress{display:flex;gap:6px;align-items:center;margin:8px 0}
+.dot{width:10px;height:10px;border-radius:999px;border:1px solid rgba(255,255,255,.18)}
+.dot.on{background:rgba(168,85,247,.55);border-color:rgba(168,85,247,.75)}
+.bar{flex:1;height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.barFill{height:100%;width:0%;background:rgba(34,211,238,.35)}
+input,select,textarea{background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--text);padding:10px;border-radius:12px;width:100%}
+textarea{min-height:120px}
+/* Ad placeholders */
+.ad{border:1px dashed rgba(255,255,255,.20);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.45);background:rgba(255,255,255,.03)}
+.ad.tall{min-height:260px}
+.adLabel{font-family:var(--mono);font-size:12px;opacity:.9}
+/* Sticky anchor */
+.anchor{position:fixed;left:0;right:0;bottom:0;z-index:9999; padding:10px 10px 12px;
+  background:linear-gradient(to top, rgba(11,10,16,.92), rgba(11,10,16,.55));backdrop-filter:blur(10px);
+  border-top:1px solid rgba(255,255,255,.10)}
+.anchorInner{max-width:var(--max);margin:0 auto;display:flex;gap:10px;align-items:center}
+.anchorLeft{flex:1}
+.anchorTitle{font-size:12px;font-weight:950}
+.anchorMeta{font-size:11px;color:var(--faint);font-family:var(--mono)}
+.anchorAd{flex:2}
+canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radius:12px;background:rgba(255,255,255,.02)}
+.notice{border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px;background:rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px}
+.goodNote{border-color:rgba(34,197,94,.35)}
+.warnNote{border-color:rgba(245,158,11,.35)}
+/* Page wrapper */
+.page{display:none}
+.page.active{display:block}
+
+/* ===== Support Button (bottom-left) ===== */
+.supportFab{
+  position: fixed;
+  left: 14px;
+  bottom: 14px;
+  z-index: 99999;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.supportFab .btn{
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.modalOverlay{
+  position: fixed; inset:0;
+  background: rgba(0,0,0,.55);
+  z-index: 100000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+}
+.modalOverlay.open{ display:flex; }
+.modal{
+  width: min(860px, 100%);
+  max-height: min(86vh, 820px);
+  overflow:auto;
+  border-radius: 16px;
+  background: rgba(20,20,26,.92);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 18px 60px rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+}
+.modalHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  padding: 16px 16px 0 16px;
+}
+.modalHeader h2{ margin:0; }
+.modalBody{ padding: 12px 16px 16px 16px; }
+.videoBox{
+  border-radius: 14px;
+  overflow:hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+}
+.videoMeta{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  font-size: 12px;
+}
+.smallRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.donateGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+@media(max-width: 760px){
+  .donateGrid{ grid-template-columns: 1fr; }
+}
+.addrBox{
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+
+/* ===== v12 Progress Bars (Pool Cap) ===== */
+.progressWrap{
+  margin-top:10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  padding: 10px 12px;
+}
+.progressTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.progressBar{
+  height: 12px;
+  border-radius: 999px;
+  overflow:hidden;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.10);
+  margin-top:8px;
+}
+.progressFill{
+  height:100%;
+  width:0%;
+  background: rgba(110,255,180,.75);
+}
+
+/* ===== v12 Support Button (bottom-left) ===== */
+.supportFab{
+  position: fixed;
+  left: 14px;
+  bottom: 14px;
+  z-index: 99999;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.supportFab .btn{
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.modalOverlay{
+  position: fixed; inset:0;
+  background: rgba(0,0,0,.55);
+  z-index: 100000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+}
+.modalOverlay.open{ display:flex; }
+.modal{
+  width: min(860px, 100%);
+  max-height: min(86vh, 820px);
+  overflow:auto;
+  border-radius: 16px;
+  background: rgba(20,20,26,.92);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 18px 60px rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+}
+.modalHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  padding: 16px 16px 0 16px;
+}
+.modalHeader h2{ margin:0; }
+.modalBody{ padding: 12px 16px 16px 16px; }
+.videoBox{
+  border-radius: 14px;
+  overflow:hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+}
+.videoMeta{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  font-size: 12px;
+}
+.smallRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.donateGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+@media(max-width: 760px){
+  .donateGrid{ grid-template-columns: 1fr; }
+}
+.addrBox{
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+
+/* ===== Sponsor Side Stickies (hideable) ===== */
+.sideSponsorWrap{position:fixed;top:120px;z-index:9998;max-width:260px;width:240px;pointer-events:auto}
+.sideSponsorWrap.left{left:14px}
+.sideSponsorWrap.right{right:14px}
+.sideSponsorWrap .ad{min-height:160px}
+.sideSponsorWrap .sideHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sideSponsorWrap .sideHead .mini{opacity:.85}
+.sideSponsorWrap .sideClose{border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.35);color:rgba(255,255,255,.85);border-radius:10px;padding:4px 8px;cursor:pointer}
+.sideSponsorTab{position:fixed;top:160px;z-index:9998;pointer-events:auto}
+.sideSponsorTab.left{left:8px}
+.sideSponsorTab.right{right:8px}
+.sideSponsorTab button{border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.35);color:rgba(255,255,255,.85);border-radius:999px;padding:8px 10px;cursor:pointer}
+@media(max-width:1100px){
+  .sideSponsorWrap,.sideSponsorTab{display:none !important;}
+}
+
+
+
+/* ===== Side Sponsored Stickies ===== */
+.sideSticky{
+  position:fixed;
+  top:104px;
+  width:200px;
+  z-index:9999;
+  border:1px solid rgba(255,255,255,0.10);
+  background:rgba(12,12,16,0.86);
+  backdrop-filter: blur(10px);
+  border-radius:14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  overflow:hidden;
+}
+.sideLeft{ left:16px; }
+.sideRight{ right:16px; }
+.sideHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 10px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.sideTitle{ font-size:12px; opacity:0.9; }
+.sideHide{
+  border:none;
+  background:rgba(255,255,255,0.07);
+  color:#fff;
+  width:26px;height:26px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.sideBody{
+  padding:10px;
+  min-height:110px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.sideBody .adLabel{ text-align:center; opacity:0.95; }
+.sideTab{
+  position:fixed;
+  top:140px;
+  z-index:9999;
+}
+.sideTabLeft{ left:10px; }
+.sideTabRight{ right:10px; }
+.sideShow{
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(12,12,16,0.78);
+  color:#fff;
+  padding:10px 12px;
+  border-radius:14px;
+  cursor:pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+}
+/* Hide side stickies on small screens */
+@media (max-width: 720px){
+  .sideSticky,.sideTab{ display:none !important; }
+}
+/* ===== /Side Sponsored Stickies ===== */
+
+
+/* ===== Floating Action Buttons ===== */
+.fab{
+  position:fixed;
+  bottom:18px;
+  z-index:9999;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(12,12,16,0.80);
+  color:#fff;
+  padding:10px 14px;
+  border-radius:16px;
+  cursor:pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  font-weight:600;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.fab .fabDot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,0.65);
+  box-shadow: 0 0 14px rgba(255,255,255,0.35);
+}
+.fab:active{ transform: translateY(1px); }
+.fab-eve{
+  right:18px;
+}
+/* Push up above sticky anchor ad if present */
+.hasStickyAnchor .fab{ bottom:64px; }
+/* Mobile safety: keep visible but small */
+@media (max-width: 520px){
+  .fab{ padding:9px 12px; font-size:12px; }
+}
+/* ===== /Floating Action Buttons ===== */
+
+
+/* ===== RPM Optimization Layer (v1.1) ===== */
+.reveal{ opacity:0; transform: translateY(4px); transition: opacity .35s ease, transform .35s ease; }
+.reveal.on{ opacity:1; transform: translateY(0); }
+.softLock{ pointer-events:none; opacity:.72; }
+.tooltipPill{
+  display:inline-flex; align-items:center; gap:8px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(12,12,16,0.55);
+  padding:8px 10px;
+  border-radius:14px;
+}
+/* ===== /RPM Optimization Layer ===== */
+
+/* ===== ADV_PUB_STACK v1.2 ===== */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+.pillRow{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.pill{padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(12,12,16,.45)}
+.kpi{font-size:28px;font-weight:800}
+.kpiSub{opacity:.82;font-size:12px;margin-top:2px}
+.hr{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+/* ===== /ADV_PUB_STACK v1.2 ===== */
+</style>
+
+<script>
+(function(){
+  const K = {
+    pv:'cfamm_pv', ses:'cfamm_sessions', steps:'cfamm_steps', ads:'cfamm_ads',
+    byDay:'cfamm_byDay'
+  };
+  const nowDay = new Date().toISOString().slice(0,10);
+  const inc=(k,n=1)=>localStorage.setItem(k,(+localStorage.getItem(k)||0)+n);
+  const byDay = JSON.parse(localStorage.getItem(K.byDay)||'{}');
+  byDay[nowDay]=byDay[nowDay]||{pv:0,ads:0};
+  // pageview on load
+  inc(K.pv,1); byDay[nowDay].pv++;
+  localStorage.setItem(K.byDay, JSON.stringify(byDay));
+  // session
+  if(!sessionStorage.getItem('cfamm_s')){ inc(K.ses,1); sessionStorage.setItem('cfamm_s','1'); }
+  // simple ad-intent counter
+  document.addEventListener('click',e=>{
+    if(e.target.closest('.ad')){ inc(K.ads,1); byDay[nowDay].ads++; localStorage.setItem(K.byDay, JSON.stringify(byDay)); }
+  });
+
+  // Context skins (high-intent)
+  const skins={
+    default:{name:'Default',keywords:['tools','docs']},
+    tax:{name:'Tax & Compliance',keywords:['tax','payroll','compliance','CRA','IRS']},
+    security:{name:'Security & Privacy',keywords:['vpn','security','encryption','privacy']}
+  };
+  const skin = localStorage.getItem('cfamm_skin')||'default';
+  document.documentElement.setAttribute('data-skin', skin);
+
+  // Geo-tier stub (replace later)
+  const geoTier = localStorage.getItem('cfamm_geo')||'T1';
+  document.documentElement.setAttribute('data-geo', geoTier);
+})();
+</script>
+
+<!-- ADMENSION Revenue System -->
+<script src="src/consent.js"></script>
+<script src="src/ads-config.js"></script>
+<script src="src/engagement-system.js"></script>
+<script src="src/anti-abuse-system.js"></script>
+<script src="src/daily-quotes.js"></script>
+
+</head>
+<body>
+
+<!-- =========================
+  AD NETWORK SCRIPT HERE
+  Paste ONLY scripts/markup your ad provider gives you.
+  Do NOT auto-refresh ads or incentivize clicks.
+========================= -->
+
+<header class="topbar">
+  <div class="topbarInner">
+    <div class="brand">
+      ◼ CFAMM + ADMENSION <span class="badge" id="bVer">v1.2 Advanced Publisher Stack</span>
+      <span class="badge">Admin PIN 979899</span>
+    </div>
+    <nav class="nav" id="nav">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#stats" data-page="stats">Stats</a>
+      <a href="#create" data-page="create">Create</a>
+      <a href="#manage" data-page="manage">Manage</a>
+      <a href="#docs" data-page="docs">Docs</a>
+      <a href="#admin" data-page="admin">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="pills" style="margin-bottom:10px">
+    <span class="pill" id="pillPage">page=—</span>
+    <span class="pill" id="pillStep">s=1/3</span>
+    <span class="pill" id="pillDev">dev=—</span>
+    <span class="pill" id="pillPv">pv=—</span>
+    <span class="pill" id="pillAds">adsShown=—</span>
+    <span class="pill" id="pillScore">score=—</span>
+    <span class="pill" id="pillAdm">adm=—</span>
+  </div>
+
+  <!-- ===== PAGE: HOME ===== -->
+  <section class="page" id="page-home">
+    <div class="card">
+      
+<h1>The Only Link Shortener That Pays You — Automatically</h1>
+<p class="sub">
+No signup. No dashboard. No referrals.  
+Share a link → people browse → ads run → revenue is pooled and distributed.
+This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</b>.
+</p>
+<div class="notice goodNote">
+<b>How it works (30 seconds):</b><br>
+1) Share your link.<br>
+2) Visitors naturally browse (no timers, no tricks).<br>
+3) Ads earn money.<br>
+4) A fixed % is pooled and distributed transparently.<br>
+<b>No revenue = no payout.</b> Simple and honest.
+</div>
+
+      <!-- Daily Motivational Quote (365 quotes + 27 rotating GIFs) -->
+      <div id="dailyQuoteContainer"></div>
+
+      <p class="sub">This is the "ad base" landing flow + ADMENSION creator system in one file.</p>
+
+      <!-- Eye-Catching Revenue Dashboard -->
+      <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%); border: 2px solid rgba(102, 126, 234, 0.3); margin-bottom: 16px;">
+        <h2 style="margin-top: 0; color: #667eea; font-size: 24px;">🎯 Live Revenue Tracking</h2>
+        <div class="grid2" style="margin-top: 12px;">
+          <div class="card" style="background: rgba(12, 12, 16, 0.6); border: 1px solid rgba(102, 126, 234, 0.3);">
+            <div class="kpiSub" style="color: #667eea;">Current Session RPM</div>
+            <div class="kpi" id="liveRPM" style="color: #00ff88; font-size: 36px;">$0.00</div>
+            <div class="mini" style="opacity: 0.85; margin-top: 4px;">Updates as you browse • Target: $20+ RPM</div>
+            <div class="progressBar" style="margin-top: 8px; height: 8px; border-radius: 4px;">
+              <div class="progressFill" id="rpmProgressFill" style="background: linear-gradient(90deg, #667eea 0%, #00ff88 100%);"></div>
+            </div>
+            <div class="mini" style="margin-top: 4px; opacity: 0.75;"><span id="rpmProgress">0</span>% to $20 goal</div>
+          </div>
+          <div class="card" style="background: rgba(12, 12, 16, 0.6); border: 1px solid rgba(118, 75, 162, 0.3);">
+            <div class="kpiSub" style="color: #764ba2;">Estimated Daily Revenue</div>
+            <div class="kpi" id="dailyRev" style="color: #ffd700; font-size: 36px;">$0.00</div>
+            <div class="mini" style="opacity: 0.85; margin-top: 4px;">At current traffic • 1.2 sessions/user/day</div>
+            <div class="pillRow" style="margin-top: 8px; gap: 6px;">
+              <div class="pill" style="font-size: 11px;">100 DAU: <b id="rev100">$0</b></div>
+              <div class="pill" style="font-size: 11px;">1K DAU: <b id="rev1k">$0</b></div>
+              <div class="pill" style="font-size: 11px;">10K DAU: <b id="rev10k">$0</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progressWrap" id="homePoolWrap">
+        <div class="progressTop">
+          <div>
+            <b>💰 This Month: ADMENSION Pool Cap</b>
+            <div class="mini">Estimated pool = min($10K cap, projected_month_revenue × 13%)</div>
+            <div id="rpmHint" class="small" style="opacity:.88;margin-top:6px;">Step <span id="stepOf">1</span> of 3 • Session depth boosts RPM (no refresh timers)</div>
+          </div>
+          <div class="badge" id="homePoolBadge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 700;">$0 / $10,000</div>
+        </div>
+        <div class="progressBar" style="height: 24px; border-radius: 12px; background: rgba(12, 12, 16, 0.8);">
+          <div class="progressFill" id="homePoolFill" style="background: linear-gradient(90deg, #667eea 0%, #00ff88 50%, #ffd700 100%); border-radius: 12px; transition: width 0.5s ease;"></div>
+        </div>
+        <div class="mini" style="margin-top:8px; padding: 8px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
+          📊 <b>Payouts are proportional:</b> <span class="code">your_payout = pool × (your_units / total_units)</span>
+        </div>
+      </div>
+
+      <div class="notice">
+        <b>Policy-safe revenue maximization:</b> more ads ≠ more money. This layout maximizes viewability and PV/session using navigation + step-gating.
+      </div>
+      <div class="stack">
+        <div class="card col-12"><div id="ad-top-banner" class="ad-container" style="min-height: 90px;"></div></div>
+        <div class="card col-8">
+          <h2>3-step flow</h2>
+          <p class="sub">Use the buttons below to cycle steps (creates controlled PV/session without auto-refresh).</p>
+          <div class="progress">
+            <div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+            <div class="bar"><div class="barFill" id="barFill"></div></div>
+            <span class="mini" id="stepText">Step 1 of 3</span>
+          </div>
+          <div class="row" id="choiceRow">
+            <button class="btn primary" id="btnChoiceA">Option A</button>
+            <button class="btn" id="btnChoiceB">Option B</button>
+            <span class="mini code" id="choiceHint">labels utm_content</span>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn primary" id="btnNext">Next</button>
+            <button class="btn" id="btnSeed">New Seed</button>
+            <button class="btn" id="btnCopy">Copy Share Link</button>
+          </div>
+          <div class="divider"></div>
+          <div class="notice warnNote">
+            <b>Reminder:</b> Do not add timer-based refresh. Only refresh ads on user intent (page/nav/step).
+          </div>
+        </div>
+        <div class="card col-4" id="homeRail">
+          <div id="ad-rail-right" class="ad-container" style="min-height: 600px;"></div>
+          <p class="mini">Hidden on mobile automatically.</p>
+        </div>
+        <div class="card col-12"><div id="ad-in-content-tall" class="ad-container" style="min-height: 600px;"></div></div>
+        <div class="card col-12"><div id="ad-footer-banner" class="ad-container" style="min-height: 90px;"></div></div>
+      </div>
+    </div>
+  
+      <div class="card" style="margin-top:12px" id="homeLastMonthCard">
+        <h3 style="margin-top:0">Last month summary (latest settlement)</h3>
+        <div class="mini">Entered by admin after ad networks settle.</div>
+        <table class="table" style="margin-top:8px">
+          <tr><th>Metric</th><th>Value</th></tr>
+          <tr><td>Last month received revenue</td><td><b id="home_last_rev">—</b></td></tr>
+          <tr><td>Last month ADMENSION pool paid</td><td><b id="home_last_pool">—</b></td></tr>
+          <tr><td>Total units counted</td><td><b id="home_last_units">—</b></td></tr>
+          <tr><td>Payout per 1,000 units</td><td><b id="home_last_perk">—</b></td></tr>
+        </table>
+      </div>
+
+
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>After Step 3: Explore (optional)</h2>
+  <div class="small" style="opacity:.9;margin-top:-6px">Optional routes that extend session depth without timers or incentives.</div>
+  <div class="pillRow" style="margin-top:10px">
+    <a href="#stats" id="apsExploreA" class="pill">View transparency stats</a>
+    <a href="#docs" id="apsExploreB" class="pill">Read how ads are processed</a>
+    <a href="#create" id="apsExploreC" class="pill">Start another run</a>
+  </div>
+</div>
+</section>
+
+  <!-- ===== PAGE: STATS ===== -->
+  <section class="page" id="page-stats">
+<div class="card col-12" style="margin-top:14px">
+  <h2>Publisher Diagnostics (Ad-only)</h2>
+  <div class="small" style="opacity:.9;margin-top:-6px">These metrics identify funnel leaks, session depth, and geo mix. Local-only estimates.</div>
+  <div class="hr"></div>
+  <div class="grid2">
+    <div class="pill"><div class="kpi" id="kConv12">0.0%</div><div class="kpiSub">Step 1 → Step 2 conversion</div></div>
+    <div class="pill"><div class="kpi" id="kConv23">0.0%</div><div class="kpiSub">Step 2 → Step 3 conversion</div></div>
+    <div class="pill"><div class="kpi" id="kPPS">0.00</div><div class="kpiSub">Pages per session (PV / sessions)</div></div>
+    <div class="pill"><div class="kpi" id="kRPM2">$0.00</div><div class="kpiSub">Estimated Session RPM (weighted)</div><div class="small" id="statRPMExplain2" style="opacity:.82;margin-top:6px">Estimated. Not a guarantee.</div></div>
+  </div>
+  <div class="pillRow">
+    <div class="pill mono" id="kTierMix">T1 0 • T2 0 • T3 0</div>
+    <div class="pill mono" id="kDurBins">&lt;60: 0 • 60-120: 0 • 120-240: 0 • 240-360: 0 • 360+: 0</div>
+  </div>
+</div>
+
+
+    <section class="card">
+      <h1>Stats</h1>
+      <p class="sub">Saved locally. Time-framed. Exportable. Multi-source comparable (UTM).</p>
+      <div class="card" style="margin-top:12px">
+        <h2 style="margin-top:0">Estimated this month profit (projection)</h2>
+        <div class="notice">
+          These are estimates for <b>this month</b>. Real payouts are only known after settlement.
+        </div>
+        <table class="table" style="margin-top:8px">
+          <tr><th>Metric</th><th>Value</th><th>Notes</th></tr>
+          <tr><td>Projected month revenue</td><td><b id="k_proj_rev">—</b></td><td>Admin input</td></tr>
+          <tr><td>Estimated pool this month</td><td><b id="k_proj_pool">—</b></td><td>13% of projected revenue, capped</td></tr>
+          <tr><td>Current cap</td><td><b id="k_cap">—</b></td><td>$10k until 3 monthly summaries exist, then $100k</td></tr>
+        </table>
+      </div>
+
+      <div class="notice goodNote" style="margin-top:10px">
+        <b>Pool payout (quick):</b> pool is <b>13%</b> of received revenue this month, capped at <b>$10,000</b>.
+        Your payout is your percentage of units:
+        <span class="code">your_payout = pool × (your_units / total_units)</span>.
+      </div>
+
+      <div class="notice goodNote" style="margin-top:10px">
+        <b>ADMENSION pool payout (quick):</b> <span class="code">pool = received_revenue × 0.13</span> and your payout is your percent of units:
+        <span class="code">your_payout = pool × (your_units/total_units)</span>. This page also shows conservative projections for planning.
+      </div>
+
+
+      <div class="stack">
+        <div class="card col-12"><div id="ad-stats-banner" class="ad-container" style="min-height: 90px;"></div></div>
+        <div class="card col-4 kpi"><span class="mini">ADMENSION Pool %</span><b>13%</b><span class="mini">fixed (post-revenue)</span></div>
+        <div class="card col-4 kpi"><span class="mini">Sponsored Active (now)</span><b id="k_sp_active">—</b></div>
+        <div class="card col-4 kpi"><span class="mini">Sponsored Scheduled (90d)</span><b id="k_sp_sched">—</b></div>
+
+        <div class="card col-12">
+          <h2>Conservative projections (planning only)</h2>
+          <div class="notice">
+            Assumptions (conservative): <span class="code">150 pageviews/day</span>, <span class="code">90% sticky visibility</span>, rounded down.
+            These are <b>not guarantees</b>. ADMENSION distributions use revenue actually received.
+          </div>
+          <table class="table" style="margin-top:8px">
+            <tr><th>Item</th><th>Value</th><th>How computed</th></tr>
+            <tr><td>Sticky impressions per 72h sponsor</td><td><b id="k_sp_imps">—</b></td><td>150 × 3 days × 0.90</td></tr>
+            <tr><td>Effective CPM (example tier)</td><td><b id="k_sp_ecpm">—</b></td><td>(Price ÷ Impressions) × 1000</td></tr>
+            <tr><td>ADMENSION pool from sponsored (example)</td><td><b id="k_sp_pool">—</b></td><td>SponsoredReceived × 0.13</td></tr>
+          </table>
+          <div class="mini" style="margin-top:6px">
+            Example tier price used here is editable in Admin “Sponsor Pricing” (local) to keep projections consistent.
+          </div>
+        </div>
+
+
+        <div class="card col-3 kpi"><span class="mini">Sessions (24h)</span><b id="k_sessions_24">—</b></div>
+        <div class="card col-3 kpi"><span class="mini">Pageviews (24h)</span><b id="k_pv_24">—</b></div>
+        <div class="card col-3 kpi"><span class="mini">Ads Shown (24h)</span><b id="k_ads_24">—</b></div>
+        <div class="card col-3 kpi"><span class="mini">Avg Ads / PV (24h)</span><b id="k_apv_24">—</b></div>
+
+        <div class="card col-3 kpi"><span class="mini">Sessions (7d)</span><b id="k_sessions_7">—</b></div>
+        <div class="card col-3 kpi"><span class="mini">Pageviews (7d)</span><b id="k_pv_7">—</b></div>
+        <div class="card col-3 kpi"><span class="mini">Ads Shown (7d)</span><b id="k_ads_7">—</b></div>
+        <div class="card col-3 kpi"><span class="mini">Avg PV / Session (7d)</span><b id="k_pvps_7">—</b></div>
+
+        <div class="card col-4 kpi"><span class="mini">Desktop Share (7d)</span><b id="k_desktop">—</b></div>
+        <div class="card col-4 kpi"><span class="mini">Step 3 Reach (7d)</span><b id="k_step3">—</b></div>
+        <div class="card col-4 kpi"><span class="mini">Top UTM Source (7d)</span><b id="k_topsrc">—</b></div>
+
+        <div class="card col-12" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border: 1px solid rgba(102, 126, 234, 0.3); margin-top: 12px;">
+          <h2 style="color: #667eea; margin-top: 0;">🎯 Engagement Tracking (Advanced)</h2>
+          <div class="mini" style="margin-bottom: 12px;">User profiling, geo tracking, and session quality metrics from engagement-system.js</div>
+          <div class="grid2">
+            <div class="pill"><div class="kpi" id="eng_tier" style="color: #00ff88;">—</div><div class="kpiSub">User Engagement Tier</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">NEW (0.8×) → ENGAGED (1.0×) → RETAINED (1.3×) → POWER (1.6×)</div></div>
+            <div class="pill"><div class="kpi" id="eng_multiplier" style="color: #ffd700;">—</div><div class="kpiSub">RPM Multiplier</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">Based on session count & retention</div></div>
+            <div class="pill"><div class="kpi" id="eng_geo" style="color: #667eea;">—</div><div class="kpiSub">IP Geo Location</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">Via ipapi.co with 24h cache</div></div>
+            <div class="pill"><div class="kpi" id="eng_quality" style="color: #a855f7;">—</div><div class="kpiSub">Session Quality Score</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">0-100 based on depth & dwell time</div></div>
+          </div>
+          <div class="pillRow" style="margin-top: 10px;">
+            <div class="pill">Bounce Rate: <b id="eng_bounce">—</b></div>
+            <div class="pill" style="opacity: 0.85;">Page value multipliers active (home: 1.0×, stats: 1.4×, create: 1.8×, manage: 1.5×, admin: 2.0×)</div>
+          </div>
+        </div>
+
+        <div class="card col-12" style="background: linear-gradient(135deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 136, 0, 0.1) 100%); border: 1px solid rgba(255, 68, 68, 0.3); margin-top: 12px;">
+          <h2 style="color: #ff4444; margin-top: 0;">🛡️ Anti-Abuse & Fraud Prevention</h2>
+          <div class="mini" style="margin-bottom: 12px;">Policy-safe tracking with IVT detection, refresh limits, and bot signature analysis</div>
+          <div class="grid2">
+            <div class="pill"><div class="kpi" id="abuse_ivt" style="color: #ffd700;">—</div><div class="kpiSub">Invalid Traffic (IVT) Score</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">0-30: low risk | 30-70: medium | 70+: high risk (flagged)</div></div>
+            <div class="pill"><div class="kpi" id="abuse_refreshes" style="color: #667eea;">—</div><div class="kpiSub">Session Refresh Count</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">Max 10 per session (policy-safe limit)</div></div>
+            <div class="pill"><div class="kpi" id="abuse_flags" style="color: #ff8800;">—</div><div class="kpiSub">Abuse Flags</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">Rapid refresh, excessive views, suspicious patterns</div></div>
+            <div class="pill"><div class="kpi" id="abuse_health" style="color: #00ff88;">—</div><div class="kpiSub">System Health</div><div class="mini" style="opacity: 0.8; margin-top: 4px;">✅ Healthy | ⚠️ Issues detected</div></div>
+          </div>
+          <div class="pillRow" style="margin-top: 10px;">
+            <div class="pill" style="opacity: 0.85;">Stagnation refresh: 5-7 min random (policy-safe)</div>
+            <div class="pill" style="opacity: 0.85;">Viewability: 50%+ visible for 1+ second (Google standard)</div>
+            <div class="pill" style="opacity: 0.85;">Auto-detects: bots, headless browsers, rapid refresh abuse</div>
+          </div>
+        </div>
+
+        <div class="card col-12">
+          <h2>Last 14 days (pageviews)</h2>
+          <canvas id="spark" width="900" height="120"></canvas>
+          <p class="mini">Local-only trend.</p>
+        </div>
+
+        <div class="card col-12">
+          <h2>Source leaderboard (7d)</h2>
+          <table class="table" id="srcTable">
+            <thead>
+              <tr><th>utm_source</th><th>pv</th><th>sessions</th><th>pv/session</th><th>step3%</th><th>desktop%</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="card col-12"><div id="ad-stats-tall" class="ad-container" style="min-height: 600px;"></div></div>
+
+        <div class="card col-4" id="statsRail">
+          <div id="ad-stats-rail" class="ad-container" data-placement="rail" data-page="stats" style="min-height: 600px;"></div>
+          <p class="mini">Desktop rail - hidden on mobile</p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="row">
+        <button class="btn" id="btnExport">Export Logs</button>
+        <label class="btn" style="cursor:pointer">
+          Import Logs
+          <input type="file" id="fileImport" accept="application/json" style="display:none" />
+        </label>
+      
+        <div class="card col-12">
+          <h2>Estimated this month projections (conservative)</h2>
+          <div class="notice">
+            Planning only. Uses conservative defaults and never overrides revenue actually received.
+          </div>
+          <table class="table" style="margin-top:8px">
+            <tr><th>Metric</th><th>Value</th><th>Assumption</th></tr>
+            <tr><td>Projected sponsored slots sold / month</td><td><b id="k_m_slots">—</b></td><td>Admin input (default 10)</td></tr>
+            <tr><td>Projected sponsored revenue / month</td><td><b id="k_m_sp_rev">—</b></td><td>slots × sponsor price</td></tr>
+            <tr><td>Monthly ADMENSION pool (capped)</td><td><b id="k_m_pool">—</b></td><td>min($10k, received × 13%)</td></tr>
+          </table>
+
+          <div class="progressWrap" id="statsPoolWrap">
+            <div class="progressTop">
+              <div>
+                <b>Monthly pool progress</b>
+                <div class="mini">Cap is $10,000 per month.</div>
+              </div>
+              <div class="badge" id="statsPoolBadge">$0 / $10,000</div>
+            </div>
+            <div class="progressBar"><div class="progressFill" id="statsPoolFill"></div></div>
+          </div>
+        </div>
+</div>
+    
+        <div class="card col-12" id="statsLastMonthCard">
+          <h2>Last month summary (latest settlement)</h2>
+          <div class="mini">Admin-entered after settlement (post-revenue only).</div>
+          <table class="table" style="margin-top:8px">
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Last month received revenue</td><td><b id="k_last_rev">—</b></td></tr>
+            <tr><td>Last month ADMENSION pool paid</td><td><b id="k_last_pool">—</b></td></tr>
+            <tr><td>Total units counted</td><td><b id="k_last_units">—</b></td></tr>
+            <tr><td>Payout per 1,000 units</td><td><b id="k_last_perk">—</b></td></tr>
+          </table>
+        </div>
+
+
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>Estimated Session RPM (Ad-only)</h2>
+  <div class="small" id="statRPMExplain" style="opacity:.9;margin-top:-6px">Estimated from logged ad-intent count and conservative CPM. Not a guarantee.</div>
+  <div style="display:flex;align-items:baseline;gap:10px;margin-top:10px">
+    <div style="font-size:30px;font-weight:800" id="statRPM">$0.00</div>
+    <div class="small" style="opacity:.8">per 1,000 sessions</div>
+  </div>
+  <div class="small" style="opacity:.85;margin-top:10px">
+    This number improves when users complete steps (more viewable placements per session) and when Tier-1 traffic increases.
+  </div>
+</div>
+</section>
+  </section>
+
+  <!-- ===== PAGE: CREATE ===== -->
+  <section class="page" id="page-create">
+    <section class="card">
+      <h1>Create (ADMENSION)</h1>
+      <p class="sub">Make a tracked creator link. Wallet address is optional now — set it later.</p>
+      <div class="notice goodNote" style="margin-top:10px">
+        <b>Payout reminder:</b> 13% of received revenue goes into the ADMENSION pool. You get your percentage share based on your contribution units vs everyone.
+        No revenue received = no pool.
+      </div>
+
+
+      <div class="stack">
+        <div class="card col-12"><div id="ad-create-banner" class="ad-container" style="min-height: 90px;"></div></div>
+
+        <div class="card col-8">
+          <h2>Create ADMENSION Link</h2>
+          <div class="stack">
+            <div class="col-6">
+              <label class="mini">Payout Network</label>
+              <select id="admChain">
+                <option value="TRON">TRON (recommended)</option>
+                <option value="ETH">Ethereum</option>
+                <option value="BTC">Bitcoin</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="mini">Wallet Address (optional)</label>
+              <input id="admAddr" placeholder="TRON / ETH / BTC address (optional)" />
+            </div>
+            <div class="col-12 row" style="margin-top:6px">
+              <button class="btn primary" id="admCreate">Create Link</button>
+              <button class="btn" id="admCopy">Copy Link</button>
+              <span class="badge" id="admOut">—</span>
+            </div>
+          </div>
+
+          <div class="notice warnNote" id="admWarn" style="display:none;margin-top:10px">
+            <b>Heads up:</b> You created a link with no wallet address. That’s fine — but you must set a payout address before settlement, or you won’t be paid for that month.
+          </div>
+
+          <hr />
+
+          <h2>Network fees (simple)</h2>
+          <table class="table">
+            <tr><th>Network</th><th>Typical Fee</th><th>Speed</th><th>Best for</th></tr>
+            <tr><td><b>TRON</b></td><td>$0.00–$0.05</td><td>Seconds</td><td>Small / monthly payouts</td></tr>
+            <tr><td>Ethereum</td><td>$3–$25+</td><td>Minutes</td><td>Large payouts only</td></tr>
+            <tr><td>Bitcoin</td><td>$1–$10</td><td>10–60 min</td><td>Infrequent payouts</td></tr>
+          </table>
+
+          <div class="notice goodNote" style="margin-top:10px">
+            <b>Fees are charged by the network, not ADMENSION.</b><br/>
+            If your payout is small and fees are large, the network can eat most/all of it. TRON is best for low-frequency payouts.
+          </div>
+        </div>
+
+        <div class="card col-4" id="createRail">
+          <div id="ad-create-rail" class="ad-container" style="min-height: 600px;"></div>
+          <p class="mini">Hidden on mobile automatically.</p>
+        </div>
+
+        <div class="card col-12"><div id="ad-create-tall" class="ad-container" style="min-height: 600px;"></div></div>
+        <div class="card col-12"><div id="ad-create-footer" class="ad-container" style="min-height: 90px;"></div></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ===== PAGE: MANAGE ===== -->
+  <section class="page" id="page-manage">
+    <section class="card">
+      <h1>Manage (ADMENSION)</h1>
+      <p class="sub">View recent creator codes saved in this browser and set wallet addresses later.</p>
+
+      <div class="stack">
+        <div class="card col-12"><div id="ad-manage-banner" class="ad-container" style="min-height: 90px;"></div></div>
+
+        <div class="card col-8">
+          <h2>Recent links (local)</h2>
+          <div class="notice" id="admList">—</div>
+          <div class="divider"></div>
+          <h2>Update a wallet address</h2>
+          <div class="stack">
+            <div class="col-6">
+              <label class="mini">ADM Code</label>
+              <input id="admCodeUpdate" placeholder="e.g. R7K2M9" />
+            </div>
+            <div class="col-6">
+              <label class="mini">Wallet Address</label>
+              <input id="admAddrUpdate" placeholder="Paste address" />
+            </div>
+            <div class="col-12 row" style="margin-top:6px">
+              <button class="btn good" id="admSaveAddr">Save Address</button>
+              <button class="btn" id="admCopyLink">Copy Link for Code</button>
+            </div>
+          </div>
+
+          <div class="notice warnNote" style="margin-top:10px">
+            Wallet addresses are stored locally (this browser) until you add a real backend.
+          </div>
+        </div>
+
+        <div class="card col-4" id="manageRail">
+          <div id="ad-manage-rail" class="ad-container" style="min-height: 600px;"></div>
+        </div>
+
+        <div class="card col-12"><div id="ad-manage-tall" class="ad-container" style="min-height: 600px;"></div></div>
+
+        <div class="card col-12"><div id="ad-manage-footer" class="ad-container" data-placement="footer" data-page="manage" style="min-height: 90px;"></div></div>
+      </div>
+    </section>
+  </section>
+
+  
+  <!-- ===== PAGE: DOCS ===== -->
+  <section class="page" id="page-docs">
+    <section class="card">
+      <h1>Docs</h1>
+      <p class="sub"><b>Read this once.</b> If you understand this page, you understand the entire system.</p>
+
+      <div class="stack">
+        <div class="card col-12"><div id="ad-docs-banner" class="ad-container" style="min-height: 90px;"></div></div>
+
+        <div class="card col-8" id="docsMain">
+          <h2>1) How payouts actually work (no bullshit)</h2>
+          <div class="notice goodNote">
+            <b>Pool size:</b> <b>13%</b> of revenue the site has <b>already received</b> (post-revenue only).<br/>
+            <b>Your payout:</b> your contribution percent of total contribution units.<br/><br/>
+            <b>Formula:</b><br/>
+            <span class="code">pool = received_revenue × 0.13</span><br/>
+            <span class="code">your_share = your_units ÷ total_units</span><br/>
+            <span class="code">your_payout = pool × your_share</span><br/><br/>
+            <b>Example:</b> If the pool is $100 and you contributed 2% of all units, you receive $2 (minus network fees).<br/>
+            <b>If revenue received is $0 → pool is $0 → payout is $0.</b>
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>2) What counts as “contribution units”?</h2>
+          <div class="notice">
+            In v1 (this single-file build), the site tracks pageviews, steps reached, and other engagement signals to generate
+            contribution units. Units are <b>not dollars</b>. Units are used to compute your percentage share.
+            <br/><br/>
+            <b>Important:</b> In a real production backend, units would be computed server-side from verified traffic and anti-fraud checks.
+            This static v1 is a logic + UI baseline.
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>3) Sponsored sticky (72-hour) — how it works</h2>
+          <div class="notice">
+            Sponsored placements buy <b>time</b>, not clicks, not guaranteed traffic, not “earnings”.
+            <br/><br/>
+            <b>Rules (hard):</b><br/>
+            • Exactly <b>72 hours</b> (3 days) per sponsor.<br/>
+            • Scheduling is limited to <b>90 days ahead</b> (3 months).<br/>
+            • Up to <b>9 sponsors per 72-hour window</b> (rotation).<br/>
+            • Total maximum scheduled across the 90-day horizon: <b>270</b>.<br/>
+            • Sticky shows <b>1 sponsor at a time</b> (rotates on user intent).<br/>
+            • If no sponsor is active, sticky falls back to a normal ad slot.
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>4) Why TRON is recommended (fees)</h2>
+          <div class="notice goodNote">
+            TRON usually has near-zero fees, making it best for small monthly payouts.
+            Ethereum/Bitcoin fees can eat most/all of small payouts. Fees are charged by the network, not ADMENSION.
+          </div>
+        </div>
+
+        <div class="card col-4" id="docsRail">
+          <div id="ad-docs-rail" class="ad-container" data-placement="rail" data-page="docs" style="min-height: 600px;"></div>
+          <p class="mini">Desktop rail - hidden on mobile</p>
+        </div>
+
+        <div class="card col-12"><div id="ad-docs-tall" class="ad-container" data-placement="tall" data-page="docs" style="min-height: 600px;"></div></div>
+      </div>
+    </section>
+  </section>
+
+  <section class="page" id="page-admin">
+    <section class="card">
+      <h1>Admin</h1>
+      <p class="sub">Local controls, sponsor scheduling, and safety notes. Admin actions require PIN 979899.</p>
+
+      <div class="stack">
+        <div class="card col-12"><div id="ad-admin-banner" class="ad-container" data-placement="banner" data-page="admin" style="min-height: 90px;"></div></div>
+
+        <div class="card col-8" id="adminMain">
+          <div class="divider"></div>
+
+          <h2>Projection + last-month inputs (local)</h2>
+          <div class="notice">
+            Because payouts are not known until the end of the month, the progress bars use <b>projected month revenue</b>.
+            After settlement, fill “Last month summary (latest settlement)” to show real outcomes.
+          </div>
+
+          <div class="stack" style="margin-top:10px">
+            <div class="col-6">
+              <label class="mini">Projected month revenue (USD)</label>
+              <input id="projRevMonth" type="number" min="0" step="1" value="0" />
+              <div class="mini">Planning-only estimate for the current month.</div>
+            </div>
+            <div class="col-6">
+              <label class="mini">Projected sponsored slots sold / month</label>
+              <input id="slotsMonth" type="number" min="0" step="1" value="10" />
+              <div class="mini">Conservative default. Planning only.</div>
+            </div>
+          </div>
+
+          <div class="stack" style="margin-top:10px">
+            <div class="col-6">
+              <label class="mini">Last month received revenue (USD)</label>
+              <input id="lastRev" type="number" min="0" step="1" value="0" />
+            </div>
+            <div class="col-6">
+              <label class="mini">Last month total units counted</label>
+              <input id="lastUnits" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <button class="btn good" id="btnSaveProjLast">Save projection + last-month</button>
+          </div>
+
+          <div class="divider"></div>
+
+          </div>
+
+        <div class="card col-8">
+          <h2>Admin unlock</h2>
+          <div class="notice warnNote">
+            Admin features are locked so random visitors can’t mess with local data.
+            Click <b>Unlock</b> and enter PIN <b>979899</b> to use sponsor controls and reset.
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn primary" id="btnAdminUnlock">Unlock</button>
+            <span class="badge" id="adminStatus">locked</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>Sponsored sticky (72-hour) manager</h2>
+          <div class="notice goodNote">
+            <b>Hard limits:</b> 90 days ahead, 72 hours each, ≤9 per window, ≤270 total scheduled in horizon.
+          </div>
+
+          <div class="stack" style="margin-top:10px">
+            <div class="col-6">
+              <label class="mini">Sponsor title</label>
+              <input id="spTitle" placeholder="Sponsor name" />
+            </div>
+            <div class="col-6">
+              <label class="mini">Sponsor URL</label>
+              <input id="spUrl" placeholder="https://..." />
+            </div>
+            <div class="col-4">
+              <label class="mini">Chain</label>
+              <select id="spChain">
+                <option value="TRON">TRON</option>
+                <option value="ETH">ETH</option>
+                <option value="BTC">BTC</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <label class="mini">Price (USD)</label>
+              <input id="spPrice" type="number" min="0" step="1" value="50" />
+            </div>
+            <div class="col-4">
+              <label class="mini">Start (UTC)</label>
+              <input id="spStart" placeholder="YYYY-MM-DDTHH:MM" />
+            </div>
+            <div class="col-12 row">
+              <button class="btn good" id="spAdd">Add 72h Sponsor (Base / Plus / Premium)</button>
+              <button class="btn" id="spExport">Export Sponsors</button>
+              <label class="btn" style="cursor:pointer">
+                Import Sponsors
+                <input type="file" id="spImport" accept="application/json" style="display:none" />
+              </label>
+            </div>
+          </div>
+
+          <div class="notice" style="margin-top:10px">
+            <b>How start time works:</b> You provide a start time; the system auto-sets end time = start + 72h.
+            Use UTC format to avoid timezone confusion. If blank, it uses “now rounded up to next hour”.
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>Scheduled sponsors (local)</h2>
+          <div class="notice" id="spList">—</div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn danger" id="spClearExpired">Remove expired</button>
+            <button class="btn danger" id="spClearAll">Clear ALL sponsors (PIN)</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>Reset (PIN)</h2>
+          <button class="btn danger" id="btnReset">Reset Stats & Links (PIN)</button>
+          <p class="mini">This clears data for this browser only.</p>
+
+          <div class="divider"></div>
+
+          
+          <div class="divider"></div>
+
+          <h2>Monthly summaries (history)</h2>
+          <div class="notice">
+            Add up to 3+ monthly settlement summaries. Once there are <b>3 saved monthly summaries</b>, the system switches the pool cap to <b>$100,000/month</b> for future projections.
+          </div>
+
+          <div class="stack" style="margin-top:10px">
+            <div class="col-6">
+              <label class="mini">Summary month (YYYY-MM)</label>
+              <input id="sumMonth" type="text" placeholder="2026-01" />
+              <div class="mini">Use the month that just settled.</div>
+            </div>
+            <div class="col-6">
+              <label class="mini">Received revenue (USD)</label>
+              <input id="sumRev" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+
+          <div class="stack" style="margin-top:10px">
+            <div class="col-6">
+              <label class="mini">Total units counted</label>
+              <input id="sumUnits" type="number" min="0" step="1" value="0" />
+            </div>
+            <div class="col-6">
+              <label class="mini">Notes (optional)</label>
+              <input id="sumNote" type="text" placeholder="AdSense paid on..." />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <button class="btn good" id="btnAddSummary">Add/Update summary</button>
+            <button class="btn" id="btnExportSummaries">Export summaries</button>
+            <button class="btn" id="btnImportSummaries">Import summaries</button>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h3 style="margin-top:0">Saved summaries</h3>
+            <div class="mini">Shown newest → oldest.</div>
+            <div id="sumList" class="mini" style="margin-top:8px">—</div>
+          </div>
+<h2>Compliance basics (don’t get banned)</h2>
+          <div class="notice warnNote">
+            • Don’t auto-refresh ads on timers.<br/>
+            • Don’t incentivize clicks or tie “earnings” to ad interaction.<br/>
+            • Refresh/change ad slots only on user intent (route/step).<br/>
+            • Sponsored sticky must be labeled.<br/>
+          </div>
+        </div>
+
+        <div class="card col-4" id="adminRail">
+          <div class="ad tall"><div class="adLabel">ADMIN — Desktop Rail</div></div>
+        </div>
+
+        <div class="card col-12"><div class="ad tall"><div class="adLabel">ADMIN — In-Content Tall</div></div></div>
+      </div>
+    
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>Ad Funnel &amp; Processing (How revenue happens)</h2>
+  <div class="small" style="opacity:.9;margin-top:-6px">
+    This page explains the ad flow in plain language. This is a <b>static</b> single-file build: it shows placeholders and logs user-intent navigation.
+    Real ad revenue is created only when you publish with a real ad provider and follow their policies.
+  </div>
+
+  <h3 style="margin-top:14px">1) The funnel (why the site earns)</h3>
+  <ul class="tight">
+    <li><b>Traffic enters</b> via a share link (UTMs / referrer) or direct visit.</li>
+    <li><b>Users navigate by intent</b> through a short step flow (no timed refresh). Each step is a separate view event.</li>
+    <li><b>Each view exposes ad inventory</b> (banner/rail/in-content + sticky anchor). More legitimate views = more legitimate impressions.</li>
+    <li><b>Stats are logged locally</b> (pageviews, sessions, step reach, device share, ads shown). These help you optimize PV/session.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">2) Ad inventory on the site</h3>
+  <ul class="tight">
+    <li><b>Top Banner</b> — primary above-the-fold placement.</li>
+    <li><b>Desktop Rail</b> — visible on larger screens (hidden on mobile).</li>
+    <li><b>In‑Content (Tall)</b> — mid/late scroll placement.</li>
+    <li><b>Sticky Anchor (bottom)</b> — persistent, always-visible (policy-safe when not outcome-linked and not forcibly gated).</li>
+    <li><b>Side Stickies (optional)</b> — left + right sponsored slots. Hideable by the user; reappear on refresh.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">3) What this build logs vs what an ad network pays</h3>
+  <ul class="tight">
+    <li><b>This build logs:</b> view counts, session count, step flow reach, estimated “ads shown”, top UTM, device share.</li>
+    <li><b>Ad networks pay:</b> based on measurable impressions / viewability / fill rate / geography / advertiser demand.</li>
+    <li><b>Important:</b> this app never claims guaranteed earnings. It shows planning math and transparent counters.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">4) Policy safety (why we avoid refresh spam)</h3>
+  <ul class="tight">
+    <li>No auto-refresh timers. Impressions happen through user intent (navigation/steps).</li>
+    <li>No “watch ads to win” language. Ads are not tied to outcomes.</li>
+    <li>Optional hide controls exist for side placements (user control).</li>
+    <li>Neutral wording: “sponsored” and “disclosed odds / demo mode” style language only.</li>
+  </ul>
+</div>
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>72‑Hour Sponsored Stickies (Paid Rotation)</h2>
+  <div class="small" style="opacity:.9;margin-top:-6px">
+    Sponsors are scheduled in <b>72 hour windows</b>. A window can contain up to <b>9 sponsors</b>. This UI can display up to <b>3 at a time</b> (bottom + left + right),
+    rotating by user navigation (not timers).
+  </div>
+
+  <h3 style="margin-top:14px">How sponsors are selected</h3>
+  <ul class="tight">
+    <li>Only sponsors within their active 72h window are eligible.</li>
+    <li>We pick up to 3 unique active sponsors per view cluster.</li>
+    <li>Rotation changes on user intent (page/step changes), never on time.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">If no sponsors are booked</h3>
+  <ul class="tight">
+    <li>The side stickies fall back to normal ad inventory labels (Desktop Rail / In‑Content Tall) so premium positions still show revenue‑earning placements.</li>
+    <li>The permanent bottom sticky remains available as the anchor placement.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">Sponsor quality rules</h3>
+  <ul class="tight">
+    <li>No malware, scams, or deceptive links.</li>
+    <li>No promise-based wording (“guaranteed payout”, “risk-free”, etc.).</li>
+    <li>Sponsors can be removed if abusive or policy-risky.</li>
+  </ul>
+</div>
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>ADMENSION Pool Math (Transparent, post‑revenue)</h2>
+  <ul class="tight">
+    <li>Users earn <b>participation units</b> during the month (not dollars).</li>
+    <li>After the month closes and ad networks actually pay, you enter the <b>received revenue</b> for settlement.</li>
+    <li><b>33%</b> of net received ad revenue is allocated to the ADMENSION pool (cap applies).</li>
+    <li>User payout is proportional: <code>pool × (your_units / total_units)</code>.</li>
+    <li>Minimum redeem threshold can be enforced (e.g., $20) and payouts are only from money already received.</li>
+  </ul>
+</div>
+
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>RPM Optimization Manual (Ad-only, policy-safe)</h2>
+  <div class="small" style="opacity:.92;margin-top:-6px">
+    This system is designed to maximize <b>legitimate ad revenue</b> via <b>user-intent navigation</b> and <b>high viewability</b>.
+    It does <b>not</b> use auto-refresh timers or incentivized ad interaction.
+  </div>
+
+  <h3 style="margin-top:14px">1) What this site is</h3>
+  <ul class="tight">
+    <li>A step-based pageflow that increases <b>pages per session</b> and <b>time-on-site</b>.</li>
+    <li>Persistent stickies keep ads <b>viewable</b> for longer without popups.</li>
+    <li>Impressions are driven by <b>navigation</b> and <b>step progression</b> — not refresh spam.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">2) Placements (defined once)</h3>
+  <ul class="tight">
+    <li><b>Bottom Sticky Anchor</b> — always visible, stable baseline inventory.</li>
+    <li><b>Side Stickies</b> — persistent on desktop, hideable by the user (state remembered).</li>
+    <li><b>Top Banner</b> — above-the-fold, shown on main routes.</li>
+    <li><b>In-Content Tall</b> — appears after engagement/steps for higher viewability.</li>
+    <li><b>Desktop Rail</b> — desktop-only premium rail inventory.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">3) User-intent impressions (why this is compliant)</h3>
+  <ul class="tight">
+    <li>No timed refreshes or forced reloads.</li>
+    <li>Ad exposure increases only when a user <b>chooses</b> to proceed (route/step).</li>
+    <li>We log ad-intent counts for transparency; real revenue is reported by ad networks.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">4) Progressive reveal (viewability-first)</h3>
+  <ul class="tight">
+    <li>Bottom sticky is immediate.</li>
+    <li>Side stickies appear after first interaction.</li>
+    <li>In-content placements appear after step progression.</li>
+    <li>This improves viewability and reduces banner blindness.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">5) Geo-weighted density</h3>
+  <div class="small" style="opacity:.92">
+    Higher-paying geographies can support more placements without harming RPM. Lower CPM traffic uses a lighter density to keep average RPM higher.
+  </div>
+  <ul class="tight">
+    <li><b>Tier-1</b>: full inventory</li>
+    <li><b>Tier-2</b>: bottom + side + core in-content</li>
+    <li><b>Tier-3</b>: bottom + minimal (no side)</li>
+  </ul>
+
+  <h3 style="margin-top:14px">6) What we explicitly do NOT do</h3>
+  <ul class="tight">
+    <li>No auto-refresh timers</li>
+    <li>No “click ads to continue” gating</li>
+    <li>No incentivized clicks</li>
+    <li>No fake countdowns tied to ads</li>
+  </ul>
+
+  <h3 style="margin-top:14px">7) Stats vs payouts</h3>
+  <ul class="tight">
+    <li><b>Stats page</b> shows logged sessions/PVs/ad-intent for tuning.</li>
+    <li><b>Ad networks</b> determine actual revenue (CPM, fill rate, viewability).</li>
+    <li>ADMENSION pool settlement is computed only after revenue is received.</li>
+  </ul>
+</div>
+
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>Advanced Publisher Controls (v1.3)</h2>
+  <div class="small" style="opacity:.9;margin-top:-6px">Tune density and CPM assumptions by geo tier. Affects rendering + estimates (not a promise).</div>
+  <div class="hr"></div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card" style="padding:12px">
+      <h3 style="margin:0 0 6px 0">Context Skin</h3>
+      <div class="mini">Same engine, different copy/meta for stronger ad context.</div>
+      <label class="mini" style="margin-top:10px">Skin</label>
+      <select id="ctxSkin">
+        <option value="default">Default</option>
+        <option value="tools">Tools / Utilities</option>
+        <option value="ai">AI / Productivity</option>
+        <option value="finance">Finance-adjacent (neutral)</option>
+      </select>
+    </div>
+
+    <div class="card" style="padding:12px">
+      <h3 style="margin:0 0 6px 0">Traffic Tier Simulator</h3>
+      <div class="mini">For testing density rules locally. In production this can be wired to geo signals later.</div>
+      <label class="mini" style="margin-top:10px">Simulated tier</label>
+      <select id="simTier">
+        <option value="tier1">Tier‑1 (Premium)</option>
+        <option value="tier2">Tier‑2 (Balanced)</option>
+        <option value="tier3">Tier‑3 (Light)</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div class="grid2">
+    <div>
+      <h3 style="margin-top:0">Context Skin</h3>
+      <div class="small" style="opacity:.85">Same engine, different copy/meta for stronger ad context.</div>
+      <select id="apsSkinSel" style="width:100%;margin-top:8px">
+        <option value="default">Default</option>
+        <option value="tools">Free Tools Hub</option>
+        <option value="daily">Daily Resources Index</option>
+        <option value="ai">AI Utilities Finder</option>
+      </select>
+    </div>
+    <div>
+      <h3 style="margin-top:0">CPM assumptions (for estimates)</h3>
+      <div class="small" style="opacity:.85">Used only for Stats estimation. Not a guarantee.</div>
+      <div class="pillRow">
+        <div class="pill">Tier-1 CPM: <input id="aps_cpm_1" type="number" step="0.1" min="0.5" style="width:90px;margin-left:6px"></div>
+        <div class="pill">Tier-2 CPM: <input id="aps_cpm_2" type="number" step="0.1" min="0.5" style="width:90px;margin-left:6px"></div>
+        <div class="pill">Tier-3 CPM: <input id="aps_cpm_3" type="number" step="0.1" min="0.5" style="width:90px;margin-left:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+  <h3 style="margin-top:0">Placement Density by Geo Tier</h3>
+  <div class="small" style="opacity:.88">Avoid over-serving low CPM traffic. Toggle what renders per tier.</div>
+
+  <div class="grid2" style="margin-top:10px">
+    <div class="pill">
+      <div style="font-weight:800">Tier-1 (Premium)</div>
+      <label><input id="aps_1_bottom" type="checkbox"> Bottom</label><br>
+      <label><input id="aps_1_side" type="checkbox"> Side</label><br>
+      <label><input id="aps_1_top" type="checkbox"> Top</label><br>
+      <label><input id="aps_1_tall" type="checkbox"> Tall</label><br>
+      <label><input id="aps_1_rail" type="checkbox"> Rail</label>
+    </div>
+    <div class="pill">
+      <div style="font-weight:800">Tier-2 (Balanced)</div>
+      <label><input id="aps_2_bottom" type="checkbox"> Bottom</label><br>
+      <label><input id="aps_2_side" type="checkbox"> Side</label><br>
+      <label><input id="aps_2_top" type="checkbox"> Top</label><br>
+      <label><input id="aps_2_tall" type="checkbox"> Tall</label><br>
+      <label><input id="aps_2_rail" type="checkbox"> Rail</label>
+    </div>
+    <div class="pill">
+      <div style="font-weight:800">Tier-3 (Light)</div>
+      <label><input id="aps_3_bottom" type="checkbox"> Bottom</label><br>
+      <label><input id="aps_3_side" type="checkbox"> Side</label><br>
+      <label><input id="aps_3_top" type="checkbox"> Top</label><br>
+      <label><input id="aps_3_tall" type="checkbox"> Tall</label><br>
+      <label><input id="aps_3_rail" type="checkbox"> Rail</label>
+    </div>
+  </div>
+</div>
+
+
+<div class="card col-12" style="margin-top:14px">
+  <h2>Advanced Publisher Stack (v1.2)</h2>
+  <div class="small" style="opacity:.92;margin-top:-6px">
+    This build adds publisher-grade knobs and diagnostics: funnel conversion, geo-tier density tuning, context skins,
+    duration bins, and placement-weighted RPM estimation — while staying policy-safe (no refresh timers, no incentivized clicks).
+  </div>
+
+  <h3 style="margin-top:14px">Decision rules (stair-climb)</h3>
+  <ul class="tight">
+    <li>If Step 1→2 is &lt; 55%: improve copy/UX before adding inventory.</li>
+    <li>If pages/session is &lt; 2.5: add more optional “Explore” routes (no timers).</li>
+    <li>If Tier-1 share is low: prioritize Tier-1 distribution (CA/US/UK/AU) before tuning CPM.</li>
+    <li>If RPM is flat while sessions rise: add demand (waterfall/header bidding), not more steps.</li>
+    <li>When one domain stabilizes: clone this engine into new context skins on new domains.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">Compliance stance</h3>
+  <ul class="tight">
+    <li>No auto-refresh timers.</li>
+    <li>No “click ads to continue” gating.</li>
+    <li>No incentivized clicking.</li>
+    <li>Users can hide side stickies and the state is remembered.</li>
+  </ul>
+</div>
+</section>
+  </section>
+
+        </div>
+
+        <div class="card col-4" id="adminRail">
+          <div id="ad-admin-rail" class="ad-container" data-placement="rail" data-page="admin" style="min-height: 600px;"></div>
+          <p class="mini">Desktop rail - hidden on mobile</p>
+        </div>
+
+        <div class="card col-12"><div id="ad-admin-tall" class="ad-container" data-placement="tall" data-page="admin" style="min-height: 600px;"></div></div>
+      </div>
+    </section>
+  </section>
+</div>
+
+<!-- Sticky Anchor (always) -->
+<div class="anchor">
+  <div class="anchorInner">
+    <div class="anchorLeft">
+      <div class="anchorTitle" id="anchorTitle">Sponsored · 72-hour feature</div>
+      <div class="anchorMeta" id="anchorMeta">—</div>
+    </div>
+    <div class="anchorAd">
+      <div class="ad" style="min-height:60px" id="stickyBox"><div class="adLabel" id="stickyLabel">Sticky Anchor (default)</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Sponsor Side Stickies (hideable, desktop only) -->
+<div id="sideLeftWrap" class="sideSponsorWrap left" style="display:none">
+  <div class="sideHead">
+    <span class="mini"><b id="sideLeftTitle">Sponsor</b></span>
+    <button class="sideClose" id="sideLeftClose" title="Hide this sponsor">Hide</button>
+  </div>
+  <div class="ad" id="sideLeftBox"><div class="adLabel" id="sideLeftLabel">Sponsored (side)</div></div>
+</div>
+<div id="sideRightWrap" class="sideSponsorWrap right" style="display:none">
+  <div class="sideHead">
+    <span class="mini"><b id="sideRightTitle">Sponsor</b></span>
+    <button class="sideClose" id="sideRightClose" title="Hide this sponsor">Hide</button>
+  </div>
+  <div class="ad" id="sideRightBox"><div class="adLabel" id="sideRightLabel">Sponsored (side)</div></div>
+</div>
+<div id="sideLeftTab" class="sideSponsorTab left" style="display:none">
+  <button id="sideLeftShow">Show sponsor</button>
+</div>
+<div id="sideRightTab" class="sideSponsorTab right" style="display:none">
+  <button id="sideRightShow">Show sponsor</button>
+</div>
+
+<script>
+/* ================= SAFE AD PLAN (per-page) =================
+- Anchor: always (1)
+- Each page: Top Banner + In-content Tall + Desktop Rail (desktop only)
+- Home additionally has multiple creative slots, but do NOT timer-refresh.
+- User intent triggers: route changes (#hash), step changes, copy link.
+=========================================================== */
+
+const CFG = {
+  enableDesktopRails: true,
+};
+
+
+
+// ===== v1.3 Context + Tier enforcement (local) =====
+const CTX_KEY = "cfamm.ctxSkin";
+const TIER_KEY = "cfamm.simTier";
+
+// Simple copy/meta presets (neutral, non-promissory)
+const SKINS = {
+  default: {
+    title: "CFAMM + ADMENSION",
+    desc: "Clickbait-free ad money maker base with safe navigation steps, local stats, and optional sponsor placements."
+  },
+  tools: {
+    title: "CFAMM Tools + ADMENSION",
+    desc: "Simple tools and explainers with a conservative, policy-safe ad layout and optional sponsor placements."
+  },
+  ai: {
+    title: "CFAMM AI Utilities + ADMENSION",
+    desc: "AI and productivity utilities with transparent stats and policy-safe ad placements (no incentives)."
+  },
+  finance: {
+    title: "CFAMM Reference + ADMENSION",
+    desc: "Reference-style pages with transparent projections and policy-safe ads (no promises, no click incentives)."
+  }
+};
+
+function applyContextSkin(skin){
+  const s = SKINS[skin] || SKINS.default;
+  document.title = s.title;
+  const md = document.getElementById("metaDesc");
+  if (md) md.setAttribute("content", s.desc);
+  document.documentElement.setAttribute("data-skin", skin || "default");
+}
+
+// Slot groups: anchor is always allowed; others can be disabled by simulated tier
+function enforceTier(tier){
+  document.documentElement.setAttribute("data-tier", tier || "tier1");
+
+  const hide = (sel, on) => document.querySelectorAll(sel).forEach(el => el.style.display = on ? "none" : "");
+  const isT3 = tier === "tier3";
+  const isT2 = tier === "tier2";
+
+  // Tier‑3: keep bottom + top only (light)
+  hide("#sideLeftWrap, #sideRightWrap, #sideLeftTab, #sideRightTab", isT3);
+  hide(".rail", isT3);
+
+  // Tier‑2: balanced — keep rails, but reduce tall density if present
+  // (We mark extra tall slots with [data-tall='extra'] if/when added)
+  hide("[data-tall='extra']", isT2);
+}
+
+function setRobotsForRoute(){
+  const rm = document.getElementById("robotsMeta");
+  if (!rm) return;
+  const isAdmin = (location.hash || "").toLowerCase().includes("admin");
+  rm.setAttribute("content", isAdmin ? "noindex,nofollow" : "index,follow");
+}
+
+function initSkinAndTierControls(){
+  const skin = localStorage.getItem(CTX_KEY) || "default";
+  const tier = localStorage.getItem(TIER_KEY) || "tier1";
+  applyContextSkin(skin);
+  enforceTier(tier);
+  setRobotsForRoute();
+
+  const selSkin = document.getElementById("ctxSkin");
+  if (selSkin){
+    selSkin.value = skin;
+    selSkin.addEventListener("change", () => {
+      localStorage.setItem(CTX_KEY, selSkin.value);
+      applyContextSkin(selSkin.value);
+    });
+  }
+  const selTier = document.getElementById("simTier");
+  if (selTier){
+    selTier.value = tier;
+    selTier.addEventListener("change", () => {
+      localStorage.setItem(TIER_KEY, selTier.value);
+      enforceTier(selTier.value);
+    });
+  }
+}
+
+// ===== v9 Sponsored Sticky Engine (local v1) =====
+const SP = {
+  key: "cfamm.sponsors",
+  pricing_key: "cfamm.sponsor_pricing_usd",
+  horizon_days: 90,
+  slot_hours: 72,
+  max_per_window: 9,
+  max_total: 270
+};
+function spLoad(){ try{return JSON.parse(localStorage.getItem(SP.key)||"[]");}catch(e){return [];} }
+function spSave(arr){ localStorage.setItem(SP.key, JSON.stringify(arr)); }
+function spNow(){ return Date.now(); }
+function spHorizonMs(){ return SP.horizon_days*24*60*60*1000; }
+function spParseStart(s){
+  // Accept ISO-like "YYYY-MM-DDTHH:MM" (treated as UTC)
+  if(!s) return null;
+  const m = s.trim().match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
+  if(!m) return null;
+  // Create as UTC explicitly
+  const [d,t] = s.split("T");
+  const [Y,M,D] = d.split("-").map(Number);
+  const [hh,mm] = t.split(":").map(Number);
+  return Date.UTC(Y, M-1, D, hh, mm, 0, 0);
+}
+function spRoundUpToNextHour(ts){
+  const ms = 60*60*1000;
+  return Math.ceil(ts/ms)*ms;
+}
+function spWindowKey(startMs){
+  // windows are aligned to sponsor start times, but we enforce capacity by exact start boundary.
+  return String(startMs);
+}
+function spCountInWindow(list, startMs){
+  return list.filter(x=>x.starts_at===startMs).length;
+}
+function spValidateNew(list, startMs){
+  const now = spNow();
+  if(startMs < now - 5*60*1000) return {ok:false, msg:"Start time is in the past."};
+  if(startMs > now + spHorizonMs()) return {ok:false, msg:"Start must be within 90 days."};
+  if(list.length >= SP.max_total) return {ok:false, msg:"Max 270 sponsors already scheduled in 90-day horizon."};
+  const inWin = spCountInWindow(list, startMs);
+  if(inWin >= SP.max_per_window) return {ok:false, msg:"This 72-hour window already has 9 sponsors."};
+  return {ok:true, msg:"ok"};
+}
+function spActive(list){
+  const now = spNow();
+  return list.filter(x=>now >= x.starts_at && now < x.ends_at);
+}
+function spRotatePick(activeList, salt){
+  if(!activeList.length) return null;
+  // stable rotation index using pvTotal + salt
+  const idx = ( (pvTotal||0) + (salt||0) ) % activeList.length;
+  return activeList.slice().sort((a,b)=>a.starts_at-b.starts_at || (a.id||"").localeCompare(b.id||""))[idx];
+}
+
+function spRotatePicks(activeList, salt, n){
+  const list = activeList.slice().sort((a,b)=>a.starts_at-b.starts_at || (a.id||"").localeCompare(b.id||""));
+  const L = list.length;
+  if(!L) return [];
+  const count = Math.max(1, Math.min(n||1, L));
+  const base = (((pvTotal||0) + (salt||0)) % L + L) % L;
+  const out = [];
+  for(let i=0;i<count;i++) out.push(list[(base+i)%L]);
+  return out;
+}
+
+function spFormatUTC(ms){
+  const d = new Date(ms);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth()+1).padStart(2,"0");
+  const da = String(d.getUTCDate()).padStart(2,"0");
+  const hh = String(d.getUTCHours()).padStart(2,"0");
+  const mm = String(d.getUTCMinutes()).padStart(2,"0");
+  return `${y}-${m}-${da} ${hh}:${mm} UTC`;
+}
+function spRenderSticky(){
+  const list = spLoad();
+  const act = spActive(list);
+  const picks = spRotatePicks(act, step, 3);
+  const pick = picks[0] || null;
+  const pickL = picks[1] || null;
+  const pickR = picks[2] || null;
+  const box = document.getElementById("stickyBox");
+  const label = document.getElementById("stickyLabel");
+  const title = document.getElementById("anchorTitle");
+  if(!box || !label || !title) return;
+  if(pick){
+    title.textContent = "Sponsored · 72-hour feature";
+    label.innerHTML = `<div class="adLabel"><b>${escapeHtml(pick.title||"Sponsor")}</b> — click to open</div>`;
+    box.style.cursor = "pointer";
+    box.onclick = ()=>{ window.open(pick.url, "_blank", "noopener"); logEvent("sponsor_click",{id:pick.id, url:pick.url}); };
+    const meta = document.getElementById("anchorMeta");
+    if(meta){
+      meta.textContent = `active • ${spFormatUTC(pick.starts_at)} → ${spFormatUTC(pick.ends_at)} • ${pick.chain||"TRON"} • $${pick.paid_usd||0}`;
+    }
+  }else{
+    title.textContent = "Sticky (default)";
+    label.textContent = "Sticky Anchor (default)";
+    box.style.cursor = "default";
+    box.onclick = null;
+    const meta = document.getElementById("anchorMeta");
+    if(meta){
+      meta.textContent = `sid ${sid.slice(0,8)} • seed ${seed.slice(-6)}`;
+    }
+  }
+  
+  // side sponsors (hideable, no timers; rotates on user intent via pvTotal)
+  let hideL = (localStorage.getItem("cfamm_side_hide_L")==="1");
+  let hideR = (localStorage.getItem("cfamm_side_hide_R")==="1");
+  const wL = document.getElementById("sideLeftWrap");
+  const wR = document.getElementById("sideRightWrap");
+  const tL = document.getElementById("sideLeftTab");
+  const tR = document.getElementById("sideRightTab");
+  const bL = document.getElementById("sideLeftBox");
+  const bR = document.getElementById("sideRightBox");
+  const lL = document.getElementById("sideLeftLabel");
+  const lR = document.getElementById("sideRightLabel");
+  const ttlL = document.getElementById("sideLeftTitle");
+  const ttlR = document.getElementById("sideRightTitle");
+
+  function renderSide(slot, pickSide){
+    const wrap = slot==="L"?wL:wR;
+    const tab = slot==="L"?tL:tR;
+    const boxS = slot==="L"?bL:bR;
+    const labS = slot==="L"?lL:lR;
+    const titleS = slot==="L"?ttlL:ttlR;
+    const hidden = slot==="L"?hideL:hideR;
+
+    if(!wrap || !tab || !boxS || !labS || !titleS) return;
+
+    if(hidden){
+      wrap.style.display = "none";
+      tab.style.display = "block";
+      return;
+    }
+    tab.style.display = "none";
+
+    if(pickSide){
+      wrap.style.display = "block";
+      titleS.textContent = escapeHtml(pickSide.name||"Sponsor");
+      labS.innerHTML = `<div class="adLabel"><b>${escapeHtml(pickSide.title||"Sponsor")}</b> — click to open</div>`;
+      boxS.style.cursor = "pointer";
+      boxS.onclick = ()=>{ window.open(pickSide.url, "_blank", "noopener"); logEvent("sponsor_click",{id:pickSide.id, url:pickSide.url, slot:slot}); };
+    }else{
+      // No active sponsor for this slot: show a normal sidebar ad placeholder (still hideable).
+      // This keeps the layout consistent and "shows what earns" even when no sponsor is booked.
+      wrap.style.display = "block";
+      titleS.textContent = "Sidebar Ad";
+      labS.innerHTML = `<div class="adLabel"><b>Ad Slot (side)</b> — network fill / house</div>`;
+      boxS.style.cursor = "default";
+      boxS.onclick = null;
+    }
+  }
+
+  renderSide("L", pickL);
+  renderSide("R", pickR);
+
+  // expose counts to stats pills
+  try{
+    const actN = act.length;
+    const schedN = list.filter(x=>x.ends_at >= spNow() && x.starts_at <= spNow()+spHorizonMs()).length;
+    const pillAds = document.getElementById("pillAds");
+    if(pillAds) pillAds.textContent = "adsShown=route-based";
+  }catch(e){}
+}
+
+// Admin lock state
+let adminUnlocked = false;
+function adminGuard(){
+  if(adminUnlocked) return true;
+  alert("Admin is locked. Click Unlock and enter PIN 979899.");
+  return false;
+}
+function adminUnlockFlow(){
+  const pin = prompt("Admin PIN:");
+  if(pin===null) return false;
+  if(String(pin).trim() !== "979899"){ alert("Invalid PIN."); return false; }
+  adminUnlocked = true;
+  const st = document.getElementById("adminStatus");
+  if(st) st.textContent = "unlocked";
+  return true;
+}
+
+
+
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+function cid(){const a=new Uint8Array(16);crypto.getRandomValues(a);return Array.from(a).map(x=>x.toString(16).padStart(2,"0")).join("")}
+
+const u = new URL(location.href);
+const p = u.searchParams;
+let step = clamp(parseInt(p.get("s")||"1",10),1,3);
+let seed = p.get("seed") || String(Date.now());
+p.set("s",String(step)); p.set("seed",seed);
+history.replaceState({},'',u.toString());
+
+const adm = p.get("adm") || "";
+const utm = {
+  utm_source: p.get("utm_source")||"",
+  utm_medium: p.get("utm_medium")||"",
+  utm_campaign: p.get("utm_campaign")||"",
+  utm_content: p.get("utm_content")||"",
+  utm_term: p.get("utm_term")||""
+};
+const ref = document.referrer || "";
+const device = matchMedia("(max-width:980px)").matches ? "mobile" : "desktop";
+
+const K = {
+  sessions: "cfamm.sessions",
+  ads: "cfamm.ads",
+  pv_total: "cfamm.pv_total",
+  sid: "cfamm.sid",
+  adm_refs: "admension.refs"
+};
+let sid = localStorage.getItem(K.sid) || cid(); localStorage.setItem(K.sid, sid);
+let pvTotal = parseInt(localStorage.getItem(K.pv_total)||"0",10)+1; localStorage.setItem(K.pv_total, String(pvTotal));
+let sessions = JSON.parse(localStorage.getItem(K.sessions)||"[]");
+let ads = JSON.parse(localStorage.getItem(K.ads)||"[]");
+let admRefs = JSON.parse(localStorage.getItem(K.adm_refs)||"[]");
+
+function logEvent(type, payload){
+  sessions.push({ t: Date.now(), sid, step, device, ref, utm, adm, type, page: currentPage(), payload: payload || {} });
+  localStorage.setItem(K.sessions, JSON.stringify(sessions));
+}
+function markAd(slot){
+  ads.push({ t: Date.now(), slot, step, device, utm, adm, page: currentPage() });
+  localStorage.setItem(K.ads, JSON.stringify(ads));
+}
+function computeScore(){
+  const base = step * 3;
+  const desk = device === "desktop" ? 2 : 0;
+  const content = (step >= 3 ? 2 : (step >= 2 ? 1 : 0));
+  return base + desk + content;
+}
+const score = computeScore();
+
+pillStep.textContent = `s=${step}/3`;
+pillDev.textContent = `dev=${device}`;
+pillPv.textContent = `pv=${pvTotal}`;
+pillScore.textContent = `score=${score}`;
+pillAdm.textContent = `adm=${adm ? adm : "—"}`;
+anchorMeta.textContent = `sid ${sid.slice(0,8)} • seed ${seed.slice(-6)}`;
+
+/* ===== Routing ===== */
+function currentPage(){
+  const h = (location.hash||"#home").replace("#","");
+  return ["home","stats","create","manage","docs","admin"].includes(h) ? h : "home";
+}
+function showPage(name){
+  // v1.3 hard lock: admin page requires PIN
+  if(name==="admin" && !adminUnlocked){
+    setRobotsForRoute();
+    alert("Admin is locked. Use Unlock (PIN 979899).");
+    location.hash = "#home";
+    name = "home";
+  }
+  document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
+  const el = document.getElementById("page-"+name);
+  if(el) el.classList.add("active");
+  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("active", a.dataset.page===name));
+  pillPage.textContent = `page=${name}`;
+  // ad view marks for the route (user intent)
+  markAd("anchor");
+  markAd(`${name}_top_banner`);
+  markAd(`${name}_incontent`);
+  if(device==="desktop" && CFG.enableDesktopRails) markAd(`${name}_desktop_rail`);
+  // route pageview event
+  logEvent("route",{to:name});
+  // engagement system tracking
+  if(window.ADMENSION_ENGAGEMENT) {
+    try {
+      window.ADMENSION_ENGAGEMENT.onPageView(name, step);
+    } catch(e) {
+      console.warn('Engagement tracking error:', e);
+    }
+  }
+  // anti-abuse tracking
+  if(window.ADMENSION_ANTI_ABUSE) {
+    try {
+      window.ADMENSION_ANTI_ABUSE.trackPageView(name);
+    } catch(e) {
+      console.warn('Anti-abuse tracking error:', e);
+    }
+  }
+  // update lists on manage
+  if(name==="manage") renderManageList();
+  // update stats when entering stats
+  if(name==="stats") refreshStatsUI();
+  try{ spRenderSticky(); 
+  setupSideStickyButtons();
+}catch(e){}
+
+  
+  try{ admRender(); }catch(e){}
+try{ admRender(); }catch(e){}
+}
+window.addEventListener("hashchange", ()=>{ setRobotsForRoute(); initSkinAndTierControls();
+showPage(currentPage()); });
+
+/* ===== Desktop rail visibility ===== */
+function setRail(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.display = (device==="desktop" && CFG.enableDesktopRails) ? "block" : "none";
+}
+["homeRail","createRail","manageRail","docsRail","adminRail"].forEach(setRail);
+
+/* ===== Home step UI + actions ===== */
+const HEAD = ["No signup.", "Fast page.", "Done."];
+const SUB  = ["Choose one, then continue.", "Step 2 loads more.", "Final step. Loop or exit."];
+function renderStepUI(){
+  const h = document.getElementById("headline"); // may not exist on v8 home
+  // home page has d1/d2/d3 etc
+  d1.classList.toggle("on",step>=1); d2.classList.toggle("on",step>=2); d3.classList.toggle("on",step>=3);
+  barFill.style.width = `${(step/3)*100}%`;
+  stepText.textContent = `Step ${step} of 3`;
+  const choiceA = ["Agree","Curious","Continue"];
+  const choiceB = ["Disagree","Skeptical","Loop"];
+  btnChoiceA.textContent = choiceA[step-1];
+  btnChoiceB.textContent = choiceB[step-1];
+  pillStep.textContent = `s=${step}/3`;
+}
+function setUtmContent(val){
+  const nu = new URL(location.href);
+  nu.searchParams.set("utm_content", val);
+  location.href = nu.toString();
+}
+btnChoiceA.onclick = () => { logEvent("choice",{which:"A"}); setUtmContent(`choiceA_s${step}`); };
+btnChoiceB.onclick = () => { logEvent("choice",{which:"B"}); setUtmContent(`choiceB_s${step}`); };
+function navStep(nextStep, newSeed=false){
+  const nu = new URL(location.href);
+  nu.searchParams.set("s", String(nextStep));
+  if(newSeed) nu.searchParams.set("seed", String(Date.now()));
+  location.href = nu.toString();
+}
+btnNext.onclick = () => { logEvent("next",{}); navStep(step<3?step+1:1,false); };
+btnSeed.onclick = () => { logEvent("new_seed",{}); navStep(1,true); };
+btnCopy.onclick = async () => {
+  const nu = new URL(location.href);
+  nu.searchParams.set("s","1");
+  nu.searchParams.set("seed", String(Date.now()));
+  const keep = new Set(["s","seed","utm_source","utm_medium","utm_campaign","utm_content","utm_term","adm"]);
+  for(const k of Array.from(nu.searchParams.keys())) if(!keep.has(k)) nu.searchParams.delete(k);
+  const link = nu.toString();
+  try{ await navigator.clipboard.writeText(link); alert("Copied ✅"); }catch(e){ prompt("Copy link:", link); }
+  logEvent("copy_link",{link});
+};
+
+/* ===== Base pageview ===== */
+logEvent("pageview",{adsShown:"route_marked",score,adm_present:!!adm});
+renderStepUI();
+
+/* ===== Stats computations ===== */
+function within(ms){ const cut=Date.now()-ms; return (t)=>t>=cut; }
+function uniqSids(arr){ return new Set(arr.map(x=>x.sid)).size; }
+const DAY=24*60*60*1000, WEEK=7*DAY;
+
+function buildLeaderboard(pv7){
+  const map = {};
+  for(const ev of pv7){
+    const s = (ev.utm?.utm_source)||"(none)";
+    if(!map[s]) map[s] = { pv:0, sessions:new Set(), step3:0, desk:0 };
+    map[s].pv += 1;
+    map[s].sessions.add(ev.sid);
+    if(ev.step===3) map[s].step3 += 1;
+    if(ev.device==="desktop") map[s].desk += 1;
+  }
+  const rows = Object.entries(map).map(([src,a])=>{
+    const sess = a.sessions.size || 1;
+    return { src, pv:a.pv, sessions:a.sessions.size, pvps:a.pv/sess, step3p:100*(a.step3/Math.max(1,a.pv)), deskp:100*(a.desk/Math.max(1,a.pv)) };
+  }).sort((x,y)=> y.pvps - x.pvps);
+  const tb = document.querySelector("#srcTable tbody");
+  if(!tb) return;
+  tb.innerHTML = "";
+  for(const r of rows.slice(0,12)){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(r.src)}</td><td>${r.pv}</td><td>${r.sessions}</td><td>${r.pvps.toFixed(2)}</td><td>${r.step3p.toFixed(0)}%</td><td>${r.deskp.toFixed(0)}%</td>`;
+    tb.appendChild(tr);
+  }
+}
+function drawSpark(sessions){
+  const c = document.getElementById("spark");
+  if(!c) return;
+  const ctx = c.getContext("2d");
+  const days = 14;
+  const now = new Date();
+  const buckets = Array.from({length:days},()=>0);
+  for(const ev of sessions){
+    if(ev.type!=="pageview") continue;
+    const d = new Date(ev.t);
+    const diffDays = Math.floor((now - d) / (24*60*60*1000));
+    if(diffDays>=0 && diffDays<days) buckets[days-1-diffDays]++;
+  }
+  ctx.clearRect(0,0,c.width,c.height);
+  const pad = 12, w = c.width - pad*2, h = c.height - pad*2;
+  const maxV = Math.max(1, ...buckets);
+  ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(pad, pad+h); ctx.lineTo(pad+w, pad+h); ctx.stroke();
+  ctx.strokeStyle = "rgba(34,211,238,.55)"; ctx.lineWidth = 3; ctx.beginPath();
+  buckets.forEach((v,i)=>{
+    const x = pad + (i/(days-1))*w;
+    const y = pad + h - (v/maxV)*h;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.fillStyle = "rgba(168,85,247,.65)";
+  buckets.forEach((v,i)=>{
+    const x = pad + (i/(days-1))*w;
+    const y = pad + h - (v/maxV)*h;
+    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+  });
+}
+function refreshStatsUI(){
+  sessions = JSON.parse(localStorage.getItem(K.sessions)||"[]");
+  ads = JSON.parse(localStorage.getItem(K.ads)||"[]");
+
+  const pv24 = sessions.filter(x=>x.type==="pageview" && within(DAY)(x.t));
+  const pv7  = sessions.filter(x=>x.type==="pageview" && within(WEEK)(x.t));
+  const a24  = ads.filter(x=>within(DAY)(x.t));
+  const a7   = ads.filter(x=>within(WEEK)(x.t));
+
+  const byId = (id)=>document.getElementById(id);
+
+  if(byId("k_sessions_24")) byId("k_sessions_24").textContent = uniqSids(pv24);
+  if(byId("k_pv_24")) byId("k_pv_24").textContent = pv24.length;
+  if(byId("k_ads_24")) byId("k_ads_24").textContent = a24.length;
+  if(byId("k_apv_24")) byId("k_apv_24").textContent = (a24.length/Math.max(1,pv24.length)).toFixed(2);
+
+  if(byId("k_sessions_7")) byId("k_sessions_7").textContent = uniqSids(pv7);
+  if(byId("k_pv_7")) byId("k_pv_7").textContent = pv7.length;
+  if(byId("k_ads_7")) byId("k_ads_7").textContent = a7.length;
+  if(byId("k_pvps_7")) byId("k_pvps_7").textContent = (pv7.length/Math.max(1,uniqSids(pv7))).toFixed(2);
+
+  const pv7desk = pv7.filter(x=>x.device==="desktop").length;
+  if(byId("k_desktop")) byId("k_desktop").textContent = Math.round(100*(pv7desk/Math.max(1,pv7.length))) + "%";
+
+  const pv7step3 = pv7.filter(x=>x.step===3).length;
+  if(byId("k_step3")) byId("k_step3").textContent = Math.round(100*(pv7step3/Math.max(1,pv7.length))) + "%";
+
+  const srcCounts = {};
+  for(const ev of pv7){
+    const s = (ev.utm?.utm_source) ? ev.utm.utm_source : "(none)";
+    srcCounts[s] = (srcCounts[s]||0) + 1;
+  }
+  let topSrc="(none)", topSrcN=0;
+  for(const [k,v] of Object.entries(srcCounts)){ if(v>topSrcN){topSrc=k;topSrcN=v;} }
+  if(byId("k_topsrc")) byId("k_topsrc").textContent = topSrc;
+
+  buildLeaderboard(pv7);
+  drawSpark(sessions);
+  
+  // Engagement system stats display
+  if(window.ADMENSION_ENGAGEMENT) {
+    try {
+      const engStats = window.ADMENSION_ENGAGEMENT.getEngagementStats();
+      const geoData = window.ADMENSION_ENGAGEMENT.getGeoData();
+      const sessionMetrics = window.ADMENSION_ENGAGEMENT.getSessionMetrics();
+      
+      if(byId("eng_tier")) byId("eng_tier").textContent = engStats.tier || "—";
+      if(byId("eng_multiplier")) byId("eng_multiplier").textContent = engStats.rpmMultiplier ? engStats.rpmMultiplier.toFixed(2) + "x" : "—";
+      if(byId("eng_geo")) byId("eng_geo").textContent = geoData.country ? `${geoData.country} (${geoData.geoTier})` : "—";
+      if(byId("eng_quality")) byId("eng_quality").textContent = sessionMetrics.quality ? Math.round(sessionMetrics.quality) : "—";
+      if(byId("eng_bounce")) byId("eng_bounce").textContent = sessionMetrics.bounceRate ? Math.round(sessionMetrics.bounceRate * 100) + "%" : "—";
+    } catch(e) {
+      console.warn('Engagement stats display error:', e);
+    }
+  }
+  // Anti-abuse system stats display
+  if(window.ADMENSION_ANTI_ABUSE) {
+    try {
+      const abuseStats = window.ADMENSION_ANTI_ABUSE.getStats();
+      
+      if(byId("abuse_ivt")) byId("abuse_ivt").textContent = abuseStats.ivtScore.score + " (" + abuseStats.ivtScore.risk + ")";
+      if(byId("abuse_refreshes")) byId("abuse_refreshes").textContent = abuseStats.sessionRefreshes + " / 10";
+      if(byId("abuse_flags")) byId("abuse_flags").textContent = abuseStats.flags.length;
+      if(byId("abuse_health")) {
+        const isHealthy = window.ADMENSION_ANTI_ABUSE.isHealthy();
+        byId("abuse_health").textContent = isHealthy ? "✅ Healthy" : "⚠️ Issues";
+        byId("abuse_health").style.color = isHealthy ? "#00ff88" : "#ff4444";
+      }
+    } catch(e) {
+      console.warn('Anti-abuse stats display error:', e);
+    }
+  }
+}
+
+/* ===== Export / Import (Stats page) ===== */
+const btnExport = document.getElementById("btnExport");
+const fileImport = document.getElementById("fileImport");
+if(btnExport){
+  btnExport.onclick = () => {
+    const blob = new Blob([JSON.stringify({version:"cfamm_admension_v8", exported_at:new Date().toISOString(), sessions, ads, admRefs}, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "cfamm_admension_logs.json";
+    a.click();
+  };
+}
+if(fileImport){
+  fileImport.onchange = async (e) => {
+    const f = e.target.files?.[0]; if(!f) return;
+    const txt = await f.text();
+    try{
+      const obj = JSON.parse(txt);
+      const addS = Array.isArray(obj.sessions) ? obj.sessions : [];
+      const addA = Array.isArray(obj.ads) ? obj.ads : [];
+      const addR = Array.isArray(obj.admRefs) ? obj.admRefs : [];
+      sessions = sessions.concat(addS);
+      ads = ads.concat(addA);
+      admRefs = admRefs.concat(addR);
+      localStorage.setItem(K.sessions, JSON.stringify(sessions));
+      localStorage.setItem(K.ads, JSON.stringify(ads));
+      localStorage.setItem(K.adm_refs, JSON.stringify(admRefs));
+      alert("Imported ✅ (merged). Refreshing…");
+      location.reload();
+    }catch(err){ alert("Import failed: not valid JSON."); }
+  };
+}
+
+/* ===== Admin reset (PIN) ===== */
+const btnReset = document.getElementById("btnReset");
+if(btnReset){
+  btnReset.onclick = () => {
+    const pin = prompt("Admin PIN to reset stats:");
+    if(pin === null) return;
+    if(String(pin).trim() !== "979899"){ alert("Invalid PIN."); return; }
+    if(!confirm("Reset ALL saved stats and ADMENSION links on this browser?")) return;
+    localStorage.removeItem(K.sessions);
+    localStorage.removeItem(K.ads);
+    localStorage.removeItem(K.pv_total);
+    localStorage.removeItem(K.adm_refs);
+    alert("Reset complete.");
+    location.reload();
+  };
+}
+
+/* ===== ADMENSION create ===== */
+const admAddrEl = document.getElementById("admAddr");
+const admChainEl = document.getElementById("admChain");
+const admOutEl = document.getElementById("admOut");
+const admWarnEl = document.getElementById("admWarn");
+function genAdmCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
+function makeAdmLink(code){
+  const nu = new URL(location.href);
+  nu.searchParams.set("adm", code);
+  nu.searchParams.set("s","1");
+  nu.searchParams.set("seed", String(Date.now()));
+  return nu.toString();
+}
+function saveAdmRefs(){ localStorage.setItem(K.adm_refs, JSON.stringify(admRefs)); }
+function renderManageList(){
+  admRefs = JSON.parse(localStorage.getItem(K.adm_refs)||"[]");
+  const box = document.getElementById("admList");
+  if(!box) return;
+  if(!admRefs.length){ box.textContent = "No links yet (in this browser)."; return; }
+  const last = admRefs.slice(-25).reverse().map(r=>{
+    const tag = r.addr ? "addr:set" : "addr:EMPTY";
+    return `${r.code} | ${r.chain} | ${tag} | ${new Date(r.created).toLocaleString()}`;
+  }).join("\n");
+  box.textContent = last;
+}
+const admCreateBtn = document.getElementById("admCreate");
+const admCopyBtn = document.getElementById("admCopy");
+if(admCreateBtn){
+  admCreateBtn.onclick = async () => {
+    const chain = admChainEl.value;
+    const addr = (admAddrEl.value||"").trim();
+    const code = genAdmCode();
+    const rec = { code, chain, addr: addr || "", created: Date.now(), addr_set: !!addr };
+    admRefs.push(rec); saveAdmRefs();
+    const link = makeAdmLink(code);
+    admOutEl.textContent = link;
+    try{ await navigator.clipboard.writeText(link); }catch(e){}
+    logEvent("adm_create",{code, chain, has_addr: !!addr});
+    
+    // Engagement system: validate link and track creation
+    if(window.ADMENSION_ENGAGEMENT) {
+      try {
+        const validation = window.ADMENSION_ENGAGEMENT.validateLink(link);
+        if(!validation.valid) {
+          console.warn('Link validation warnings:', validation.errors);
+        }
+        window.ADMENSION_ENGAGEMENT.onLinkCreated();
+      } catch(e) {
+        console.warn('Link validation error:', e);
+      }
+    }
+    
+    if(!addr){ admWarnEl.style.display="block"; } else { admWarnEl.style.display="none"; }
+    alert("ADMENSION link created ✅ (copied).");
+  };
+}
+if(admCopyBtn){
+  admCopyBtn.onclick = async () => {
+    const link = admOutEl.textContent;
+    if(!link || link==="—"){ alert("Create a link first."); return; }
+    try{ await navigator.clipboard.writeText(link); alert("Copied ✅"); }catch(e){ prompt("Copy link:", link); }
+    logEvent("adm_copy",{link});
+  };
+}
+
+/* ===== ADMENSION manage ===== */
+const admSave = document.getElementById("admSaveAddr");
+const admCopyLinkBtn = document.getElementById("admCopyLink");
+function findRec(code){ return admRefs.find(r=>r.code===String(code||"").trim().toUpperCase()); }
+if(admSave){
+  admSave.onclick = () => {
+    const code = document.getElementById("admCodeUpdate").value.trim().toUpperCase();
+    const addr = document.getElementById("admAddrUpdate").value.trim();
+    if(!code){ alert("Enter an ADM code."); return; }
+    const rec = findRec(code);
+    if(!rec){ alert("Code not found in this browser storage."); return; }
+    rec.addr = addr;
+    rec.addr_set = !!addr;
+    saveAdmRefs();
+    renderManageList();
+    logEvent("adm_set_addr",{code, has_addr:!!addr});
+    alert(addr ? "Saved ✅" : "Address cleared ⚠");
+  };
+}
+if(admCopyLinkBtn){
+  admCopyLinkBtn.onclick = async () => {
+    const code = document.getElementById("admCodeUpdate").value.trim().toUpperCase();
+    if(!code){ alert("Enter an ADM code."); return; }
+    const rec = findRec(code);
+    if(!rec){ alert("Code not found in this browser storage."); return; }
+    const link = makeAdmLink(code);
+    try{ await navigator.clipboard.writeText(link); alert("Copied ✅"); }catch(e){ prompt("Copy link:", link); }
+    logEvent("adm_copy_for_code",{code, link});
+  };
+}
+
+/* ===== Mark baseline ad + show page ===== */
+
+/* ===== Support Modal (30s sponsor clip) ===== */
+(function(){
+  const btn = document.getElementById("btnSupport");
+  const modal = document.getElementById("supportModal");
+  const closeBtn = document.getElementById("btnSupportClose");
+  const startBtn = document.getElementById("btnSupportStart");
+  const shareBtn = document.getElementById("btnSupportShare");
+  const donateBtn = document.getElementById("btnSupportDonate");
+  const donatePanel = document.getElementById("donatePanel");
+  const pill = document.getElementById("supportTimerPill");
+  const video = document.getElementById("supportVideo");
+
+  let timer = null;
+  let remaining = 30;
+
+  function openModal(){
+    if(!modal) return;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+    remaining = 30;
+    if(pill) pill.textContent = "30s clip • ready";
+    if(timer){ clearInterval(timer); timer=null; }
+    logEvent("support_open",{});
+  }
+  function closeModal(){
+    if(!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+    if(timer){ clearInterval(timer); timer=null; }
+    logEvent("support_close",{});
+  }
+
+  function start30(){
+    remaining = 30;
+    if(pill) pill.textContent = "30s clip • running… 30s";
+    if(timer){ clearInterval(timer); timer=null; }
+    // Play if a source is provided
+    try{
+      if(video){
+        // If src is empty, still run timer; user can attach a clip later.
+        video.currentTime = 0;
+        video.play().catch(()=>{});
+      }
+    }catch(e){}
+    timer = setInterval(()=>{
+      remaining -= 1;
+      if(remaining < 0) remaining = 0;
+      if(pill) pill.textContent = `30s clip • running… ${remaining}s`;
+      if(remaining === 0){
+        clearInterval(timer); timer=null;
+        if(pill) pill.textContent = "30s clip • complete ✅";
+        logEvent("support_30s_complete",{});
+      }
+    }, 1000);
+    logEvent("support_30s_start",{});
+  }
+
+  function share(){
+    const url = location.href;
+    const text = `Check this out: ${url} — stats + sponsored slots + ADMENSION pool transparency.`;
+    if(navigator.share){
+      navigator.share({title:"Support", text, url}).catch(()=>{});
+    }else{
+      // fallback: copy to clipboard
+      copyText(text);
+      alert("Share text copied ✅");
+    }
+    logEvent("support_share",{});
+  }
+
+  function toggleDonate(){
+    if(!donatePanel) return;
+    donatePanel.style.display = (donatePanel.style.display==="none" || !donatePanel.style.display) ? "block" : "none";
+    logEvent("support_donate_toggle",{open: donatePanel.style.display==="block"});
+  }
+
+  function copyText(t){
+    try{
+      navigator.clipboard.writeText(t);
+    }catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = t;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+  }
+
+  // Copy buttons for donate/share boxes
+  document.addEventListener("click",(e)=>{
+    const el = e.target;
+    if(!(el instanceof HTMLElement)) return;
+    const sel = el.getAttribute("data-copy");
+    if(sel){
+      const node = document.querySelector(sel);
+      if(node){
+        const text = node.textContent || "";
+        copyText(text.trim());
+        logEvent("support_copy",{target: sel});
+        alert("Copied ✅");
+      }
+    }
+  });
+
+  if(btn) btn.onclick = openModal;
+  if(closeBtn) closeBtn.onclick = closeModal;
+  if(modal) modal.addEventListener("click",(e)=>{ if(e.target===modal) closeModal(); });
+  document.addEventListener("keydown",(e)=>{ if(e.key==="Escape" && modal && modal.classList.contains("open")) closeModal(); });
+
+  if(startBtn) startBtn.onclick = start30;
+  if(shareBtn) shareBtn.onclick = share;
+  if(donateBtn) donateBtn.onclick = toggleDonate;
+})();
+
+/* ===== v9 Admin wiring (sponsors) ===== */
+function spRenderList(){
+  const box = document.getElementById("spList");
+  if(!box) return;
+  const list = spLoad().slice().sort((a,b)=>a.starts_at-b.starts_at);
+  if(!list.length){ box.textContent = "No sponsors scheduled (local)."; return; }
+  const now = spNow();
+  const lines = list.slice(0,120).map(s=>{
+    const st = (now>=s.starts_at && now<s.ends_at) ? "ACTIVE" : (now<s.starts_at ? "SCHEDULED" : "EXPIRED");
+    return `${st} | ${s.id} | ${s.title} | ${s.chain} $${s.paid_usd} | ${spFormatUTC(s.starts_at)} → ${spFormatUTC(s.ends_at)} | ${s.url}`;
+  }).join("\n");
+  box.textContent = lines + (list.length>120 ? `\n… +${list.length-120} more` : "");
+}
+function spStatsExpose(){
+  const list = spLoad();
+  const act = spActive(list);
+  const kA = document.getElementById("k_sp_active");
+  const kS = document.getElementById("k_sp_sched");
+  if(kA) kA.textContent = String(act.length);
+  const sched = list.filter(x=>x.starts_at>=spNow() && x.starts_at<=spNow()+spHorizonMs());
+  if(kS) kS.textContent = String(sched.length);
+
+  // Conservative projections
+  const imps = Math.floor(150 * 3 * 0.90); // 405
+  const price = parseFloat(localStorage.getItem(SP.pricing_key) || "50") || 50;
+  const ecpm = (price / Math.max(1, imps)) * 1000;
+  const kI = document.getElementById("k_sp_imps");
+  const kE = document.getElementById("k_sp_ecpm");
+  const kP = document.getElementById("k_sp_pool");
+  if(kI) kI.textContent = String(imps);
+  if(kE) kE.textContent = `$${ecpm.toFixed(0)} eCPM @ $${price}`;
+  if(kP) kP.textContent = `$${(price*0.13).toFixed(2)} pool/share (per slot, example)`;
+}
+const btnAdminUnlock = document.getElementById("btnAdminUnlock");
+if(btnAdminUnlock){
+  btnAdminUnlock.onclick = ()=>{ adminUnlockFlow(); spRenderList(); spStatsExpose(); };
+}
+const spAdd = document.getElementById("spAdd");
+if(spAdd){
+  spAdd.onclick = ()=>{
+    if(!adminGuard()) return;
+    const list = spLoad();
+    const title = (document.getElementById("spTitle")?.value || "").trim() || "Sponsor";
+    const url = (document.getElementById("spUrl")?.value || "").trim();
+    if(!url || !/^https?:\/\//i.test(url)){ alert("Sponsor URL must start with http(s)://"); return; }
+    const chain = document.getElementById("spChain")?.value || "TRON";
+    const price = parseFloat(document.getElementById("spPrice")?.value || "0") || 0;
+    const startRaw = (document.getElementById("spStart")?.value || "").trim();
+    let startMs = spParseStart(startRaw);
+    if(startMs===null) startMs = spRoundUpToNextHour(spNow());
+    const endMs = startMs + SP.slot_hours*60*60*1000;
+    const v = spValidateNew(list, startMs);
+    if(!v.ok){ alert(v.msg); return; }
+    const id = "SPN-" + String(Math.floor(Math.random()*900000)+100000);
+    list.push({id, title, url, starts_at:startMs, ends_at:endMs, chain, paid_usd:Math.floor(price), created_at:spNow()});
+    spSave(list);
+    localStorage.setItem(SP.pricing_key, String(Math.floor(price)||50));
+    spRenderList();
+    spRenderSticky();
+    spStatsExpose();
+    alert("Sponsor added ✅");
+  };
+}
+const spClearExpired = document.getElementById("spClearExpired");
+if(spClearExpired){
+  spClearExpired.onclick = ()=>{
+    if(!adminGuard()) return;
+    const list = spLoad();
+    const now = spNow();
+    const kept = list.filter(x=>x.ends_at>now);
+    spSave(kept);
+    spRenderList();
+    spRenderSticky();
+    spStatsExpose();
+    alert("Expired sponsors removed ✅");
+  };
+}
+const spClearAll = document.getElementById("spClearAll");
+if(spClearAll){
+  spClearAll.onclick = ()=>{
+    if(!adminGuard()) return;
+    if(!confirm("Clear ALL sponsors from this browser?")) return;
+    spSave([]);
+    spRenderList();
+    spRenderSticky();
+    spStatsExpose();
+    alert("Sponsors cleared ✅");
+  };
+}
+const spExport = document.getElementById("spExport");
+if(spExport){
+  spExport.onclick = ()=>{
+    if(!adminGuard()) return;
+    const blob = new Blob([JSON.stringify({version:"cfamm_admension_v9_sponsors", exported_at:new Date().toISOString(), sponsors: spLoad()}, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "cfamm_sponsors.json";
+    a.click();
+  };
+}
+const spImport = document.getElementById("spImport");
+if(spImport){
+  spImport.onchange = async (e)=>{
+    if(!adminGuard()) return;
+    const f = e.target.files?.[0]; if(!f) return;
+    try{
+      const obj = JSON.parse(await f.text());
+      const add = Array.isArray(obj.sponsors) ? obj.sponsors : [];
+      // basic sanitize + enforce horizon/limits
+      const now = spNow();
+      let list = spLoad();
+      for(const s of add){
+        if(list.length >= SP.max_total) break;
+        if(!s || typeof s !== "object") continue;
+        const starts = Number(s.starts_at||0), ends = Number(s.ends_at||0);
+        if(!(starts>0 && ends>starts)) continue;
+        if(starts > now + spHorizonMs()) continue;
+        if(spCountInWindow(list, starts) >= SP.max_per_window) continue;
+        list.push({
+          id: String(s.id||"SPN-IMP"),
+          title: String(s.title||"Sponsor"),
+          url: String(s.url||""),
+          starts_at: starts,
+          ends_at: ends,
+          chain: String(s.chain||"TRON"),
+          paid_usd: Number(s.paid_usd||0),
+          created_at: Number(s.created_at||now)
+        });
+      }
+      spSave(list);
+      spRenderList();
+      spRenderSticky();
+      spStatsExpose();
+      alert("Sponsors imported ✅ (filtered by limits).");
+    }catch(err){
+      alert("Sponsor import failed: invalid JSON.");
+    }
+  };
+}
+
+
+markAd("anchor");
+pillAds.textContent = "adsShown=route-based";
+refreshStatsUI();
+showPage(currentPage());
+try{ spRenderSticky(); }catch(e){}
+
+
+  
+  try{ admRender(); }catch(e){}
+try{ admRender(); }catch(e){}
+try{ renderPoolBars(); }catch(e){}
+
+
+/* ===== v14 Projections + 3-month milestone cap switch ===== */
+const ADM = {
+  pool_cap_base: 10000,
+  pool_cap_after3: 100000,
+  proj_rev_month_key: "adm.proj_rev_month_usd",
+  slots_month_key: "adm.proj_sponsored_slots_month",
+  sponsor_price_key: "cfamm.sponsor_pricing_usd",
+  summaries_key: "adm.monthly_summaries_v1"
+};
+
+function admGetNum(key, fallback){
+  const v = localStorage.getItem(key);
+  const n = v===null ? NaN : parseFloat(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+function admSetNum(key, val){
+  const n = Math.max(0, Math.floor(Number(val)||0));
+  localStorage.setItem(key, String(n));
+}
+function admFmtUSD(n){
+  const x = Number(n)||0;
+  return "$" + x.toLocaleString(undefined,{maximumFractionDigits:0});
+}
+function admLoadSummaries(){
+  try{
+    const raw = localStorage.getItem(ADM.summaries_key);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    if(!Array.isArray(arr)) return [];
+    // sanitize
+    return arr
+      .filter(x => x && typeof x.month === "string")
+      .map(x => ({
+        month: String(x.month).slice(0,7),
+        rev: Math.max(0, Math.floor(Number(x.rev)||0)),
+        units: Math.max(0, Math.floor(Number(x.units)||0)),
+        note: x.note ? String(x.note).slice(0,140) : ""
+      }))
+      .sort((a,b)=> b.month.localeCompare(a.month));
+  }catch(e){ return []; }
+}
+function admSaveSummaries(arr){
+  localStorage.setItem(ADM.summaries_key, JSON.stringify(arr));
+}
+function admCap(){
+  const s = admLoadSummaries();
+  return (s.length >= 3) ? ADM.pool_cap_after3 : ADM.pool_cap_base;
+}
+function admPoolUSD(rev, cap){
+  const c = Number(cap)||ADM.pool_cap_base;
+  return Math.min(c, (Number(rev)||0) * 0.13);
+}
+
+function admRenderSummaries(){
+  const s = admLoadSummaries();
+  const list = document.getElementById("sumList");
+  if(list){
+    if(!s.length){ list.textContent = "—"; }
+    else{
+      list.innerHTML = s.slice(0,12).map(x=>{
+        const pool = admPoolUSD(x.rev, ADM.pool_cap_base); // historical months: show base 10k cap logic for that month
+        const per1k = x.units>0 ? (pool/x.units)*1000 : 0;
+        return `<div style="padding:8px 0;border-top:1px solid rgba(255,255,255,.08)">
+          <b>${x.month}</b> • rev ${admFmtUSD(x.rev)} • pool ${admFmtUSD(pool)} • units ${x.units.toLocaleString()} • per 1k ${admFmtUSD(per1k)}
+          ${x.note ? `<div class="mini" style="opacity:.85;margin-top:2px">${x.note}</div>` : ``}
+        </div>`;
+      }).join("");
+    }
+  }
+
+  // Update "last month summary" UI = newest summary
+  const latest = s[0];
+  const setTxt = (id, val)=>{ const el=document.getElementById(id); if(el) el.textContent = val; };
+  if(latest){
+    const pool = admPoolUSD(latest.rev, ADM.pool_cap_base);
+    const per1k = latest.units>0 ? (pool/latest.units)*1000 : 0;
+    setTxt("k_last_rev", admFmtUSD(latest.rev));
+    setTxt("k_last_pool", admFmtUSD(pool));
+    setTxt("k_last_units", latest.units.toLocaleString());
+    setTxt("k_last_perk", admFmtUSD(per1k));
+    setTxt("home_last_rev", admFmtUSD(latest.rev));
+    setTxt("home_last_pool", admFmtUSD(pool));
+    setTxt("home_last_units", latest.units.toLocaleString());
+    setTxt("home_last_perk", admFmtUSD(per1k));
+  }else{
+    ["k_last_rev","k_last_pool","k_last_units","k_last_perk","home_last_rev","home_last_pool","home_last_units","home_last_perk"]
+      .forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent="—"; });
+  }
+}
+
+function admRender(){
+  const cap = admCap();
+  const projRev = admGetNum(ADM.proj_rev_month_key, 0);
+  const projPool = admPoolUSD(projRev, cap);
+
+  const pct = Math.max(0, Math.min(1, projPool / cap));
+  const w = (pct*100).toFixed(2) + "%";
+
+  const hb = document.getElementById("homePoolBadge");
+  const hf = document.getElementById("homePoolFill");
+  if(hb) hb.textContent = `${admFmtUSD(projPool)} / ${admFmtUSD(cap)}`;
+  if(hf) hf.style.width = w;
+
+  const sb = document.getElementById("statsPoolBadge");
+  const sf = document.getElementById("statsPoolFill");
+  if(sb) sb.textContent = `${admFmtUSD(projPool)} / ${admFmtUSD(cap)}`;
+  if(sf) sf.style.width = w;
+
+  // Stats "estimated this month"
+  const kpr = document.getElementById("k_proj_rev");
+  const kpp = document.getElementById("k_proj_pool");
+  const kcap = document.getElementById("k_cap");
+  if(kpr) kpr.textContent = admFmtUSD(projRev);
+  if(kpp) kpp.textContent = admFmtUSD(projPool);
+  if(kcap) kcap.textContent = admFmtUSD(cap);
+
+  // Conservative monthly projections (sponsored)
+  const slotsM = admGetNum(ADM.slots_month_key, 10);
+  const sponsorPrice = admGetNum(ADM.sponsor_price_key, 50);
+  const projSponsorRev = Math.max(0, slotsM) * Math.max(0, sponsorPrice);
+
+  const kSlots = document.getElementById("k_m_slots");
+  const kRev = document.getElementById("k_m_sp_rev");
+  const kPool = document.getElementById("k_m_pool");
+  if(kSlots) kSlots.textContent = String(slotsM);
+  if(kRev) kRev.textContent = admFmtUSD(projSponsorRev);
+  if(kPool) kPool.textContent = admFmtUSD(projPool);
+
+  admRenderSummaries();
+}
+
+/* Admin wiring */
+(function(){
+  const projRevMonth = document.getElementById("projRevMonth");
+  const slotsMonth = document.getElementById("slotsMonth");
+  const lastRev = document.getElementById("lastRev");
+  const lastUnits = document.getElementById("lastUnits");
+  const btnSave = document.getElementById("btnSaveProjLast");
+
+  // Backward compatible: keep existing fields if present
+  if(projRevMonth) projRevMonth.value = String(admGetNum(ADM.proj_rev_month_key, 0));
+  if(slotsMonth) slotsMonth.value = String(admGetNum(ADM.slots_month_key, 10));
+  if(lastRev) lastRev.value = "0";
+  if(lastUnits) lastUnits.value = "0";
+
+  if(btnSave){
+    btnSave.onclick = ()=>{
+      try{ if(typeof adminGuard==="function" && !adminGuard()) return; }catch(e){}
+      admSetNum(ADM.proj_rev_month_key, projRevMonth?.value || 0);
+      admSetNum(ADM.slots_month_key, slotsMonth?.value || 10);
+      admRender();
+      alert("Saved ✅");
+    };
+  }
+
+  // Monthly summaries history
+  const sumMonth = document.getElementById("sumMonth");
+  const sumRev = document.getElementById("sumRev");
+  const sumUnits = document.getElementById("sumUnits");
+  const sumNote = document.getElementById("sumNote");
+  const btnAdd = document.getElementById("btnAddSummary");
+  const btnExp = document.getElementById("btnExportSummaries");
+  const btnImp = document.getElementById("btnImportSummaries");
+
+  function validMonth(m){
+    return /^\d{4}-\d{2}$/.test(m);
+  }
+  function exportSummaries(){
+    const data = { exported_at: new Date().toISOString(), summaries: admLoadSummaries() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "admension_summaries.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function importSummaries(){
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.accept = "application/json";
+    inp.onchange = ()=>{
+      const f = inp.files && inp.files[0];
+      if(!f) return;
+      const r = new FileReader();
+      r.onload = ()=>{
+        try{
+          const obj = JSON.parse(String(r.result||""));
+          const arr = Array.isArray(obj) ? obj : obj.summaries;
+          if(!Array.isArray(arr)) throw new Error("bad file");
+          admSaveSummaries(arr);
+          admRender();
+          alert("Imported ✅");
+        }catch(e){
+          alert("Import failed");
+        }
+      };
+      r.readAsText(f);
+    };
+    inp.click();
+  }
+
+  if(btnAdd){
+    btnAdd.onclick = ()=>{
+      try{ if(typeof adminGuard==="function" && !adminGuard()) return; }catch(e){}
+      const m = (sumMonth?.value||"").trim();
+      if(!validMonth(m)){ alert("Month must be YYYY-MM"); return; }
+      const rev = Math.max(0, Math.floor(Number(sumRev?.value||0)));
+      const units = Math.max(0, Math.floor(Number(sumUnits?.value||0)));
+      const note = (sumNote?.value||"").trim();
+      const s = admLoadSummaries();
+      const idx = s.findIndex(x=>x.month===m);
+      const row = {month:m, rev, units, note};
+      if(idx>=0) s[idx]=row; else s.push(row);
+      // keep sorted
+      s.sort((a,b)=> b.month.localeCompare(a.month));
+      admSaveSummaries(s);
+      admRender();
+      alert("Summary saved ✅");
+    };
+  }
+  if(btnExp) btnExp.onclick = ()=>{ try{ if(typeof adminGuard==="function" && !adminGuard()) return; }catch(e){} exportSummaries(); };
+  if(btnImp) btnImp.onclick = ()=>{ try{ if(typeof adminGuard==="function" && !adminGuard()) return; }catch(e){} importSummaries(); };
+})();
+
+/* Re-render on load + navigation */
+try{ admRender(); }catch(e){}
+
+
+// side sponsor hide/show controls (persisted per-browser)
+(function(){
+  const btnLC = document.getElementById("sideLeftClose");
+  const btnRC = document.getElementById("sideRightClose");
+  const btnLS = document.getElementById("sideLeftShow");
+  const btnRS = document.getElementById("sideRightShow");
+  if(btnLC) btnLC.onclick = ()=>{ /* no persistence */ spRenderSticky(); };
+  if(btnRC) btnRC.onclick = ()=>{ /* no persistence */ spRenderSticky(); };
+  if(btnLS) btnLS.onclick = ()=>{ localStorage.removeItem("cfamm_hide_side_left"); spRenderSticky(); };
+  if(btnRS) btnRS.onclick = ()=>{ localStorage.removeItem("cfamm_hide_side_right"); spRenderSticky(); };
+})();
+
+
+
+
+
+function setupSideStickyButtons(){
+  const wL = document.getElementById("sideLeftWrap");
+  const wR = document.getElementById("sideRightWrap");
+  const tL = document.getElementById("sideLeftTab");
+  const tR = document.getElementById("sideRightTab");
+  const hL = document.getElementById("sideLeftClose");
+  const hR = document.getElementById("sideRightClose");
+  const sL = document.getElementById("sideLeftShow");
+  const sR = document.getElementById("sideRightShow");
+
+  const KEY_L = "cfamm_side_hide_L";
+  const KEY_R = "cfamm_side_hide_R";
+
+  function apply(){
+    const hideL = localStorage.getItem(KEY_L)==="1";
+    const hideR = localStorage.getItem(KEY_R)==="1";
+    if(hideL){ if(wL) wL.style.display="none"; if(tL) tL.style.display="block"; }
+    else { if(tL) tL.style.display="none"; /* wL display controlled by renderSide */ }
+    if(hideR){ if(wR) wR.style.display="none"; if(tR) tR.style.display="block"; }
+    else { if(tR) tR.style.display="none"; }
+  }
+
+  if(hL) hL.onclick = ()=>{ localStorage.setItem(KEY_L,"1"); apply(); };
+  if(hR) hR.onclick = ()=>{ localStorage.setItem(KEY_R,"1"); apply(); };
+  if(sL) sL.onclick = ()=>{ localStorage.removeItem(KEY_L); apply(); try{ spRenderSticky(); }catch(e){} };
+  if(sR) sR.onclick = ()=>{ localStorage.removeItem(KEY_R); apply(); try{ spRenderSticky(); }catch(e){} };
+
+  apply();
+}
+
+
+
+
+// ===== EVE Chat Bubble (Coming Soon) =====
+(function(){
+  const btn = document.getElementById("eveBtn");
+  if(btn){
+    btn.addEventListener("click", ()=>{
+      alert("EVE chat is coming soon. 👁️\n\nFor now, use the Support button for info + links.");
+    });
+  }
+  // If sticky anchor exists, add class to lift FABs above it
+  const sticky = document.getElementById("stickyAnchor") || document.getElementById("stickyAnchorBox") || document.querySelector(".stickyAnchor");
+  if(sticky){
+    document.documentElement.classList.add("hasStickyAnchor");
+    document.body.classList.add("hasStickyAnchor");
+  }
+})();
+// ===== /EVE Chat Bubble =====
+
+
+
+// ===== Side sticky visibility guard (desktop) =====
+(function(){
+  function ensureSideVisible(){
+    const w = window.innerWidth || 0;
+    const L = document.getElementById("sideLeftWrap");
+    const R = document.getElementById("sideRightWrap");
+    const tL = document.getElementById("sideLeftTab");
+    const tR = document.getElementById("sideRightTab");
+    if(!L || !R) return;
+    if(w > 720){
+      // default visible on desktop
+      L.style.display = "block";
+      R.style.display = "block";
+      if(tL) tL.style.display = "none";
+      if(tR) tR.style.display = "none";
+    }
+  }
+  window.addEventListener("resize", ensureSideVisible);
+  ensureSideVisible();
+})();
+// ===== /Side sticky visibility guard =====
+
+
+
+
+// ===========================
+// RPM Optimization Engine (v1.1)
+// Policy-safe: no timed refresh, no incentivized clicks.
+// Impressions are counted only on user intent: route/step/interactions.
+// ===========================
+
+const RPM = {
+  // default blended CPM by tier (can be overridden in Admin if you later add settings UI)
+  tierCPM: {1: 3.5, 2: 2.2, 3: 1.2},
+  tierName: {1:"Tier-1",2:"Tier-2",3:"Tier-3"},
+  // density per geo tier (how many placements we show)
+  density: {
+    1: { bottom:true, side:true, top:true, rail:true, tall:true },
+    2: { bottom:true, side:true, top:true, rail:false, tall:true },
+    3: { bottom:true, side:false, top:true, rail:false, tall:false }
+  },
+  // progressive reveal state
+  interacted:false,
+  minStepDelayMs: 900,
+  lastStepClickAt: 0,
+  geoTier: 2, // default mid
+};
+
+function inferGeoTier(){
+  // Very conservative heuristic: treat NA/UK/AU/NZ as Tier-1, EU often Tier-2, else Tier-3.
+  // We avoid fragile IP geo lookups in a static file.
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+  const lang = (navigator.language || "").toLowerCase();
+  const tier1TZ = ["America/", "Canada", "Europe/London", "Australia/", "Pacific/Auckland"];
+  if(tz.startsWith("America/") || tz.startsWith("Canada/") || tz==="Europe/London" || tz.startsWith("Australia/") || tz==="Pacific/Auckland"){
+    return 1;
+  }
+  if(tz.startsWith("Europe/") || lang.startsWith("de") || lang.startsWith("fr") || lang.startsWith("es") || lang.startsWith("it") || lang.startsWith("nl")){
+    return 2;
+  }
+  return 3;
+}
+
+function rpmCPM(){
+  const t = RPM.geoTier || 2;
+  return RPM.tierCPM[t] || 2.0;
+}
+
+function placementEnabled(key){
+  const d = RPM.density[RPM.geoTier || 2];
+  return !!(d && d[key]);
+}
+
+function setReveal(el, on){
+  if(!el) return;
+  el.classList.add("reveal");
+  if(on) el.classList.add("on"); else el.classList.remove("on");
+}
+
+function applyPlacementDensity(){
+  // Bottom sticky is always present in layout, but we keep it visible across tiers.
+  // Side stickies exist only on desktop widths; we additionally hide on tier3.
+  try{
+    const sideL = document.getElementById("sideLeftWrap");
+    const sideR = document.getElementById("sideRightWrap");
+    const tabL = document.getElementById("sideLeftTab");
+    const tabR = document.getElementById("sideRightTab");
+
+    const allowSide = placementEnabled("side");
+    if(sideL && sideR){
+      if(!allowSide){
+        sideL.style.display="none";
+        sideR.style.display="none";
+        if(tabL) tabL.style.display="none";
+        if(tabR) tabR.style.display="none";
+      }
+    }
+    // desktop rail + tall are handled by show/hide of those blocks if they exist
+    const rail = document.getElementById("adminRail") || document.getElementById("railBox");
+    if(rail) rail.style.display = placementEnabled("rail") ? "" : "none";
+    const tall = document.getElementById("adminTall") || document.getElementById("tallBox");
+    if(tall) tall.style.display = placementEnabled("tall") ? "" : "none";
+  }catch(e){}
+}
+
+function progressiveRevealForContext(step){
+  // bottom: always on
+  // side: after first interaction
+  // tall: step >= 2
+  // rail: step >= 3 (desktop only & enabled by tier)
+  try{
+    const sideL = document.getElementById("sideLeftWrap");
+    const sideR = document.getElementById("sideRightWrap");
+    if(sideL) setReveal(sideL, RPM.interacted && placementEnabled("side"));
+    if(sideR) setReveal(sideR, RPM.interacted && placementEnabled("side"));
+
+    const tall = document.getElementById("adminTall") || document.getElementById("tallBox");
+    if(tall) setReveal(tall, step>=2 && placementEnabled("tall"));
+
+    const rail = document.getElementById("adminRail") || document.getElementById("railBox");
+    if(rail) setReveal(rail, step>=3 && placementEnabled("rail"));
+  }catch(e){}
+}
+
+function markAdIntent(reason){
+  // This is a policy-safe counter for internal planning transparency.
+  try{
+    if(typeof markAd==="function"){ markAd(reason); }
+    if(typeof logEvent==="function"){ logEvent("ad_intent",{reason, page:(window.__page||""), step:(window.__step||1), tier:RPM.geoTier}); }
+  }catch(e){}
+}
+
+function onFirstInteraction(){
+  if(RPM.interacted) return;
+  RPM.interacted = true;
+  try{ markAdIntent("first_interaction"); }catch(e){}
+  progressiveRevealForContext(window.__step||1);
+}
+
+// Step debounce to prevent accidental rapid-fire step spam (UX + compliance)
+function allowStepAdvance(){
+  const now = Date.now();
+  if(now - RPM.lastStepClickAt < RPM.minStepDelayMs) return false;
+  RPM.lastStepClickAt = now;
+  return true;
+}
+
+function updateRpmHint(){
+  const el = document.getElementById("stepOf");
+  if(el) el.textContent = String(window.__step || 1);
+}
+
+function updateEstimatedRPMUI(){
+  // Update stats UI if elements exist
+  try{
+    const cpm = rpmCPM();
+    const sessions = (window.CFAMM_STATS && CFAMM_STATS.sessions) ? CFAMM_STATS.sessions : (parseInt(localStorage.getItem("cfamm_sessions")||"0",10) || 0);
+    const adsShown = (window.CFAMM_STATS && CFAMM_STATS.adsShown) ? CFAMM_STATS.adsShown : (parseInt(localStorage.getItem("cfamm_adsShown")||"0",10) || 0);
+    const rpmEl = document.getElementById("statRPM");
+    const rpmExplain = document.getElementById("statRPMExplain");
+    // Estimate: impressions/1000 * CPM = revenue. revenue/sessions*1000 = RPM (session)
+    const revenueEst = (adsShown/1000.0) * cpm;
+    const rpm = sessions>0 ? (revenueEst/sessions*1000.0) : 0;
+    if(rpmEl) rpmEl.textContent = "$" + (isFinite(rpm)?rpm.toFixed(2):"0.00");
+    if(rpmExplain) rpmExplain.textContent = `Estimated from ${RPM.tierName[RPM.geoTier]} CPM $${cpm.toFixed(2)} and logged ad-intent count. Not a guarantee.`;
+    
+    // UPDATE HOMEPAGE LIVE TRACKING
+    updateHomepageRevenueDashboard(rpm, cpm);
+  }catch(e){}
+}
+
+function updateHomepageRevenueDashboard(rpm, cpm) {
+  try {
+    // Live RPM display
+    const liveRPMEl = document.getElementById("liveRPM");
+    if (liveRPMEl) {
+      liveRPMEl.textContent = "$" + (isFinite(rpm) ? rpm.toFixed(2) : "0.00");
+      // Color coding: green if above $11, yellow if above $6, red otherwise
+      if (rpm >= 11) {
+        liveRPMEl.style.color = "#00ff88";
+      } else if (rpm >= 6) {
+        liveRPMEl.style.color = "#ffd700";
+      } else {
+        liveRPMEl.style.color = "#ff6b6b";
+      }
+    }
+    
+    // RPM Progress to $20 goal
+    const rpmProgressEl = document.getElementById("rpmProgress");
+    const rpmProgressFillEl = document.getElementById("rpmProgressFill");
+    if (rpmProgressEl && rpmProgressFillEl) {
+      const progressPct = Math.min(100, (rpm / 20.0) * 100);
+      rpmProgressEl.textContent = progressPct.toFixed(0);
+      rpmProgressFillEl.style.width = progressPct + "%";
+    }
+    
+    // Daily Revenue Calculations (based on current RPM)
+    // RPM = revenue per 1000 sessions
+    // Assume 1.2 sessions per user per day
+    const revenuePerSession = rpm / 1000.0; // dollars per session
+    const sessionsPerUserPerDay = 1.2;
+    const revenuePerUserPerDay = revenuePerSession * sessionsPerUserPerDay;
+    
+    const dailyRevEl = document.getElementById("dailyRev");
+    if (dailyRevEl) {
+      // Show revenue for 1 DAU
+      dailyRevEl.textContent = "$" + (revenuePerUserPerDay * 1).toFixed(4);
+    }
+    
+    // Scaling projections
+    const rev100El = document.getElementById("rev100");
+    const rev1kEl = document.getElementById("rev1k");
+    const rev10kEl = document.getElementById("rev10k");
+    
+    if (rev100El) rev100El.textContent = "$" + (revenuePerUserPerDay * 100).toFixed(2) + "/day";
+    if (rev1kEl) rev1kEl.textContent = "$" + (revenuePerUserPerDay * 1000).toFixed(2) + "/day";
+    if (rev10kEl) rev10kEl.textContent = "$" + (revenuePerUserPerDay * 10000).toFixed(0) + "/day";
+    
+  } catch(e) {
+    console.error('[RPM] Error updating homepage dashboard:', e);
+  }
+}
+
+// Boot
+(function(){
+  try{
+    RPM.geoTier = inferGeoTier();
+    window.__geoTier = RPM.geoTier;
+    // capture first user interaction anywhere
+    window.addEventListener("pointerdown", onFirstInteraction, {once:true, passive:true});
+    window.addEventListener("keydown", onFirstInteraction, {once:true});
+    applyPlacementDensity();
+    progressiveRevealForContext(window.__step||1);
+    updateRpmHint();
+    setTimeout(()=>{ try{ updateEstimatedRPMUI(); }catch(e){} }, 50);
+  }catch(e){}
+})();
+// ===========================
+
+
+
+// ===== Hook showPage for RPM engine =====
+try{
+  const __origShowPage = showPage;
+  showPage = function(name){
+    window.__page = name;
+    const r = __origShowPage(name);
+    try{ markAdIntent("route:"+name); }catch(e){}
+    try{ applyPlacementDensity(); progressiveRevealForContext(window.__step||1); updateRpmHint(); updateEstimatedRPMUI(); }catch(e){}
+    return r;
+  };
+}catch(e){}
+// ===== /Hook showPage =====
+
+
+
+
+// ===== Step advancement hook (RPM) =====
+(function(){
+  const ids = ["btnNext","stepNext","nextStep","goNext","nextBtn"];
+  ids.forEach(id=>{
+    const b = document.getElementById(id);
+    if(!b) return;
+    b.addEventListener("click", (ev)=>{
+      if(!allowStepAdvance()){
+        ev.preventDefault(); ev.stopPropagation();
+        return false;
+      }
+      // after original handlers run, update state
+      setTimeout(()=>{
+        try{
+          // best-effort: if app maintains a step counter, mirror it
+          const sEl = document.getElementById("stepOf");
+          if(sEl){
+            // try read from global
+            window.__step = window.__step || 1;
+          }
+          
+          // Dispatch custom event for ad refresh system
+          window.dispatchEvent(new CustomEvent('step-changed', {
+            detail: { step: window.__step || 1 }
+          }));
+          
+          markAdIntent("step_change");
+          progressiveRevealForContext(window.__step||1);
+          updateRpmHint();
+          updateEstimatedRPMUI();
+        }catch(e){}
+      }, 10);
+    }, true);
+  });
+})();
+// ===== /Step advancement hook =====
+
+
+// ===========================
+// ADV_PUBLISHER_STACK v1.2
+// Instrumentation + diagnostics + geo/density controls + context skins + waterfall scaffolding.
+// Static-file friendly. Policy-safe: no timed refresh, no incentivized ad interaction.
+// ===========================
+
+const APS = {
+  k: {
+    sessions: "cfamm_sessions",
+    sessionStart: "cfamm_sessionStart",
+    sessionDurBins: "cfamm_sessionDurBins",
+    stepsSeen: "cfamm_stepsSeen",
+    stepsDone: "cfamm_stepsDone",
+    postExplore: "cfamm_postExplore",
+    geoTierCounts: "cfamm_geoTierCounts",
+    placementCounts: "cfamm_placementCounts",
+    intentCounts: "cfamm_intentCounts",
+    apsSettings: "cfamm_apsSettings",
+    contextSkin: "cfamm_contextSkin",
+  },
+  defaults: {
+    cpmByTier: {1: 4.0, 2: 2.6, 3: 1.3},
+    densityByTier: {
+      1: {bottom:true, side:true, top:true, tall:true, rail:true},
+      2: {bottom:true, side:true, top:true, tall:true, rail:false},
+      3: {bottom:true, side:false, top:true, tall:false, rail:false},
+    },
+    placementWeights: { bottom:1.0, side:1.25, top:0.85, tall:1.10, rail:1.15 },
+    skins: {
+      "default": { label:"Default", title:"Clickbait Free Ad Money Maker", desc:"Step-based navigation system optimized for viewability (policy-safe)." },
+      "tools": { label:"Free Tools Hub", title:"Free Tools Hub — Quick Index", desc:"A curated index of utilities and resources with a step-based navigation flow." },
+      "daily": { label:"Daily Resources Index", title:"Daily Resources Index — Picks & Links", desc:"Daily-style resource index with transparent stats and safe ad funnel mechanics." },
+      "ai": { label:"AI Utilities Finder", title:"AI Utilities Finder — Prompts & Tools", desc:"AI-focused utilities finder with a viewability-first ad layout (no refresh timers)." },
+    }
+  }
+};
+
+function apsLoadSettings(){
+  try{
+    const raw = localStorage.getItem(APS.k.apsSettings);
+    if(!raw) return JSON.parse(JSON.stringify(APS.defaults));
+    const obj = JSON.parse(raw);
+    const out = JSON.parse(JSON.stringify(APS.defaults));
+    if(obj.cpmByTier) out.cpmByTier = {...out.cpmByTier, ...obj.cpmByTier};
+    if(obj.densityByTier) out.densityByTier = {...out.densityByTier, ...obj.densityByTier};
+    if(obj.placementWeights) out.placementWeights = {...out.placementWeights, ...obj.placementWeights};
+    return out;
+  }catch(e){ return JSON.parse(JSON.stringify(APS.defaults)); }
+}
+function apsSaveSettings(s){ localStorage.setItem(APS.k.apsSettings, JSON.stringify(s)); }
+
+function apsGetJSON(key, fallback){
+  try{ const v=localStorage.getItem(key); return v?JSON.parse(v):JSON.parse(JSON.stringify(fallback)); }
+  catch(e){ return JSON.parse(JSON.stringify(fallback)); }
+}
+function apsSetJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
+
+function apsInc(key, field, by=1){
+  const obj = apsGetJSON(key, {});
+  obj[field] = (obj[field]||0) + by;
+  apsSetJSON(key, obj);
+  return obj[field];
+}
+
+function apsInferGeoTier(){
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+  const lang = (navigator.language || "").toLowerCase();
+  if(tz.startsWith("America/") || tz==="Europe/London" || tz.startsWith("Australia/") || tz==="Pacific/Auckland") return 1;
+  if(tz.startsWith("Europe/") || ["de","fr","es","it","nl","sv","no","da","fi"].some(p=>lang.startsWith(p))) return 2;
+  return 3;
+}
+
+function apsEnsureSession(){
+  const now = Date.now();
+  let start = parseInt(localStorage.getItem(APS.k.sessionStart)||"0",10);
+  if(!start){
+    localStorage.setItem(APS.k.sessionStart, String(now));
+    const s = parseInt(localStorage.getItem(APS.k.sessions)||"0",10) || 0;
+    localStorage.setItem(APS.k.sessions, String(s+1));
+    const tier = (window.__geoTier || 2);
+    apsInc(APS.k.geoTierCounts, String(tier), 1);
+    start = now;
+  }
+  return start;
+}
+
+function apsCloseSessionIfNeeded(){
+  try{
+    const start = parseInt(localStorage.getItem(APS.k.sessionStart)||"0",10);
+    if(!start) return;
+    const durSec = Math.max(0, Math.round((Date.now()-start)/1000));
+    const bins = apsGetJSON(APS.k.sessionDurBins, { "<60":0, "60-120":0, "120-240":0, "240-360":0, "360+":0 });
+    const b = durSec < 60 ? "<60" : durSec < 120 ? "60-120" : durSec < 240 ? "120-240" : durSec < 360 ? "240-360" : "360+";
+    bins[b] = (bins[b]||0)+1;
+    apsSetJSON(APS.k.sessionDurBins, bins);
+    localStorage.removeItem(APS.k.sessionStart);
+  }catch(e){}
+}
+
+function apsPlacementEnabled(key){
+  const s = window.__APS_SETTINGS || APS.defaults;
+  const tier = window.__geoTier || 2;
+  const d = (s.densityByTier && s.densityByTier[tier]) ? s.densityByTier[tier] : APS.defaults.densityByTier[2];
+  return !!(d && d[key]);
+}
+
+function apsMarkIntent(reason){
+  apsInc(APS.k.intentCounts, reason, 1);
+  try{ if(typeof markAd==="function") markAd(reason); }catch(e){}
+  try{ if(typeof logEvent==="function") logEvent("ad_intent",{reason, page:(window.__page||""), step:(window.__step||1), tier:(window.__geoTier||2)}); }catch(e){}
+}
+
+function apsMarkPlacement(id){ apsInc(APS.k.placementCounts, id, 1); }
+
+function apsMarkStepSeen(step){ apsInc(APS.k.stepsSeen, "s"+String(step), 1); }
+function apsMarkStepDone(step){ apsInc(APS.k.stepsDone, "s"+String(step), 1); }
+
+function apsApplyDensityToDOM(){
+  try{
+    const allowSide = apsPlacementEnabled("side");
+    const sideL = document.getElementById("sideLeftWrap");
+    const sideR = document.getElementById("sideRightWrap");
+    const tabL = document.getElementById("sideLeftTab");
+    const tabR = document.getElementById("sideRightTab");
+    if(sideL && sideR){
+      sideL.style.display = allowSide ? "" : "none";
+      sideR.style.display = allowSide ? "" : "none";
+      if(tabL) tabL.style.display = allowSide ? "" : "none";
+      if(tabR) tabR.style.display = allowSide ? "" : "none";
+    }
+    const rail = document.getElementById("adminRail") || document.getElementById("railBox");
+    if(rail) rail.style.display = apsPlacementEnabled("rail") ? "" : "none";
+    const tall = document.getElementById("adminTall") || document.getElementById("tallBox");
+    if(tall) tall.style.display = apsPlacementEnabled("tall") ? "" : "none";
+    const top = document.getElementById("topAd") || document.getElementById("bannerTop");
+    if(top) top.style.display = apsPlacementEnabled("top") ? "" : "none";
+  }catch(e){}
+}
+
+// Waterfall scaffolding: static placeholders
+function apsServeAd(placementId){
+  apsMarkPlacement(placementId);
+  apsMarkIntent("serve:"+placementId);
+}
+
+function apsUpdateStatsUI(){
+  try{
+    const s = window.__APS_SETTINGS || APS.defaults;
+    const sessions = parseInt(localStorage.getItem(APS.k.sessions)||"0",10) || 0;
+    const pv = (window.CFAMM_STATS && CFAMM_STATS.pageViews) ? CFAMM_STATS.pageViews : (parseInt(localStorage.getItem("cfamm_pageViews")||"0",10)||0);
+    const stepsSeen = apsGetJSON(APS.k.stepsSeen, {});
+    const stepsDone = apsGetJSON(APS.k.stepsDone, {});
+    const geoCounts = apsGetJSON(APS.k.geoTierCounts, {});
+    const placements = apsGetJSON(APS.k.placementCounts, {});
+    const durBins = apsGetJSON(APS.k.sessionDurBins, { "<60":0, "60-120":0, "120-240":0, "240-360":0, "360+":0 });
+
+    const s1 = stepsSeen.s1||0, s2 = stepsSeen.s2||0, s3 = stepsSeen.s3||0;
+    const conv12 = (s1>0) ? (s2/s1*100) : 0;
+    const conv23 = (s2>0) ? (s3/s2*100) : 0;
+    const pagesPerSession = sessions>0 ? (pv/sessions) : 0;
+
+    const tier = window.__geoTier || 2;
+    const cpm = (s.cpmByTier && s.cpmByTier[tier]) ? s.cpmByTier[tier] : 2.0;
+
+    let imp = 0;
+    const w = s.placementWeights || APS.defaults.placementWeights;
+    const keys = Object.keys(placements||{});
+    if(keys.length){
+      keys.forEach(pid=>{
+        const val = placements[pid]||0;
+        let bucket="bottom";
+        if(pid.includes("side")) bucket="side";
+        else if(pid.includes("rail")) bucket="rail";
+        else if(pid.includes("tall")) bucket="tall";
+        else if(pid.includes("top") || pid.includes("banner")) bucket="top";
+        imp += val * (w[bucket] || 1.0);
+      });
+    }else{
+      const adsShown = (window.CFAMM_STATS && CFAMM_STATS.adsShown) ? CFAMM_STATS.adsShown : (parseInt(localStorage.getItem("cfamm_adsShown")||"0",10)||0);
+      imp = adsShown;
+    }
+    const revenueEst = (imp/1000.0) * cpm;
+    const rpm = sessions>0 ? (revenueEst/sessions*1000.0) : 0;
+
+    const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+    set("kConv12", conv12.toFixed(1)+"%");
+    set("kConv23", conv23.toFixed(1)+"%");
+    set("kPPS", pagesPerSession.toFixed(2));
+    set("kRPM2", "$"+(isFinite(rpm)?rpm.toFixed(2):"0.00"));
+    set("kTierMix", `T1 ${(geoCounts["1"]||0)} • T2 ${(geoCounts["2"]||0)} • T3 ${(geoCounts["3"]||0)}`);
+    set("kDurBins", Object.entries(durBins).map(([k,v])=>`${k}: ${v}`).join(" • ") || "—");
+    const ex = document.getElementById("statRPMExplain2");
+    if(ex) ex.textContent = `Estimated from weighted placement impressions and Tier-${tier} CPM $${cpm.toFixed(2)}. Not a guarantee.`;
+  }catch(e){}
+}
+
+function apsApplySkin(){
+  try{
+    const s = window.__APS_SETTINGS || APS.defaults;
+    const skins = (s.skins || APS.defaults.skins);
+    const key = localStorage.getItem(APS.k.contextSkin) || "default";
+    const sk = skins[key] || skins["default"];
+    document.title = sk.title;
+    const meta = document.querySelector('meta[name="description"]');
+    if(meta) meta.setAttribute("content", sk.desc);
+    const sel = document.getElementById("apsSkinSel");
+    if(sel && sel.value !== key) sel.value = key;
+  }catch(e){}
+}
+
+function apsInitAdminControls(){
+  try{
+    const s = window.__APS_SETTINGS || APS.defaults;
+    const bindTier = (tier)=>{
+      ["bottom","side","top","tall","rail"].forEach(k=>{
+        const el = document.getElementById(`aps_${tier}_${k}`);
+        if(!el) return;
+        el.checked = !!(s.densityByTier[tier] && s.densityByTier[tier][k]);
+        el.addEventListener("change", ()=>{
+          s.densityByTier[tier] = s.densityByTier[tier] || {};
+          s.densityByTier[tier][k] = el.checked;
+          apsSaveSettings(s);
+          apsApplyDensityToDOM();
+          apsUpdateStatsUI();
+        });
+      });
+      const c = document.getElementById(`aps_cpm_${tier}`);
+      if(c){
+        c.value = String(s.cpmByTier[tier] || APS.defaults.cpmByTier[tier]);
+        c.addEventListener("change", ()=>{
+          const v = parseFloat(c.value);
+          if(isFinite(v) && v>0){
+            s.cpmByTier[tier]=v;
+            apsSaveSettings(s);
+            apsUpdateStatsUI();
+          }
+        });
+      }
+    };
+    bindTier(1); bindTier(2); bindTier(3);
+
+    const sel = document.getElementById("apsSkinSel");
+    if(sel){
+      const cur = localStorage.getItem(APS.k.contextSkin) || "default";
+      sel.value = cur;
+      sel.addEventListener("change", ()=>{
+        localStorage.setItem(APS.k.contextSkin, sel.value);
+        apsApplySkin();
+      });
+    }
+  }catch(e){}
+}
+
+// Boot
+(function(){
+  try{
+    window.__APS_SETTINGS = apsLoadSettings();
+    window.__geoTier = window.__geoTier || apsInferGeoTier();
+    apsEnsureSession();
+    window.__step = window.__step || 1;
+    apsMarkStepSeen(window.__step);
+    apsMarkIntent("session_start");
+    apsApplySkin();
+    apsApplyDensityToDOM();
+    if(typeof showPage==="function"){
+      const __orig = showPage;
+      showPage = function(name){
+        window.__page = name;
+        const r = __orig(name);
+        apsMarkIntent("page_nav:"+name);
+        apsApplySkin();
+        apsApplyDensityToDOM();
+        apsUpdateStatsUI();
+        return r;
+      }
+    }
+    const once = ()=>{ apsMarkIntent("first_interaction"); };
+    window.addEventListener("pointerdown", once, {once:true, passive:true});
+    window.addEventListener("keydown", once, {once:true});
+    setTimeout(()=>{ apsUpdateStatsUI(); apsInitAdminControls(); }, 120);
+    window.addEventListener("beforeunload", ()=>{ apsCloseSessionIfNeeded(); });
+  }catch(e){}
+})();
+// ===========================
+
+// ===== APS_STEP_HOOKS v1.2 =====
+(function(){
+  const exploreIds=["apsExploreA","apsExploreB","apsExploreC"];
+  exploreIds.forEach(id=>{
+    const a=document.getElementById(id);
+    if(!a) return;
+    a.addEventListener("click", ()=>{
+      try{ apsInc(APS.k.postExplore, "clicks", 1); apsMarkIntent("post_explore"); apsUpdateStatsUI(); }catch(e){}
+    });
+  });
+})();
+// ===== /APS_STEP_HOOKS v1.2 =====
+</script>
+
+<!-- ===== Support FAB (bottom-left) ===== -->
+<div class="supportFab">
+  <button class="btn good" id="btnSupport">Support</button>
+      <button id="eveBtn" class="fab fab-eve" title="EVE chat (coming soon)" aria-label="EVE chat (coming soon)"><span class="fabDot"></span>EVE</button>
+
+</div>
+
+<!-- ===== Support Modal ===== -->
+<div class="modalOverlay" id="supportModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Support">
+    <div class="modalHeader">
+      <div>
+        <h2>Support (optional)</h2>
+        <p class="mini" style="margin:6px 0 0 0">
+          This is optional. No rewards are tied to watching. Sponsored clips are not ad-network units.
+        </p>
+      </div>
+      <button class="btn" id="btnSupportClose">Close</button>
+    </div>
+    <div class="modalBody">
+      <div class="card">
+        <h3 style="margin-top:0">Watch a 30-second sponsor clip</h3>
+        <div class="notice">
+          If you choose to watch, it helps fund the site. This does <b>not</b> change your ADMENSION units and is not “click-to-earn”.
+        </div>
+
+        <div class="videoBox">
+          <video id="supportVideo" controls preload="metadata" style="width:100%;display:block;max-height:420px;background:#000">
+            <!-- Replace this with your own hosted sponsor clip URL -->
+            <source src="" type="video/mp4" />
+            Your browser does not support video.
+          </video>
+        </div>
+
+        <div class="videoMeta">
+          <span class="pill" id="supportTimerPill">30s clip • ready</span>
+          <span class="mini">Tip: host your clip yourself (CDN/static host) and paste the URL in code.</span>
+        </div>
+
+        <div class="smallRow">
+          <button class="btn primary" id="btnSupportStart">Start 30s</button>
+          <button class="btn" id="btnSupportShare">Share</button>
+          <button class="btn good" id="btnSupportDonate">Donate</button>
+        </div>
+      </div>
+
+      <div class="card" id="donatePanel" style="display:none;margin-top:12px">
+        <h3 style="margin-top:0">Donate</h3>
+        <div class="notice goodNote">
+          Donations are optional support. They do not guarantee payouts or returns.
+        </div>
+        <div class="donateGrid">
+          <div>
+            <div class="mini">TRON (recommended for low fees)</div>
+            <div class="addrBox" id="addrTron">TRON_ADDRESS_HERE</div>
+            <div class="smallRow">
+              <button class="btn" data-copy="#addrTron">Copy</button>
+            </div>
+          </div>
+          <div>
+            <div class="mini">ETH</div>
+            <div class="addrBox" id="addrEth">ETH_ADDRESS_HERE</div>
+            <div class="smallRow">
+              <button class="btn" data-copy="#addrEth">Copy</button>
+            </div>
+          </div>
+          <div>
+            <div class="mini">BTC</div>
+            <div class="addrBox" id="addrBtc">BTC_ADDRESS_HERE</div>
+            <div class="smallRow">
+              <button class="btn" data-copy="#addrBtc">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3 style="margin-top:0">Quick share text</h3>
+        <div class="addrBox" id="shareText">Check this out: {{URL}} — stats + sponsored slots + ADMENSION pool transparency.</div>
+        <div class="smallRow">
+          <button class="btn" data-copy="#shareText">Copy share text</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+

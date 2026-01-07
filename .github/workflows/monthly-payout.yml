@@ -1,0 +1,51 @@
+name: Monthly Payout Distribution
+
+on:
+  schedule:
+    # Run on the 1st of every month at 00:00 UTC
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # Allow manual triggers for testing
+
+jobs:
+  compute-payouts:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: |
+          cd scripts
+          npm install node-fetch
+      
+      - name: Compute and distribute payouts
+        env:
+          SHEET_EVENTS_CSV_URL: ${{ secrets.SHEET_EVENTS_CSV_URL }}
+          SHEET_WALLETS_CSV_URL: ${{ secrets.SHEET_WALLETS_CSV_URL }}
+          WALLET_CAP_PCT: ${{ secrets.WALLET_CAP_PCT }}
+          CREATOR_ADM_CODE: ${{ secrets.CREATOR_ADM_CODE }}
+        run: |
+          cd scripts
+          node compute_payouts.mjs
+      
+      - name: Upload payout report
+        uses: actions/upload-artifact@v3
+        with:
+          name: payout-report-${{ github.run_number }}
+          path: scripts/payout_report_*.json
+          retention-days: 90
+      
+      - name: Create summary
+        run: |
+          echo "## 💰 Monthly Payout Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Month:** $(date -u +'%Y-%m')" >> $GITHUB_STEP_SUMMARY
+          echo "**Run:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See artifacts for full payout report." >> $GITHUB_STEP_SUMMARY

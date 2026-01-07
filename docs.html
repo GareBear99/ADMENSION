@@ -621,6 +621,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
           <a class="btn" href="#d-compliance">Compliance rules</a>
           <a class="btn" href="#d-rpm">RPM playbook</a>
           <a class="btn" href="#d-branches">Branch scaling</a>
+          <a class="btn" href="#d-cli">CLI/API Commands</a>
           <a class="btn" href="#d-adminops">Admin-only ops</a>
         </div>
 
@@ -789,8 +790,197 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
           </div>
         </div>
 
+        <div class="card" id="d-cli">
+          <h2>13) CLI/API Commands & Automation</h2>
+          <div class="notice goodNote">
+            <b>Screenshot Feature:</b> ADMENSION includes built-in full-page screenshot capability accessible via the navigation bar and JavaScript API.
+          </div>
+
+          <h3 style="margin-top:1.5rem">Browser JavaScript API</h3>
+          <div class="notice">
+            <b>Capture current page as PNG:</b>
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code>// Click the 📸 Screenshot button in nav bar
+// OR call programmatically:
+window.captureFullPageScreenshot();</code></pre>
+            
+            <div class="mini" style="margin-top:8px">
+              • Captures entire scrollable page (not just viewport)<br>
+              • 2x resolution for high quality<br>
+              • Auto-downloads as: <span class="code">ADMENSION_[page]_[timestamp].png</span><br>
+              • Works on all pages (Home, Stats, Create, Manage, Docs, Admin)
+            </div>
+          </div>
+
+          <h3 style="margin-top:1.5rem">Browser DevTools Console Commands</h3>
+          <div class="notice">
+            <b>Open browser console (F12 or Cmd+Option+I) and run:</b>
+            
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code>// Screenshot current page
+window.captureFullPageScreenshot();
+
+// Get daily quote data
+ADMENSION_DAILY_QUOTES.getTodaysQuote();
+ADMENSION_DAILY_QUOTES.getTodaysGif();
+ADMENSION_DAILY_QUOTES.getDayOfYear();
+
+// Access analytics data
+CFAMM_STATS.sessions;
+CFAMM_STATS.pageviews;
+CFAMM_STATS.adsShown;
+
+// Export stats data
+exportStats(); // Downloads JSON file
+
+// Get current geo tier
+window.__geoTier; // 1, 2, or 3
+
+// Get current page
+window.__page; // "home", "stats", "create", etc.
+
+// Re-start homepage demo
+window.ADMENSION_DEMO_START();</code></pre>
+          </div>
+
+          <h3 style="margin-top:1.5rem">CLI Tools (External)</h3>
+          <div class="notice warnNote">
+            <b>Note:</b> For automated screenshots via CLI/headless browser, you'll need external tools like:
+          </div>
+
+          <div class="notice">
+            <b>1. Using Playwright (Node.js):</b>
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code># Install
+npm install -D @playwright/test
+npx playwright install chromium
+
+# Create screenshot script (screenshot.js):
+const { chromium } = require('playwright');
+
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  
+  await page.goto('https://garebear99.github.io/ADMENSION/');
+  await page.waitForLoadState('networkidle');
+  
+  // Full page screenshot
+  await page.screenshot({
+    path: 'admension-full.png',
+    fullPage: true
+  });
+  
+  await browser.close();
+})();
+
+# Run:
+node screenshot.js</code></pre>
+          </div>
+
+          <div class="notice">
+            <b>2. Using Puppeteer (Node.js):</b>
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code># Install
+npm install puppeteer
+
+# Create script:
+const puppeteer = require('puppeteer');
+
+(async () => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  
+  await page.goto('https://garebear99.github.io/ADMENSION/', {
+    waitUntil: 'networkidle2'
+  });
+  
+  await page.screenshot({
+    path: 'admension.png',
+    fullPage: true
+  });
+  
+  await browser.close();
+})();</code></pre>
+          </div>
+
+          <div class="notice">
+            <b>3. Using shot-scraper (Python):</b>
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code># Install
+pip install shot-scraper
+shot-scraper install
+
+# Take screenshot
+shot-scraper https://garebear99.github.io/ADMENSION/ \
+  --output admension.png \
+  --height 1080 \
+  --width 1920
+
+# Full page
+shot-scraper https://garebear99.github.io/ADMENSION/ \
+  --output admension-full.png \
+  --height full</code></pre>
+          </div>
+
+          <div class="notice">
+            <b>4. Using macOS screencapture (Native):</b>
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code># Capture entire screen after 5 second delay
+screencapture -T 5 admension.png
+
+# Capture window (interactive selector)
+screencapture -w admension.png
+
+# Capture selection
+screencapture -s admension.png</code></pre>
+          </div>
+
+          <h3 style="margin-top:1.5rem">Data Export/Import Commands</h3>
+          <div class="notice">
+            <b>Console commands for data management:</b>
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code>// Export all stats data
+exportStats(); // Downloads JSON
+
+// View localStorage data
+JSON.parse(localStorage.getItem('cfamm.adm_refs')); // Links
+JSON.parse(localStorage.getItem('cfamm.sponsors')); // Sponsors
+JSON.parse(localStorage.getItem('cfamm.sessions')); // Analytics
+
+// Clear specific data
+localStorage.removeItem('cfamm.adm_refs');
+localStorage.removeItem('cfamm.sponsors');
+
+// Clear all ADMENSION data
+Object.keys(localStorage)
+  .filter(k => k.startsWith('cfamm'))
+  .forEach(k => localStorage.removeItem(k));</code></pre>
+          </div>
+
+          <h3 style="margin-top:1.5rem">Integration Examples</h3>
+          <div class="notice">
+            <b>Automated testing with screenshots:</b>
+            <pre class="codebox" style="background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;overflow-x:auto;margin-top:8px"><code>// Playwright test example
+const { test, expect } = require('@playwright/test');
+
+test('ADMENSION homepage loads', async ({ page }) => {
+  await page.goto('https://garebear99.github.io/ADMENSION/');
+  
+  // Wait for demo to load
+  await page.waitForSelector('#demo_step1');
+  
+  // Take screenshot
+  await page.screenshot({
+    path: 'test-homepage.png',
+    fullPage: true
+  });
+  
+  // Verify demo is visible
+  await expect(page.locator('#demo_step1')).toBeVisible();
+});</code></pre>
+          </div>
+
+          <div class="notice goodNote">
+            <b>💡 Pro Tip:</b> The built-in 📸 Screenshot button is the easiest way for users to capture pages. For automation and CI/CD, use Playwright or Puppeteer.
+          </div>
+        </div>
+
         <div class="card" id="d-adminops">
-          <h2>13) Admin-only operations</h2>
+          <h2>14) Admin-only operations</h2>
           <div class="notice">
             Admin controls (sponsor scheduling, settlement entry, resets) live on the <b>Admin</b> page only.
           </div>

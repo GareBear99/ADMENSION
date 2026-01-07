@@ -1,0 +1,422 @@
+/**
+ * ADMENSION Universal Ad System v1.0
+ * Single CSS import for consistent ad placement across all properties
+ * Includes: Sidebar ads, bottom anchor bar, support button & modal
+ */
+
+/* ===== CSS Custom Properties (Theme Override Points) ===== */
+:root {
+  --admension-bg-primary: rgba(0,0,0,0.45);
+  --admension-bg-secondary: rgba(0,0,0,0.35);
+  --admension-bg-modal: rgba(12,12,18,0.95);
+  --admension-border: rgba(255,255,255,0.12);
+  --admension-border-hover: rgba(215,160,255,0.35);
+  --admension-text: rgba(255,255,255,0.92);
+  --admension-text-muted: rgba(255,255,255,0.65);
+  --admension-text-faint: rgba(255,255,255,0.45);
+  --admension-support-color: rgba(34,197,94,0.45);
+  --admension-radius: 14px;
+  --admension-radius-sm: 10px;
+  --admension-shadow: 0 18px 60px rgba(0,0,0,0.45);
+  --admension-z-sidebar: 9998;
+  --admension-z-anchor: 9999;
+  --admension-z-support: 99999;
+  --admension-z-modal: 100000;
+}
+
+/* ===== Sidebar Ads (Left + Right) ===== */
+.admension-sidebar-wrap {
+  position: fixed;
+  top: 120px;
+  z-index: var(--admension-z-sidebar);
+  max-width: 260px;
+  width: 240px;
+  pointer-events: auto;
+  border-radius: var(--admension-radius);
+  border: 1px solid var(--admension-border);
+  background: var(--admension-bg-primary);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--admension-shadow);
+  overflow: hidden;
+  display: none; /* Hidden by default, shown via JS on interaction */
+}
+
+.admension-sidebar-wrap.left { left: 14px; }
+.admension-sidebar-wrap.right { right: 14px; }
+
+.admension-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid var(--admension-border);
+}
+
+.admension-sidebar-head .mini {
+  opacity: 0.85;
+  font-size: 12px;
+  color: var(--admension-text-muted);
+}
+
+.admension-sidebar-close {
+  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--admension-bg-secondary);
+  color: var(--admension-text-muted);
+  border-radius: var(--admension-radius-sm);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 120ms ease;
+  font-family: inherit;
+}
+
+.admension-sidebar-close:hover {
+  background: rgba(215,160,255,0.15);
+  border-color: var(--admension-border-hover);
+}
+
+.admension-sidebar-ad {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border: 1px dashed rgba(255,255,255,0.20);
+  border-radius: 12px;
+  margin: 12px;
+  background: rgba(255,255,255,0.03);
+}
+
+.admension-ad-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  opacity: 0.9;
+  text-align: center;
+  color: var(--admension-text-muted);
+}
+
+/* Sidebar Show Tabs (when hidden) */
+.admension-sidebar-tab {
+  position: fixed;
+  top: 160px;
+  z-index: var(--admension-z-sidebar);
+  pointer-events: auto;
+  display: none; /* Shown when sidebar is hidden */
+}
+
+.admension-sidebar-tab.left { left: 8px; }
+.admension-sidebar-tab.right { right: 8px; }
+
+.admension-sidebar-tab button {
+  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--admension-bg-secondary);
+  backdrop-filter: blur(10px);
+  color: var(--admension-text-muted);
+  border-radius: var(--admension-radius);
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  transition: all 120ms ease;
+  font-family: inherit;
+}
+
+.admension-sidebar-tab button:hover {
+  background: rgba(215,160,255,0.15);
+  border-color: var(--admension-border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.50);
+}
+
+/* Hide sidebar ads on small screens */
+@media (max-width: 1100px) {
+  .admension-sidebar-wrap,
+  .admension-sidebar-tab {
+    display: none !important;
+  }
+}
+
+/* ===== Sticky Bottom Anchor Ad Bar ===== */
+.admension-anchor-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--admension-z-anchor);
+  padding: 12px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.65));
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--admension-border);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.55);
+}
+
+.admension-anchor-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admension-anchor-left {
+  flex: 0 0 auto;
+  min-width: 160px;
+}
+
+.admension-anchor-title {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--admension-text);
+  margin-bottom: 3px;
+}
+
+.admension-anchor-meta {
+  font-size: 11px;
+  color: var(--admension-text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.admension-anchor-ad {
+  flex: 1;
+  max-width: 728px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admension-ad-placeholder {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255,255,255,0.20);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: var(--admension-text-muted);
+}
+
+@media (max-width: 920px) {
+  .admension-anchor-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admension-anchor-left {
+    min-width: 0;
+    text-align: center;
+  }
+  .admension-anchor-ad {
+    max-width: 100%;
+  }
+}
+
+/* Add padding to body to prevent content from hiding under anchor */
+body.admension-ads-active {
+  padding-bottom: 110px !important;
+}
+
+/* ===== Support FAB Button (Bottom-Left) ===== */
+.admension-support-fab {
+  position: fixed;
+  left: 14px;
+  bottom: 100px;
+  z-index: var(--admension-z-support);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.admension-support-btn {
+  border: 1px solid var(--admension-support-color);
+  background: linear-gradient(135deg, rgba(34,197,94,0.22), rgba(34,211,238,0.18));
+  color: var(--admension-text);
+  font-weight: 900;
+  padding: 12px 16px;
+  border-radius: var(--admension-radius);
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  transition: all 180ms ease;
+  font-family: inherit;
+}
+
+.admension-support-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.55), 0 0 0 4px rgba(34,197,94,0.12);
+  border-color: rgba(34,197,94,0.65);
+}
+
+/* ===== Support Modal ===== */
+.admension-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  z-index: var(--admension-z-modal);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.admension-modal-overlay[aria-hidden="false"] {
+  display: flex;
+}
+
+.admension-modal {
+  width: min(860px, 100%);
+  max-height: min(86vh, 820px);
+  overflow: auto;
+  border-radius: var(--admension-radius);
+  background: var(--admension-bg-modal);
+  border: 1px solid var(--admension-border);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+  backdrop-filter: blur(16px);
+}
+
+.admension-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--admension-border);
+}
+
+.admension-modal-header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  color: var(--admension-text);
+}
+
+.admension-modal-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--admension-text-muted);
+}
+
+.admension-modal-close {
+  border: 1px solid var(--admension-border);
+  background: var(--admension-bg-secondary);
+  color: var(--admension-text);
+  padding: 8px 12px;
+  border-radius: var(--admension-radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 120ms ease;
+  font-family: inherit;
+}
+
+.admension-modal-close:hover {
+  background: rgba(215,160,255,0.15);
+  border-color: var(--admension-border-hover);
+}
+
+.admension-modal-body {
+  padding: 20px;
+}
+
+.admension-modal-card {
+  background: rgba(0,0,0,0.32);
+  border: 1px solid var(--admension-border);
+  border-radius: var(--admension-radius);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.admension-modal-card:last-child {
+  margin-bottom: 0;
+}
+
+.admension-modal-card h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: var(--admension-text);
+}
+
+.admension-notice {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--admension-border);
+  background: rgba(255,255,255,0.04);
+  font-size: 13px;
+  color: var(--admension-text-muted);
+  margin-bottom: 14px;
+}
+
+.admension-donate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .admension-donate-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admension-donate-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--admension-text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admension-addr-box {
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--admension-border);
+  background: rgba(0,0,0,0.28);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  word-break: break-all;
+  color: var(--admension-text-muted);
+  margin-bottom: 8px;
+}
+
+.admension-btn-small {
+  padding: 8px 12px;
+  font-size: 12px;
+  border: 1px solid var(--admension-border);
+  background: var(--admension-bg-secondary);
+  color: var(--admension-text);
+  border-radius: var(--admension-radius-sm);
+  cursor: pointer;
+  transition: all 120ms ease;
+  font-family: inherit;
+}
+
+.admension-btn-small:hover {
+  background: rgba(215,160,255,0.15);
+  border-color: var(--admension-border-hover);
+  transform: translateY(-1px);
+}
+
+/* ===== Toast Notification ===== */
+.admension-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border-radius: var(--admension-radius);
+  border: 1px solid var(--admension-border);
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(10px);
+  color: var(--admension-text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  z-index: calc(var(--admension-z-modal) + 1);
+  font-size: 13px;
+}
+
+.admension-toast.show {
+  opacity: 1;
+}

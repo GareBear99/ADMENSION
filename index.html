@@ -567,8 +567,6 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
       <!-- Daily Motivational Quote (365 quotes + 27 rotating GIFs) -->
       <div id="dailyQuoteContainer"></div>
 
-      <p class="sub">This is the "ad base" landing flow + ADMENSION creator system in one file.</p>
-
       <!-- Eye-Catching Revenue Dashboard -->
       <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%); border: 2px solid rgba(102, 126, 234, 0.3); margin-bottom: 16px;">
         <h2 style="margin-top: 0; color: #667eea; font-size: 24px;">🎯 Live Revenue Tracking</h2>
@@ -599,7 +597,7 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         <div class="progressTop">
           <div>
             <b>💰 This Month: ADMENSION Pool Cap</b>
-            <div class="mini">Estimated pool = min($10K cap, projected_month_revenue × 13%)</div>
+            <div class="mini" id="poolCapFormula">Estimated pool = min($10K cap, projected_month_revenue × <span id="poolPct">13</span>%)</div>
             <div id="rpmHint" class="small" style="opacity:.88;margin-top:6px;">Step <span id="stepOf">1</span> of 3 • Session depth boosts RPM (no refresh timers)</div>
           </div>
           <div class="badge" id="homePoolBadge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 700;">$0 / $10,000</div>
@@ -607,8 +605,17 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         <div class="progressBar" style="height: 24px; border-radius: 12px; background: rgba(12, 12, 16, 0.8);">
           <div class="progressFill" id="homePoolFill" style="background: linear-gradient(90deg, #667eea 0%, #00ff88 50%, #ffd700 100%); border-radius: 12px; transition: width 0.5s ease;"></div>
         </div>
-        <div class="mini" style="margin-top:8px; padding: 8px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
-          💰 <b>Monthly Payouts (1st of each month):</b> Pool = 13% of revenue (capped $10K). <span class="code">your_payout = pool × (your_units / total_units)</span>
+        <div class="mini" style="margin-top:8px; padding: 8px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;" id="poolPayoutInfo">
+          💰 <b>Monthly Payouts (1st of each month):</b> Pool = <span id="poolPctInfo">13</span>% of revenue (capped $10K). <span class="code">your_payout = pool × (your_units / total_units)</span>
+        </div>
+        
+        <!-- Bootstrap Phase Notice (auto-hides after Month 3) -->
+        <div class="notice warnNote" id="bootstrapNotice" style="margin-top:12px; display:none;">
+          <b>⚠️ Bootstrap Phase (Months 1-3):</b><br>
+          • <b>No payouts until Month 3</b> - First payout will occur on April 1, 2026<br>
+          • <b>Pool capped at 50% (6.5% of revenue)</b> during bootstrap phase<br>
+          • After Month 3, pool increases to full 13% and payouts begin monthly<br>
+          • This ensures system stability and sustainable long-term payouts
         </div>
       </div>
 
@@ -2749,7 +2756,64 @@ function admCap(){
 }
 function admPoolUSD(rev, cap){
   const c = Number(cap)||ADM.pool_cap_base;
-  return Math.min(c, (Number(rev)||0) * 0.13);
+  const poolPct = admGetPoolPercent();
+  return Math.min(c, (Number(rev)||0) * poolPct);
+}
+
+// Bootstrap phase: launched Jan 2026
+const LAUNCH_DATE = new Date('2026-01-01');
+const BOOTSTRAP_MONTHS = 3; // Months 1-3
+
+function admGetCurrentMonthNumber(){
+  const now = new Date();
+  const diffMs = now - LAUNCH_DATE;
+  const diffMonths = Math.floor(diffMs / (30.44 * 24 * 60 * 60 * 1000)); // avg month length
+  return Math.max(1, diffMonths + 1); // 1-indexed
+}
+
+function admIsBootstrapPhase(){
+  return admGetCurrentMonthNumber() <= BOOTSTRAP_MONTHS;
+}
+
+function admGetPoolPercent(){
+  // Bootstrap phase (months 1-3): 6.5% (50% of 13%)
+  // After bootstrap: 13%
+  return admIsBootstrapPhase() ? 0.065 : 0.13;
+}
+
+function admGetPoolPercentDisplay(){
+  return admIsBootstrapPhase() ? '6.5' : '13';
+}
+
+function admUpdateBootstrapUI(){
+  const isBootstrap = admIsBootstrapPhase();
+  const monthNum = admGetCurrentMonthNumber();
+  const poolPct = admGetPoolPercentDisplay();
+  
+  // Update pool percentage displays
+  const poolPctSpan = document.getElementById('poolPct');
+  const poolPctInfoSpan = document.getElementById('poolPctInfo');
+  if(poolPctSpan) poolPctSpan.textContent = poolPct;
+  if(poolPctInfoSpan) poolPctInfoSpan.textContent = poolPct;
+  
+  // Show/hide bootstrap notice
+  const bootstrapNotice = document.getElementById('bootstrapNotice');
+  if(bootstrapNotice){
+    bootstrapNotice.style.display = isBootstrap ? 'block' : 'none';
+    if(isBootstrap){
+      // Update first payout date (Month 3 = April 2026)
+      const firstPayoutDate = new Date(LAUNCH_DATE);
+      firstPayoutDate.setMonth(firstPayoutDate.getMonth() + 3);
+      const firstPayoutStr = firstPayoutDate.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+      bootstrapNotice.innerHTML = `
+        <b>⚠️ Bootstrap Phase (Months 1-3):</b><br>
+        • <b>No payouts until Month 3</b> - First payout will occur on ${firstPayoutStr}<br>
+        • <b>Pool capped at 50% (${poolPct}% of revenue)</b> during bootstrap phase (currently Month ${monthNum})<br>
+        • After Month 3, pool increases to full 13% and payouts begin monthly<br>
+        • This ensures system stability and sustainable long-term payouts
+      `;
+    }
+  }
 }
 
 function admRenderSummaries(){
@@ -2790,6 +2854,9 @@ function admRenderSummaries(){
 }
 
 function admRender(){
+  // Update bootstrap phase UI
+  admUpdateBootstrapUI();
+  
   const cap = admCap();
   const projRev = admGetNum(ADM.proj_rev_month_key, 0);
   const projPool = admPoolUSD(projRev, cap);
@@ -2959,10 +3026,24 @@ function setupSideStickyButtons(){
   function apply(){
     const hideL = localStorage.getItem(KEY_L)==="1";
     const hideR = localStorage.getItem(KEY_R)==="1";
-    if(hideL){ if(wL) wL.style.display="none"; if(tL) tL.style.display="block"; }
-    else { if(tL) tL.style.display="none"; /* wL display controlled by renderSide */ }
-    if(hideR){ if(wR) wR.style.display="none"; if(tR) tR.style.display="block"; }
-    else { if(tR) tR.style.display="none"; }
+    
+    // Left side
+    if(hideL){
+      if(wL) wL.style.display="none";
+      if(tL) tL.style.display="block";
+    } else {
+      if(wL) wL.style.display="block";
+      if(tL) tL.style.display="none";
+    }
+    
+    // Right side
+    if(hideR){
+      if(wR) wR.style.display="none";
+      if(tR) tR.style.display="block";
+    } else {
+      if(wR) wR.style.display="block";
+      if(tR) tR.style.display="none";
+    }
   }
 
   if(hL) hL.onclick = ()=>{ localStorage.setItem(KEY_L,"1"); apply(); };
@@ -2970,6 +3051,7 @@ function setupSideStickyButtons(){
   if(sL) sL.onclick = ()=>{ localStorage.removeItem(KEY_L); apply(); try{ spRenderSticky(); }catch(e){} };
   if(sR) sR.onclick = ()=>{ localStorage.removeItem(KEY_R); apply(); try{ spRenderSticky(); }catch(e){} };
 
+  // Initial state: tabs hidden, wraps visible (unless user has hidden them)
   apply();
 }
 

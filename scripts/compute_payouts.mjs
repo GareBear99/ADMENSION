@@ -72,6 +72,20 @@ async function main(){
   const CREATOR_ADM_CODE = process.env.CREATOR_ADM_CODE || '';
 
   const {start, end, tag} = lastMonthUTC();
+  
+  // Bootstrap phase check: launched Jan 2026
+  const LAUNCH_DATE = new Date('2026-01-01T00:00:00Z');
+  const BOOTSTRAP_MONTHS = 3;
+  const now = new Date();
+  const monthsSinceLaunch = Math.floor((now - LAUNCH_DATE) / (30.44 * 24 * 60 * 60 * 1000)) + 1;
+  
+  if(monthsSinceLaunch < BOOTSTRAP_MONTHS){
+    console.log(`\n⚠️  BOOTSTRAP PHASE: Month ${monthsSinceLaunch} of ${BOOTSTRAP_MONTHS}`);
+    console.log(`No payouts until Month ${BOOTSTRAP_MONTHS}. First payout will occur in April 2026.`);
+    console.log(`Ledger will be created but amounts will be $0 until bootstrap completes.\n`);
+  }
+  
+  const isBootstrap = monthsSinceLaunch <= BOOTSTRAP_MONTHS;
 
   const eventsCSV = await fetchText(SHEET_EVENTS_CSV_URL);
   const rows = parseCSV(eventsCSV);
@@ -108,7 +122,17 @@ async function main(){
   }
   const received = Number(settlement.received_revenue_usd)||0;
   const poolCap = 10000;
-  const pool = Math.min(received*0.13, poolCap);
+  
+  // Bootstrap phase: 6.5% pool (50% of 13%), no actual payouts until month 3
+  const poolPct = isBootstrap ? 0.065 : 0.13;
+  let pool = Math.min(received * poolPct, poolCap);
+  
+  // During bootstrap (months 1-2), track units but set pool to 0 for actual payouts
+  if(monthsSinceLaunch < BOOTSTRAP_MONTHS){
+    console.log(`Bootstrap phase active: Pool calculated at ${poolPct*100}% = $${pool.toFixed(2)}`);
+    console.log(`Setting actual payout pool to $0 (units tracked for future reference)`);
+    pool = 0; // No actual distribution during bootstrap
+  }
 
   // Optional wallet mapping
   let walletByAdm = new Map();

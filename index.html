@@ -607,7 +607,7 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
           <div class="progressFill" id="homePoolFill" style="background: linear-gradient(90deg, #667eea 0%, #00ff88 50%, #ffd700 100%); border-radius: 12px; transition: width 0.5s ease;"></div>
         </div>
         <div class="mini" style="margin-top:8px; padding: 8px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
-          📊 <b>Payouts are proportional:</b> <span class="code">your_payout = pool × (your_units / total_units)</span>
+          💰 <b>Monthly Payouts (1st of each month):</b> Pool = 13% of revenue (capped $10K). <span class="code">your_payout = pool × (your_units / total_units)</span>
         </div>
       </div>
 
@@ -640,24 +640,27 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
           </div>
         </div>
         <div class="card col-4" id="homeRail">
-          <div id="ad-rail-right" class="ad-container" style="min-height: 600px;"></div>
+          <div id="ad-rail-right" class="ad-container" style="min-height: 600px; max-height: 600px;"></div>
           <p class="mini">Hidden on mobile automatically.</p>
         </div>
-        <div class="card col-12"><div id="ad-in-content-tall" class="ad-container" style="min-height: 600px;"></div></div>
-        <div class="card col-12"><div id="ad-footer-banner" class="ad-container" style="min-height: 90px;"></div></div>
+        <div class="card col-12"><div id="ad-in-content-tall" class="ad-container" style="min-height: 280px; max-height: 280px;"></div></div>
+        <div class="card col-12"><div id="ad-footer-banner" class="ad-container" style="min-height: 90px; max-height: 90px;"></div></div>
       </div>
     </div>
   
-      <div class="card" style="margin-top:12px" id="homeLastMonthCard">
-        <h3 style="margin-top:0">Last month summary (latest settlement)</h3>
-        <div class="mini">Entered by admin after ad networks settle.</div>
+      <div class="card" style="margin-top:12px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%); border: 2px solid rgba(255, 215, 0, 0.3);" id="homeLastMonthCard">
+        <h3 style="margin-top:0; color: #ffd700;">💰 Last Month Settlement (Paid 1st)</h3>
+        <div class="mini" style="margin-bottom: 12px;">Payouts processed on 1st of each month based on previous month contributions. Next payout: <b style="color: #00ff88;">February 1, 2026</b></div>
         <table class="table" style="margin-top:8px">
           <tr><th>Metric</th><th>Value</th></tr>
           <tr><td>Last month received revenue</td><td><b id="home_last_rev">—</b></td></tr>
-          <tr><td>Last month ADMENSION pool paid</td><td><b id="home_last_pool">—</b></td></tr>
+          <tr><td>Last month ADMENSION pool paid (13%)</td><td><b id="home_last_pool">—</b></td></tr>
           <tr><td>Total units counted</td><td><b id="home_last_units">—</b></td></tr>
           <tr><td>Payout per 1,000 units</td><td><b id="home_last_perk">—</b></td></tr>
         </table>
+        <div class="notice" style="margin-top: 12px; background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.3);">
+          <b>✅ Automatic payouts:</b> Your crypto wallet receives payment automatically on the 1st. No manual claims needed.
+        </div>
       </div>
 
 
@@ -709,14 +712,19 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
       </div>
 
       <div class="notice goodNote" style="margin-top:10px">
-        <b>Pool payout (quick):</b> pool is <b>13%</b> of received revenue this month, capped at <b>$10,000</b>.
-        Your payout is your percentage of units:
+        <b>💰 Monthly Payout Schedule:</b> Payouts processed on <b>1st of every month</b> based on previous month's ad contributions.
+        Your payout is your percentage of total units:
         <span class="code">your_payout = pool × (your_units / total_units)</span>.
       </div>
 
       <div class="notice goodNote" style="margin-top:10px">
-        <b>ADMENSION pool payout (quick):</b> <span class="code">pool = received_revenue × 0.13</span> and your payout is your percent of units:
-        <span class="code">your_payout = pool × (your_units/total_units)</span>. This page also shows conservative projections for planning.
+        <b>ADMENSION pool calculation:</b> Pool = <b>13%</b> of received ad revenue, capped at <b>$10,000/month</b>.
+        <ul style="margin: 8px 0 0 20px; opacity: 0.9;">
+          <li>Example: $5,000 revenue → $650 pool (13%)</li>
+          <li>Example: $100,000 revenue → $10,000 pool (capped)</li>
+          <li>Payouts sent: <b>1st of each month</b> via crypto to your wallet address</li>
+          <li>Track your units via "Manage" page to estimate your share</li>
+        </ul>
       </div>
 
 
@@ -820,10 +828,10 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
           </table>
         </div>
 
-        <div class="card col-12"><div id="ad-stats-tall" class="ad-container" style="min-height: 600px;"></div></div>
+        <div class="card col-12"><div id="ad-stats-tall" class="ad-container" style="min-height: 600px; max-height: 600px;"></div></div>
 
         <div class="card col-4" id="statsRail">
-          <div id="ad-stats-rail" class="ad-container" data-placement="rail" data-page="stats" style="min-height: 600px;"></div>
+          <div id="ad-stats-rail" class="ad-container" data-placement="rail" data-page="stats" style="min-height: 600px; max-height: 600px;"></div>
           <p class="mini">Desktop rail - hidden on mobile</p>
         </div>
       </div>
@@ -946,11 +954,11 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         </div>
 
         <div class="card col-4" id="createRail">
-          <div id="ad-create-rail" class="ad-container" style="min-height: 600px;"></div>
+          <div id="ad-create-rail" class="ad-container" style="min-height: 600px; max-height: 600px;"></div>
           <p class="mini">Hidden on mobile automatically.</p>
         </div>
 
-        <div class="card col-12"><div id="ad-create-tall" class="ad-container" style="min-height: 600px;"></div></div>
+        <div class="card col-12"><div id="ad-create-tall" class="ad-container" style="min-height: 600px; max-height: 600px;"></div></div>
         <div class="card col-12"><div id="ad-create-footer" class="ad-container" style="min-height: 90px;"></div></div>
       </div>
     </section>
@@ -991,10 +999,10 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         </div>
 
         <div class="card col-4" id="manageRail">
-          <div id="ad-manage-rail" class="ad-container" style="min-height: 600px;"></div>
+          <div id="ad-manage-rail" class="ad-container" style="min-height: 600px; max-height: 600px;"></div>
         </div>
 
-        <div class="card col-12"><div id="ad-manage-tall" class="ad-container" style="min-height: 600px;"></div></div>
+        <div class="card col-12"><div id="ad-manage-tall" class="ad-container" style="min-height: 600px; max-height: 600px;"></div></div>
 
         <div class="card col-12"><div id="ad-manage-footer" class="ad-container" data-placement="footer" data-page="manage" style="min-height: 90px;"></div></div>
       </div>
@@ -1060,11 +1068,11 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         </div>
 
         <div class="card col-4" id="docsRail">
-          <div id="ad-docs-rail" class="ad-container" data-placement="rail" data-page="docs" style="min-height: 600px;"></div>
+          <div id="ad-docs-rail" class="ad-container" data-placement="rail" data-page="docs" style="min-height: 600px; max-height: 600px;"></div>
           <p class="mini">Desktop rail - hidden on mobile</p>
         </div>
 
-        <div class="card col-12"><div id="ad-docs-tall" class="ad-container" data-placement="tall" data-page="docs" style="min-height: 600px;"></div></div>
+        <div class="card col-12"><div id="ad-docs-tall" class="ad-container" data-placement="tall" data-page="docs" style="min-height: 600px; max-height: 600px;"></div></div>
       </div>
     </section>
   </section>
@@ -1513,11 +1521,11 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         </div>
 
         <div class="card col-4" id="adminRail">
-          <div id="ad-admin-rail" class="ad-container" data-placement="rail" data-page="admin" style="min-height: 600px;"></div>
+          <div id="ad-admin-rail" class="ad-container" data-placement="rail" data-page="admin" style="min-height: 600px; max-height: 600px;"></div>
           <p class="mini">Desktop rail - hidden on mobile</p>
         </div>
 
-        <div class="card col-12"><div id="ad-admin-tall" class="ad-container" data-placement="tall" data-page="admin" style="min-height: 600px;"></div></div>
+        <div class="card col-12"><div id="ad-admin-tall" class="ad-container" data-placement="tall" data-page="admin" style="min-height: 600px; max-height: 600px;"></div></div>
       </div>
     </section>
   </section>

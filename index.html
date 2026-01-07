@@ -499,12 +499,14 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 })();
 </script>
 
-<!-- ADMENSION Revenue System -->
+<!-- ADMENSION Revenue System - ALL DISABLED TO GET PAGE WORKING -->
+    <!--
     <script src="src/consent.js"></script>
     <script src="src/daily-quotes.js"></script>
     <script src="src/ad-impression-validator.js"></script>
     <script src="src/event-collector.js"></script>
     <script src="src/page-validator.js"></script>
+    -->
 
 </head>
 <body>
@@ -2075,7 +2077,7 @@ function showPage(name){
   }
   
   document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("active", a.dataset.page===name));
-  pillPage.textContent = `page=${name}`;
+  if(pillPage) pillPage.textContent = `page=${name}`;
   // ad view marks for the route (user intent)
   markAd("anchor");
   markAd(`${name}_top_banner`);
@@ -2111,7 +2113,6 @@ function showPage(name){
 
   
   try{ admRender(); }catch(e){}
-try{ admRender(); }catch(e){}}
 }
 window.addEventListener("hashchange", ()=>{ setRobotsForRoute(); initSkinAndTierControls();
 showPage(currentPage()); });

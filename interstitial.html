@@ -150,11 +150,11 @@
   </div>
 </div>
 
-<!-- Step 2: Instructions -->
+<!-- Step 2: Daily Quote + Instructions -->
 <div id="step2" class="hidden">
   <div id="mainCard">
-    <h1>Almost there…</h1>
-    <div class="instructions">
+    <div id="dailyQuoteStep2"></div>
+    <div class="instructions" style="margin-top:1rem">
       <strong>Step 2 of 3</strong>
       <p>Wait for the timer to complete, then click "Next" to continue.</p>
     </div>
@@ -189,6 +189,7 @@
   </div>
 </div>
 
+<script src="./src/daily-quotes.js"></script>
 <script src="./universal-ads/admension-ads.js"></script>
 <script>
 /* ===== ADMENSION Interstitial Page ===== */
@@ -295,6 +296,9 @@ btn1.onclick = () => {
   step2El.classList.remove('hidden');
   currentStep = 2;
   
+  // Render daily quote in Step 2
+  renderDailyQuoteStep2();
+  
   // Timer for step 2 (3 seconds)
   let countdown2 = 3;
   timer2El.textContent = countdown2;
@@ -307,6 +311,84 @@ btn1.onclick = () => {
       btn2.disabled = false;
     }
   }, 1000);
+};
+
+function renderDailyQuoteStep2() {
+  const container = document.getElementById('dailyQuoteStep2');
+  if(!container) return;
+  
+  // Use the daily quote system if available
+  if(window.ADMENSION_DAILY_QUOTES) {
+    const quote = window.ADMENSION_DAILY_QUOTES.getTodaysQuote();
+    const gifUrl = window.ADMENSION_DAILY_QUOTES.getTodaysGif();
+    const dayOfYear = window.ADMENSION_DAILY_QUOTES.getDayOfYear();
+    
+    container.innerHTML = `
+      <div class="daily-quote-card" style="
+        position: relative;
+        background: linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(12,12,16,0.95) 100%),
+                    url('${gifUrl}') center/cover;
+        border: 2px solid rgba(255,215,0,0.4);
+        border-radius: 16px;
+        padding: 24px;
+        min-height: 160px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(255,215,0,0.2);
+        overflow: hidden;
+        margin-bottom: 1rem;
+      ">
+        <div class="quote-badge" style="
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: rgba(255,215,0,0.9);
+          color: #000;
+          padding: 4px 10px;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 11px;
+          letter-spacing: 0.5px;
+        ">
+          DAY ${dayOfYear}/365
+        </div>
+        
+        <div class="quote-icon" style="
+          font-size: 36px;
+          margin-bottom: 12px;
+          opacity: 0.9;
+        ">💰</div>
+        
+        <blockquote class="quote-text" style="
+          font-size: 18px;
+          font-weight: 700;
+          line-height: 1.4;
+          color: #fff;
+          text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+          max-width: 100%;
+          margin: 0;
+          padding: 0 16px;
+          position: relative;
+          z-index: 1;
+        ">
+          "${quote}"
+        </blockquote>
+        
+        <div class="quote-attribution" style="
+          margin-top: 12px;
+          font-size: 12px;
+          color: rgba(255,215,0,0.8);
+          font-weight: 600;
+          letter-spacing: 1px;
+        ">
+          — ADMENSION DAILY MOTIVATION
+        </div>
+      </div>
+    `;
+  }
 };
 
 btn2.onclick = () => {

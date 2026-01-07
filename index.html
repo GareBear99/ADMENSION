@@ -2194,7 +2194,7 @@ try {
 }
 
 /* ===== Base pageview ===== */
-logEvent("pageview",{adsShown:"route_marked",score,adm_present:!!adm});
+try { logEvent("pageview",{adsShown:"route_marked",score,adm_present:!!adm}); } catch(e) { console.warn('[ADMENSION] logEvent failed:', e); }
 try { renderStepUI(); } catch(e) { console.warn('[ADMENSION] renderStepUI failed:', e); }
 
 /* ===== Initial page load ===== */

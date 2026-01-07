@@ -500,11 +500,12 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 </script>
 
 <!-- ADMENSION Revenue System -->
-<script src="src/consent.js"></script>
-<script src="src/ads-config.js"></script>
-<script src="src/engagement-system.js"></script>
-<script src="src/anti-abuse-system.js"></script>
-<script src="src/daily-quotes.js"></script>
+    <script src="src/consent.js"></script>
+    <script src="src/ads-config.js"></script>
+    <script src="src/engagement-tracker.js"></script>
+    <script src="src/anti-abuse-system.js"></script>
+    <script src="src/daily-quotes.js"></script>
+    <script src="src/ad-impression-validator.js"></script>
 
 </head>
 <body>
@@ -1878,8 +1879,21 @@ function logEvent(type, payload){
   localStorage.setItem(K.sessions, JSON.stringify(sessions));
 }
 function markAd(slot){
+  // Legacy tracking (keep for backwards compatibility)
   ads.push({ t: Date.now(), slot, step, device, utm, adm, page: currentPage() });
   localStorage.setItem(K.ads, JSON.stringify(ads));
+  
+  // New validated tracking
+  if (window.ADMENSION_AD_VALIDATOR) {
+    window.ADMENSION_AD_VALIDATOR.logAd(
+      slot,
+      currentPage(),
+      sid,
+      device,
+      utm,
+      ref
+    );
+  }
 }
 function computeScore(){
   const base = step * 3;
@@ -2082,38 +2096,115 @@ function refreshStatsUI(){
   if(byId("k_ads_24")) byId("k_ads_24").textContent = a24.length;
   if(byId("k_apv_24")) byId("k_apv_24").textContent = (a24.length/Math.max(1,pv24.length)).toFixed(2);
   
-  // Enhanced ad performance metrics
-  // Estimate viewability: ~82% weighted average (anchor 95%, incontent 85%, rail 70%, tall 60%)
-  const estimatedViewableAds24 = Math.round(a24.length * 0.82);
-  const viewabilityRate24 = a24.length > 0 ? 82 : 0;
+  // Enhanced ad performance metrics using validated impressions
+  let validatedStats24 = null;
+  let estimatedViewableAds24 = Math.round(a24.length * 0.82);
+  let viewabilityRate24 = a24.length > 0 ? 82 : 0;
+  let estimatedRevenue24 = 0;
+  let currentRPM = 15.22;
+  let validSessions24 = Math.round(numSessions24 * 0.92);
   
-  // Get engagement tier for RPM estimation
-  let currentRPM = 15.22; // Base ENGAGED tier RPM
-  let tierMultiplier = 1.0;
-  if(window.ADMENSION_ENGAGEMENT) {
+  // Use validator data if available
+  if(window.ADMENSION_AD_VALIDATOR) {
     try {
-      const engStats = window.ADMENSION_ENGAGEMENT.getEngagementStats();
-      tierMultiplier = engStats.rpmMultiplier || 1.0;
-      currentRPM = 15.22 * tierMultiplier; // Adjust base RPM by tier
-    } catch(e) {}
+      validatedStats24 = window.ADMENSION_AD_VALIDATOR.getStats24h();
+      
+      // Use validated counts
+      const vImpressions = validatedStats24.impressions;
+      const vViewability = validatedStats24.viewability;
+      const vRevenue = validatedStats24.revenue;
+      
+      estimatedViewableAds24 = vImpressions.estimatedViewable;
+      viewabilityRate24 = vViewability.rate;
+      estimatedRevenue24 = vRevenue.estimatedRevenue;
+      currentRPM = vRevenue.currentRPM;
+      
+      // Calculate valid sessions (IVT-filtered)
+      validSessions24 = Math.round(numSessions24 * 0.92);
+      const avgViewablePerSession24 = validSessions24 > 0 ? (estimatedViewableAds24 / validSessions24).toFixed(1) : "0.0";
+      
+      // Display validated metrics
+      if(byId("k_ad_requests_24")) {
+        // Show total with breakdown
+        const totalRequests = vImpressions.total;
+        const placeholders = vImpressions.placeholder;
+        const realAds = vImpressions.real;
+        byId("k_ad_requests_24").textContent = totalRequests;
+        byId("k_ad_requests_24").title = `Total: ${totalRequests} (${placeholders} placeholder, ${realAds} real AdSense)`;
+      }
+      
+      if(byId("k_ad_viewable_24")) {
+        byId("k_ad_viewable_24").textContent = estimatedViewableAds24;
+        byId("k_ad_viewable_24").title = `Estimated viewable (50%+ visible for 1s)`;
+      }
+      
+      if(byId("k_viewability_rate_24")) {
+        const rateText = viewabilityRate24 + "%";
+        byId("k_viewability_rate_24").textContent = rateText;
+        if (vRevenue.adsenseApproved) {
+          byId("k_viewability_rate_24").style.color = "#22c55e";
+          byId("k_viewability_rate_24").title = "AdSense APPROVED - Real revenue tracking";
+        } else {
+          byId("k_viewability_rate_24").style.color = "#ffd700";
+          byId("k_viewability_rate_24").title = "Pre-approval estimates only (no real revenue yet)";
+        }
+      }
+      
+      if(byId("k_est_revenue_24")) {
+        if (vRevenue.adsenseApproved) {
+          byId("k_est_revenue_24").textContent = "$" + estimatedRevenue24.toFixed(2);
+          byId("k_est_revenue_24").title = `Real AdSense revenue estimate (13% pool = $${vRevenue.estimatedPool.toFixed(2)})`;
+        } else {
+          byId("k_est_revenue_24").textContent = "$0.00 (pending)";
+          byId("k_est_revenue_24").title = "AdSense approval required for revenue";
+        }
+      }
+      
+      if(byId("k_valid_sessions_24")) {
+        byId("k_valid_sessions_24").textContent = validSessions24;
+        const ivtFiltered = vImpressions.ivtFiltered;
+        byId("k_valid_sessions_24").title = `${ivtFiltered} sessions flagged as IVT`;
+      }
+      
+      if(byId("k_avg_viewable_ps_24")) {
+        byId("k_avg_viewable_ps_24").textContent = avgViewablePerSession24;
+      }
+      
+      if(byId("k_current_rpm_24")) {
+        byId("k_current_rpm_24").textContent = "$" + currentRPM.toFixed(2);
+        byId("k_current_rpm_24").title = `Tier: ${vRevenue.currentTier}`;
+      }
+      
+    } catch(e) {
+      console.warn('[ADMENSION] Validator stats error:', e);
+      // Fall back to legacy calculation
+    }
   }
   
-  // Calculate estimated revenue (RPM = revenue per 1000 impressions)
-  const estimatedRevenue24 = (estimatedViewableAds24 / 1000) * currentRPM;
-  
-  // IVT filtering estimate (5-10% traffic flagged as invalid)
-  const ivtFilterRate = 0.92; // Conservative: 8% filtered
-  const validSessions24 = Math.round(numSessions24 * ivtFilterRate);
-  const avgViewablePerSession24 = validSessions24 > 0 ? (estimatedViewableAds24 / validSessions24).toFixed(1) : "0.0";
-  
-  // Display enhanced metrics
-  if(byId("k_ad_requests_24")) byId("k_ad_requests_24").textContent = a24.length;
-  if(byId("k_ad_viewable_24")) byId("k_ad_viewable_24").textContent = estimatedViewableAds24;
-  if(byId("k_viewability_rate_24")) byId("k_viewability_rate_24").textContent = viewabilityRate24 + "%";
-  if(byId("k_est_revenue_24")) byId("k_est_revenue_24").textContent = "$" + estimatedRevenue24.toFixed(2);
-  if(byId("k_valid_sessions_24")) byId("k_valid_sessions_24").textContent = validSessions24;
-  if(byId("k_avg_viewable_ps_24")) byId("k_avg_viewable_ps_24").textContent = avgViewablePerSession24;
-  if(byId("k_current_rpm_24")) byId("k_current_rpm_24").textContent = "$" + currentRPM.toFixed(2);
+  // Fallback if validator not available (legacy calculation)
+  if (!validatedStats24) {
+    estimatedViewableAds24 = Math.round(a24.length * 0.82);
+    viewabilityRate24 = a24.length > 0 ? 82 : 0;
+    
+    if(window.ADMENSION_ENGAGEMENT) {
+      try {
+        const engStats = window.ADMENSION_ENGAGEMENT.getEngagementStats();
+        currentRPM = 15.22 * (engStats.rpmMultiplier || 1.0);
+      } catch(e) {}
+    }
+    
+    estimatedRevenue24 = (estimatedViewableAds24 / 1000) * currentRPM;
+    validSessions24 = Math.round(numSessions24 * 0.92);
+    const avgViewablePerSession24 = validSessions24 > 0 ? (estimatedViewableAds24 / validSessions24).toFixed(1) : "0.0";
+    
+    if(byId("k_ad_requests_24")) byId("k_ad_requests_24").textContent = a24.length;
+    if(byId("k_ad_viewable_24")) byId("k_ad_viewable_24").textContent = estimatedViewableAds24;
+    if(byId("k_viewability_rate_24")) byId("k_viewability_rate_24").textContent = viewabilityRate24 + "%";
+    if(byId("k_est_revenue_24")) byId("k_est_revenue_24").textContent = "$" + estimatedRevenue24.toFixed(2);
+    if(byId("k_valid_sessions_24")) byId("k_valid_sessions_24").textContent = validSessions24;
+    if(byId("k_avg_viewable_ps_24")) byId("k_avg_viewable_ps_24").textContent = avgViewablePerSession24;
+    if(byId("k_current_rpm_24")) byId("k_current_rpm_24").textContent = "$" + currentRPM.toFixed(2);
+  }
 
   if(byId("k_sessions_7")) byId("k_sessions_7").textContent = uniqSids(pv7);
   if(byId("k_pv_7")) byId("k_pv_7").textContent = pv7.length;

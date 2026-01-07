@@ -1,0 +1,9 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://garebear99.github.io/ADMENSION/sitemap.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 10

@@ -503,10 +503,10 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290"
      crossorigin="anonymous"></script>
 
-<!-- ADMENSION Revenue System - ALL DISABLED TO GET PAGE WORKING -->
-    <!--
-    <script src="src/consent.js"></script>
+<!-- ADMENSION Revenue System - Selectively enabled -->
     <script src="src/daily-quotes.js"></script>
+    <!-- Disabled for now to prevent conflicts:
+    <script src="src/consent.js"></script>
     <script src="src/ad-impression-validator.js"></script>
     <script src="src/event-collector.js"></script>
     <script src="src/page-validator.js"></script>
@@ -644,8 +644,9 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
           <div class="stack" style="margin-top:12px">
             <div class="col-12">
               <h3>Interactive Demo: 3-Step Interstitial</h3>
-              <div class="notice" style="margin-bottom:12px;background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3)">
-                <b>🎮 Try it now:</b> Click through the 3 steps to see what your visitors experience
+              <div class="notice goodNote" style="margin-bottom:12px">
+                <b>🎮 Try the demo:</b> Click "Next" on each step to experience what your link visitors will see.<br>
+                <b>✨ Special:</b> Step 2 shows 1 of 365 unique daily quotes + 1 of 27 rotating daily GIFs (changes every 24 hours)
               </div>
               
               <div class="progress">
@@ -681,12 +682,19 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
                 <div class="notice goodNote">
                   <h3 style="margin:0 0 8px 0">Demo Link Name</h3>
                   <p style="margin:0 0 8px 0;opacity:0.9">This is your custom message area!</p>
+                  <div class="notice warnNote" style="margin:8px 0">
+                    <b>⚠️ Disclaimer:</b><br>
+                    We do not condone or associate with malicious links. This service is provided as-is for legitimate use only. Use at your own discretion.
+                  </div>
                   <div class="notice" style="background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.3);margin:8px 0">
-                    <b>Step 3 of 3 — How this works:</b><br>
-                    You're viewing a shortened link created via ADMENSION. This brief interstitial helps support the link creator through ad revenue. Wait for the timer to reach 0, then click the button below to continue to your destination.
+                    <b>Step 3 of 3 — Final step:</b><br>
+                    Timer starts when you click "Next". Once complete, choose to agree and continue or go back.
                   </div>
                   <div style="font-size:32px;font-weight:700;margin:12px 0;color:#f59e0b" id="demo_timer3">10</div>
-                  <a href="https://garebear99.github.io/" class="btn primary" id="demo_btn3" style="pointer-events:none;opacity:0.5;text-decoration:none;display:inline-block" target="_blank">Click to continue to VALLIS Ecosystem Hub</a>
+                  <div style="display:flex;gap:10px;margin-top:12px" id="demo_step3_buttons">
+                    <button class="btn" id="demo_btn3_disagree" style="flex:1;background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.5);pointer-events:none;opacity:0.5">Disagree & Go Back</button>
+                    <a href="https://garebear99.github.io/" class="btn primary" id="demo_btn3" style="flex:1;pointer-events:none;opacity:0.5;text-decoration:none;display:inline-block;text-align:center" target="_blank">Agree & Continue</a>
+                  </div>
                 </div>
               </div>
 
@@ -2697,18 +2705,31 @@ if(admCopyLinkBtn){
     if(demo_step2) demo_step2.style.display = 'none';
     if(demo_step3) demo_step3.style.display = 'none';
     
+    // Don't auto-start timer - user must click Next first
     if(timer) clearInterval(timer);
+    if(demo_timer1) demo_timer1.textContent = '3';
+    if(demo_btn1) {
+      demo_btn1.disabled = false;
+      demo_btn1.textContent = 'Next';
+    }
+  }
+  
+  function runTimer1() {
+    if(demo_btn1) {
+      demo_btn1.disabled = true;
+      demo_btn1.textContent = 'Please wait...';
+    }
     let countdown = 3;
-    if(demo_timer1) demo_timer1.textContent = countdown;
-    if(demo_btn1) demo_btn1.disabled = true;
-    
     timer = setInterval(() => {
       countdown--;
       if(countdown < 0) countdown = 0;
       if(demo_timer1) demo_timer1.textContent = countdown;
       if(countdown === 0){
         clearInterval(timer);
-        if(demo_btn1) demo_btn1.disabled = false;
+        // Trigger page reload after timer completes
+        const nu = new URL(location.href);
+        nu.searchParams.set('demo_step', '2');
+        location.href = nu.toString();
       }
     }, 1000);
   }

@@ -552,15 +552,15 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <h1>The Only Link Shortener That Pays You — Automatically</h1>
 <p class="sub">
 No signup. No dashboard. No referrals.  
-Share a link → people browse → ads run → revenue is pooled and distributed.
+Create links → visitors see timed interstitial with ads → revenue is pooled and distributed.
 This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</b>.
 </p>
 <div class="notice goodNote">
 <b>How it works (30 seconds):</b><br>
-1) Share your link.<br>
-2) Visitors naturally browse (no timers, no tricks).<br>
-3) Ads earn money.<br>
-4) A fixed % is pooled and distributed transparently.<br>
+1) Create a short link with destination URL.<br>
+2) Share anywhere — visitors see 3-step interstitial (3s → 3s → 10s) with ads.<br>
+3) Ads earn money during timed steps.<br>
+4) A fixed 13% is pooled and distributed transparently monthly.<br>
 <b>No revenue = no payout.</b> Simple and honest.
 </div>
 
@@ -625,26 +625,40 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
       <div class="stack">
         <div class="card col-12"><div id="ad-top-banner" class="ad-container" style="min-height: 90px;"></div></div>
         <div class="card col-8">
-          <h2>3-step flow</h2>
-          <p class="sub">Use the buttons below to cycle steps (creates controlled PV/session without auto-refresh).</p>
-          <div class="progress">
-            <div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
-            <div class="bar"><div class="barFill" id="barFill"></div></div>
-            <span class="mini" id="stepText">Step 1 of 3</span>
+          <h2>How ADMENSION Works</h2>
+          <p class="sub">Create trackable short links that generate revenue through timed interstitial ads.</p>
+          
+          <div class="notice goodNote" style="margin-bottom:12px">
+            <b>🔗 Link Shortener Flow:</b><br>
+            1️⃣ <b>Create:</b> Make a link with name, destination URL, and optional message<br>
+            2️⃣ <b>Share:</b> Get short link (e.g., <span class="code">interstitial.html?code=ABC123</span>)<br>
+            3️⃣ <b>Visitors:</b> See 3-step timed interstitial with ads before destination<br>
+            4️⃣ <b>Earn:</b> Ad revenue contributes to monthly pool (13% of total revenue)
           </div>
-          <div class="row" id="choiceRow">
-            <button class="btn primary" id="btnChoiceA">Option A</button>
-            <button class="btn" id="btnChoiceB">Option B</button>
-            <span class="mini code" id="choiceHint">labels utm_content</span>
+
+          <div class="stack" style="margin-top:12px">
+            <div class="col-12">
+              <h3>Interstitial Flow (Visitor Experience)</h3>
+              <div class="progress">
+                <div class="dot on" id="d1"></div>
+                <div class="dot on" id="d2"></div>
+                <div class="dot on" id="d3"></div>
+                <div class="bar"><div class="barFill" id="barFill" style="width:100%"></div></div>
+                <span class="mini">3 steps total</span>
+              </div>
+              <div class="notice" style="margin-top:8px">
+                <b>Step 1 (3s):</b> Link name + timer instructions<br>
+                <b>Step 2 (3s):</b> Simple timer wait<br>
+                <b>Step 3 (10s):</b> Custom message + disclaimer + click to continue<br>
+                <span class="mini">Sidebar ads + anchor bar shown on all steps</span>
+              </div>
+            </div>
           </div>
-          <div class="row" style="margin-top:10px">
-            <button class="btn primary" id="btnNext">Next</button>
-            <button class="btn" id="btnSeed">New Seed</button>
-            <button class="btn" id="btnCopy">Copy Share Link</button>
-          </div>
-          <div class="divider"></div>
-          <div class="notice warnNote">
-            <b>Reminder:</b> Do not add timer-based refresh. Only refresh ads on user intent (page/nav/step).
+
+          <div class="row" style="margin-top:12px">
+            <a href="#create" class="btn primary">Create Your Link</a>
+            <a href="#manage" class="btn">Manage Links</a>
+            <a href="#docs" class="btn">View Docs</a>
           </div>
         </div>
         <div class="card col-4" id="homeRail">

@@ -2845,14 +2845,32 @@ if(admCopyLinkBtn){
     }, 1000);
   }
 
-  if(demo_btn1) demo_btn1.onclick = startStep2;
-  if(demo_btn2) demo_btn2.onclick = startStep3;
+  // Revenue maximization: each demo step triggers a page reload (new pageview = fresh ad impressions)
+  if(demo_btn1) demo_btn1.onclick = () => {
+    const nu = new URL(location.href);
+    nu.searchParams.set('demo_step', '2');
+    location.href = nu.toString();
+  };
+  if(demo_btn2) demo_btn2.onclick = () => {
+    const nu = new URL(location.href);
+    nu.searchParams.set('demo_step', '3');
+    location.href = nu.toString();
+  };
 
   // Expose start function globally so it can be re-called on navigation
   window.ADMENSION_DEMO_START = startStep1;
 
-  // Auto-start demo on page load
-  startStep1();
+  // Auto-start demo on page load, checking URL for current step
+  const urlParams = new URLSearchParams(location.search);
+  const demoStep = parseInt(urlParams.get('demo_step') || '1', 10);
+  
+  if(demoStep === 2) {
+    startStep2();
+  } else if(demoStep === 3) {
+    startStep3();
+  } else {
+    startStep1();
+  }
 })();
 
 /* ===== Mark baseline ad + show page ===== */

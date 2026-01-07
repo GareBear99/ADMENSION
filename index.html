@@ -544,6 +544,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
     <span class="pill" id="pillAds">adsShown=—</span>
     <span class="pill" id="pillScore">score=—</span>
     <span class="pill" id="pillAdm">adm=—</span>
+    <span class="pill" id="pillDebug" style="background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);">🔍 Debug: Loading...</span>
   </div>
 
   <!-- ===== PAGE: HOME ===== -->
@@ -2021,6 +2022,14 @@ function currentPage(){
   return ["home","stats","create","manage","docs","admin"].includes(h) ? h : "home";
 }
 function showPage(name){
+  // Debug logging
+  const debugPill = document.getElementById("pillDebug");
+  if(debugPill) {
+    const timestamp = new Date().toLocaleTimeString();
+    debugPill.textContent = `🔍 showPage('${name}') @ ${timestamp}`;
+    console.log(`[ADMENSION] showPage('${name}') called at ${timestamp}`);
+  }
+  
   // v1.3 hard lock: admin page requires PIN
   if(name==="admin" && !adminUnlocked){
     setRobotsForRoute();
@@ -2028,9 +2037,25 @@ function showPage(name){
     location.hash = "#home";
     name = "home";
   }
+  
+  // Log all pages found
+  const allPages = document.querySelectorAll(".page");
+  console.log(`[ADMENSION] Found ${allPages.length} page elements:`, Array.from(allPages).map(p => p.id));
+  
   document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
   const el = document.getElementById("page-"+name);
-  if(el) el.classList.add("active");
+  
+  console.log(`[ADMENSION] Looking for #page-${name}, found:`, el);
+  
+  if(el) {
+    el.classList.add("active");
+    console.log(`[ADMENSION] Set page-${name} to active`);
+    if(debugPill) debugPill.textContent = `✅ ${name} page active`;
+  } else {
+    console.error(`[ADMENSION] ERROR: page-${name} not found!`);
+    if(debugPill) debugPill.textContent = `❌ page-${name} NOT FOUND`;
+  }
+  
   document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("active", a.dataset.page===name));
   pillPage.textContent = `page=${name}`;
   // ad view marks for the route (user intent)
@@ -2129,9 +2154,18 @@ renderStepUI();
 /* ===== Initial page load ===== */
 // Wrap in DOMContentLoaded to ensure DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => showPage(currentPage()));
+  console.log('[ADMENSION] DOM still loading, waiting...');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[ADMENSION] DOMContentLoaded fired');
+    const page = currentPage();
+    console.log('[ADMENSION] Current page:', page);
+    showPage(page);
+  });
 } else {
-  showPage(currentPage());
+  console.log('[ADMENSION] DOM already loaded');
+  const page = currentPage();
+  console.log('[ADMENSION] Current page:', page);
+  showPage(page);
 }
 
 /* ===== Stats computations ===== */

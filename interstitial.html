@@ -352,9 +352,16 @@ btn3.onclick = () => {
     } catch(e) {}
   }
   
-  // Redirect to destination URL
+  // Redirect to destination URL (validate URL to prevent open redirects)
   if(linkData && linkData.destUrl) {
-    location.href = linkData.destUrl;
+    // Security: Only allow http:// or https:// URLs
+    const url = linkData.destUrl;
+    if(url.startsWith('http://') || url.startsWith('https://')) {
+      location.href = url;
+    } else {
+      alert('Invalid destination URL. Only http:// and https:// URLs are allowed.');
+      location.href = './';
+    }
   } else {
     alert('No destination URL found.');
     location.href = './';

@@ -708,8 +708,8 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
           </div>
 
           <div class="row" style="margin-top:12px">
-            <a href="#create" class="btn primary">Create Your Link</a>
-            <a href="#manage" class="btn">Manage Links</a>
+            <a href="?page=create" class="btn primary">Create Your Link</a>
+            <a href="?page=manage" class="btn">Manage Links</a>
             <a href="https://garebear99.github.io/" class="btn" target="_blank">Visit VALLIS Ecosystem Hub</a>
           </div>
         </div>
@@ -988,7 +988,11 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         <div class="card col-8">
           <h2>Create ADMENSION Link</h2>
           <div class="notice goodNote" style="margin-bottom:12px">
-            Create a trackable short link that sends visitors through a 3-step interstitial before reaching your destination. Ads shown during steps earn you pool contributions.
+            💡 <b>How it works:</b> Your link shows visitors a 3-step interstitial (3s + 3s + 10s) with ads before reaching your destination.<br>
+            <b>• Step 1:</b> Link name + timer (3s)<br>
+            <b>• Step 2:</b> Daily motivational quote + GIF (1 of 365 quotes, 1 of 27 GIFs)<br>
+            <b>• Step 3:</b> Custom message + disclaimer + destination button (10s)<br><br>
+            <b>💰 Revenue:</b> Each step = separate pageview with fresh ads. More traffic = higher pool share. Links with no traffic for 90 days are automatically deleted.
           </div>
           <div class="stack">
             <div class="col-12">
@@ -2126,8 +2130,8 @@ function showPage(name){
   
   try{ admRender(); }catch(e){}
 }
-window.addEventListener("hashchange", ()=>{ setRobotsForRoute(); initSkinAndTierControls();
-showPage(currentPage()); });
+// Navigation now uses query params with page reloads for ad revenue
+// hashchange listener removed - each navigation = new pageview = fresh ads
 
 /* ===== Desktop rail visibility ===== */
 function setRail(id){
@@ -2551,11 +2555,42 @@ function renderManageList(){
   const box = document.getElementById("admList");
   if(!box) return;
   if(!admRefs.length){ box.textContent = "No links yet (in this browser)."; return; }
-  const last = admRefs.slice(-25).reverse().map(r=>{
-    const tag = r.addr ? "addr:set" : "addr:EMPTY";
-    return `${r.code} | ${r.chain} | ${tag} | ${new Date(r.created).toLocaleString()}`;
-  }).join("\n");
-  box.textContent = last;
+  
+  const now = Date.now();
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const EXPIRE_MS = 90 * DAY_MS;
+  
+  // Filter out expired links (>90 days with no traffic)
+  const activeRefs = admRefs.filter(r => {
+    const daysSinceView = Math.floor((now - (r.lastPageview || r.created)) / DAY_MS);
+    return daysSinceView < 90;
+  });
+  
+  if(!activeRefs.length){ 
+    box.innerHTML = `<div style="color:#f59e0b">No active links. Links expire after 90 days of no traffic.</div>`; 
+    return; 
+  }
+  
+  const lines = activeRefs.slice(-25).reverse().map(r=>{
+    const addrTag = r.addr ? "✅ Wallet" : "⚠️ NO WALLET";
+    const daysSinceView = Math.floor((now - (r.lastPageview || r.created)) / DAY_MS);
+    const daysLeft = 90 - daysSinceView;
+    const views = r.totalPageviews || 0;
+    
+    let statusTag = "";
+    if(daysLeft <= 7) {
+      statusTag = ` | ⚠️ EXPIRES IN ${daysLeft}d`;
+    } else if(daysLeft <= 30) {
+      statusTag = ` | ${daysLeft}d left`;
+    }
+    
+    return `${r.code} | ${r.chain} | ${addrTag} | ${views} views${statusTag} | ${new Date(r.created).toLocaleDateString()}`;
+  });
+  
+  box.innerHTML = `<div style="font-family:monospace;white-space:pre;font-size:12px;line-height:1.6">${lines.join('\n')}</div>
+<div style="margin-top:8px;padding:8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:8px;font-size:12px">
+💡 <b>90-Day Policy:</b> Links with no traffic for 90 days are automatically deleted. Any pageview resets the timer.
+</div>`;
 }
 const admCreateBtn = document.getElementById("admCreate");
 const admCopyBtn = document.getElementById("admCopy");
@@ -2580,7 +2615,9 @@ if(admCreateBtn){
       code, 
       chain, 
       addr: addr || "", 
-      created: Date.now(), 
+      created: Date.now(),
+      lastPageview: Date.now(),  // Track for 90-day deletion
+      totalPageviews: 0,          // Track link activity
       addr_set: !!addr,
       linkName,
       destUrl,

@@ -4,6 +4,9 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ADMENSION Redirect</title>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290"
+       crossorigin="anonymous"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -134,10 +137,14 @@
 <!-- Step 1: Link name + instructions -->
 <div id="step1" class="hidden">
   <div id="mainCard">
+    <div id="tos_error_msg" class="message" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);display:none;margin-bottom:1rem">
+      <strong>❌ You didn't agree to Terms of Service.</strong><br>
+      Please review and agree to continue to the destination.
+    </div>
     <h1 id="linkName">—</h1>
     <div class="instructions">
       <strong>Step 1 of 3</strong>
-      <p>Wait for the timer to complete, then click "Next" to continue.</p>
+      <p>Click "Next" to start the 3-second timer.</p>
     </div>
     <div class="progress">
       <div class="dot active"></div>
@@ -145,7 +152,7 @@
       <div class="dot"></div>
     </div>
     <div class="countdown" id="timer1">3</div>
-    <button class="btn" id="btn1" disabled>Next</button>
+    <button class="btn" id="btn1">Next</button>
     <div class="footer">Powered by <a href="./">ADMENSION</a></div>
   </div>
 </div>
@@ -156,7 +163,7 @@
     <div id="dailyQuoteStep2"></div>
     <div class="instructions" style="margin-top:1rem">
       <strong>Step 2 of 3</strong>
-      <p>Wait for the timer to complete, then click "Next" to continue.</p>
+      <p id="step2_instruction">Page is unlocking... Please wait.</p>
     </div>
     <div class="progress">
       <div class="dot"></div>
@@ -164,7 +171,7 @@
       <div class="dot"></div>
     </div>
     <div class="countdown" id="timer2">3</div>
-    <button class="btn" id="btn2" disabled>Next</button>
+    <button class="btn" id="btn2" disabled>Unlocking...</button>
     <div class="footer">Powered by <a href="./">ADMENSION</a></div>
   </div>
 </div>
@@ -175,24 +182,31 @@
     <h1 id="linkName3">—</h1>
     <div class="message" id="customMessage">—</div>
     <div class="message" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);">
-      <strong>⚠️ Disclaimer:</strong><br>
+      <strong>⚠️ Terms of Service:</strong><br>
       We do not condone or associate with malicious links. This service is provided as-is for legitimate use only. Use at your own discretion.
+    </div>
+    <div style="margin:1rem 0;padding:1rem;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.1);text-align:left">
+      <div style="margin-bottom:8px;font-weight:600">Do you agree to the Terms of Service?</div>
+      <label style="display:block;margin-bottom:8px;cursor:pointer">
+        <input type="radio" name="tos_radio" value="disagree" checked style="margin-right:8px">
+        <span>❌ Disagree (will return to Step 1)</span>
+      </label>
+      <label style="display:block;cursor:pointer">
+        <input type="radio" name="tos_radio" value="agree" style="margin-right:8px">
+        <span>✅ Agree to Terms of Service</span>
+      </label>
     </div>
     <div class="instructions">
       <strong>Step 3 of 3 — Final step:</strong>
-      <p style="margin-top:8px;">Click "Next" to start the timer. Once complete, choose to agree and continue to your destination, or disagree and go back.</p>
+      <p style="margin-top:8px;">Click "Next" to start the 10-second timer</p>
     </div>
     <div class="progress">
       <div class="dot"></div>
       <div class="dot"></div>
       <div class="dot active"></div>
     </div>
-    <button class="btn" id="btn3_next" style="margin-bottom:1rem">Next</button>
     <div class="countdown" id="timer3Big">10</div>
-    <div id="step3_actions" style="display:none;flex-direction:column;gap:0.75rem;margin-top:1rem">
-      <button class="btn" id="btn3_disagree" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.5)">Disagree & Go Back</button>
-      <button class="btn" id="btn3" disabled style="opacity:0.4">Agree & Continue</button>
-    </div>
+    <button class="btn" id="btn3">Next</button>
     <div class="footer">Powered by <a href="./">ADMENSION</a></div>
   </div>
 </div>
@@ -290,6 +304,14 @@ if(window.ADMENSION_ENGAGEMENT) {
 // Show the appropriate step based on istep parameter
 if(istep === 1) {
   step1El.classList.remove('hidden');
+  
+  // Check if user returned from ToS disagree
+  const tosMsg = params.get('tos_msg');
+  if(tosMsg === '1') {
+    const tosErrorEl = document.getElementById('tos_error_msg');
+    if(tosErrorEl) tosErrorEl.style.display = 'block';
+  }
+  
   // Timer doesn't auto-start - user must click Next
   timer1El.textContent = '3';
   btn1.disabled = false;
@@ -298,6 +320,7 @@ if(istep === 1) {
   btn1.onclick = () => {
     btn1.disabled = true;
     btn1.textContent = 'Please wait...';
+    btn1.style.background = 'rgba(255,255,255,0.1)';
     
     let countdown1 = 3;
     const interval1 = setInterval(() => {
@@ -306,10 +329,17 @@ if(istep === 1) {
       timer1El.textContent = countdown1;
       if(countdown1 === 0) {
         clearInterval(interval1);
-        // Page reload to step 2 (new pageview = more ads)
-        const nu = new URL(location.href);
-        nu.searchParams.set('istep', '2');
-        location.href = nu.toString();
+        // Enable button for user to click again
+        btn1.disabled = false;
+        btn1.textContent = '✅ Complete - Next';
+        btn1.style.background = 'rgba(34,197,94,0.2)';
+        btn1.style.border = '1px solid rgba(34,197,94,0.5)';
+        btn1.onclick = () => {
+          // Now trigger page reload
+          const nu = new URL(location.href);
+          nu.searchParams.set('istep', '2');
+          location.href = nu.toString();
+        };
       }
     }, 1000);
   };
@@ -317,66 +347,149 @@ if(istep === 1) {
   step2El.classList.remove('hidden');
   renderDailyQuoteStep2();
   
-  // Timer doesn't auto-start - user must click Next
-  timer2El.textContent = '3';
-  btn2.disabled = false;
-  btn2.textContent = 'Next';
+  // Auto-start unlock timer
+  let countdown2unlock = 3;
+  timer2El.textContent = countdown2unlock;
+  btn2.disabled = true;
+  btn2.textContent = 'Unlocking...';
+  btn2.style.background = 'rgba(255,255,255,0.1)';
   
-  btn2.onclick = () => {
-    btn2.disabled = true;
-    btn2.textContent = 'Please wait...';
-    
-    let countdown2 = 3;
-    const interval2 = setInterval(() => {
-      countdown2--;
-      if(countdown2 < 0) countdown2 = 0;
-      timer2El.textContent = countdown2;
-      if(countdown2 === 0) {
-        clearInterval(interval2);
-        // Page reload to step 3 (new pageview = more ads)
-        const nu = new URL(location.href);
-        nu.searchParams.set('istep', '3');
-        location.href = nu.toString();
-      }
-    }, 1000);
-  };
+  const step2InstructionEl = document.getElementById('step2_instruction');
+  if(step2InstructionEl) step2InstructionEl.textContent = 'Page is unlocking... Please wait.';
+  
+  const unlockInterval = setInterval(() => {
+    countdown2unlock--;
+    if(countdown2unlock < 0) countdown2unlock = 0;
+    timer2El.textContent = countdown2unlock;
+    if(countdown2unlock === 0) {
+      clearInterval(unlockInterval);
+      // Unlock complete - enable button for user to start main timer
+      btn2.disabled = false;
+      btn2.textContent = '✅ Unlocked - Next';
+      btn2.style.background = 'rgba(34,197,94,0.2)';
+      btn2.style.border = '1px solid rgba(34,197,94,0.5)';
+      if(step2InstructionEl) step2InstructionEl.textContent = 'Click "Next" to start the 3-second timer.';
+      
+      btn2.onclick = () => {
+        // Start main timer
+        btn2.disabled = true;
+        btn2.textContent = 'Please wait...';
+        btn2.style.background = 'rgba(255,255,255,0.1)';
+        btn2.style.border = '';
+        if(step2InstructionEl) step2InstructionEl.textContent = 'Please wait...';
+        
+        let countdown2main = 3;
+        timer2El.textContent = countdown2main;
+        const mainInterval = setInterval(() => {
+          countdown2main--;
+          if(countdown2main < 0) countdown2main = 0;
+          timer2El.textContent = countdown2main;
+          if(countdown2main === 0) {
+            clearInterval(mainInterval);
+            // Enable button for user to click again
+            btn2.disabled = false;
+            btn2.textContent = '✅ Complete - Next';
+            btn2.style.background = 'rgba(34,197,94,0.2)';
+            btn2.style.border = '1px solid rgba(34,197,94,0.5)';
+            if(step2InstructionEl) step2InstructionEl.textContent = 'Click "Next" to continue to Step 3.';
+            btn2.onclick = () => {
+              // Page reload to step 3 (new pageview = more ads)
+              const nu = new URL(location.href);
+              nu.searchParams.set('istep', '3');
+              location.href = nu.toString();
+            };
+          }
+        }, 1000);
+      };
+    }
+  }, 1000);
 } else if(istep === 3) {
   step3El.classList.remove('hidden');
   
   // Timer doesn't auto-start - user must click Next
   timer3BigEl.textContent = '10';
-  const btn3Next = document.getElementById('btn3_next');
-  const step3Actions = document.getElementById('step3_actions');
-  const btn3Disagree = document.getElementById('btn3_disagree');
+  btn3.disabled = false;
+  btn3.textContent = 'Next';
   
-  if(btn3Next) {
-    btn3Next.onclick = () => {
-      btn3Next.style.display = 'none';
-      
-      let countdown3 = 10;
-      const interval3 = setInterval(() => {
-        countdown3--;
-        if(countdown3 < 0) countdown3 = 0;
-        timer3BigEl.textContent = countdown3;
-        if(countdown3 === 0) {
-          clearInterval(interval3);
-          // Show Agree/Disagree buttons
-          if(step3Actions) step3Actions.style.display = 'flex';
-          btn3.disabled = false;
-          btn3.style.opacity = '1';
+  btn3.onclick = () => {
+    btn3.disabled = true;
+    btn3.textContent = 'Please wait...';
+    btn3.style.background = 'rgba(255,255,255,0.1)';
+    
+    let countdown3 = 10;
+    const interval3 = setInterval(() => {
+      countdown3--;
+      if(countdown3 < 0) countdown3 = 0;
+      timer3BigEl.textContent = countdown3;
+      if(countdown3 === 0) {
+        clearInterval(interval3);
+        // Enable button for user to click again
+        btn3.disabled = false;
+        btn3.textContent = '✅ Complete - Continue';
+        btn3.style.background = 'rgba(34,197,94,0.2)';
+        btn3.style.border = '1px solid rgba(34,197,94,0.5)';
+        
+        btn3.onclick = () => {
+          // Check ToS selection
+          const tosRadios = document.querySelectorAll('input[name="tos_radio"]');
+          let agreed = false;
+          tosRadios.forEach(radio => {
+            if(radio.checked && radio.value === 'agree') {
+              agreed = true;
+            }
+          });
           
-          // Disagree button - go back to Step 1 (new pageview)
-          if(btn3Disagree) {
-            btn3Disagree.onclick = () => {
-              const nu = new URL(location.href);
-              nu.searchParams.set('istep', '1');
-              location.href = nu.toString();
-            };
+          if(agreed) {
+            // Log final step completion and redirect to destination
+            if(window.ADMENSION_ENGAGEMENT) {
+              try {
+                window.ADMENSION_ENGAGEMENT.logEvent('interstitial_complete', {
+                  code: code,
+                  adm_code: admCode || 'none',
+                  destUrl: linkData.destUrl,
+                  chain: linkData.chain,
+                  hasAddr: !!linkData.addr
+                });
+              } catch(e) {}
+            }
+            
+            // Redirect to destination URL (validate URL to prevent open redirects)
+            if(linkData && linkData.destUrl) {
+              const url = linkData.destUrl;
+              if(url.startsWith('http://') || url.startsWith('https://')) {
+                location.href = url;
+              } else {
+                alert('Invalid destination URL. Only http:// and https:// URLs are allowed.');
+                location.href = './';
+              }
+            } else {
+              alert('No destination URL found.');
+              location.href = './';
+            }
+          } else {
+            // Show countdown and redirect to Step 1
+            btn3.disabled = true;
+            let countdown = 3;
+            btn3.textContent = `You must agree to ToS. Redirecting in ${countdown}...`;
+            btn3.style.background = 'rgba(239,68,68,0.2)';
+            btn3.style.border = '1px solid rgba(239,68,68,0.5)';
+            
+            const redirectInterval = setInterval(() => {
+              countdown--;
+              btn3.textContent = `You must agree to ToS. Redirecting in ${countdown}...`;
+              if(countdown === 0) {
+                clearInterval(redirectInterval);
+                const nu = new URL(location.href);
+                nu.searchParams.set('istep', '1');
+                nu.searchParams.set('tos_msg', '1');
+                location.href = nu.toString();
+              }
+            }, 1000);
           }
-        }
-      }, 1000);
-    };
-  }
+        };
+      }
+    }, 1000);
+  };
 }
 
 function renderDailyQuoteStep2() {
@@ -456,39 +569,6 @@ function renderDailyQuoteStep2() {
     `;
   }
 };
-
-// btn3 (Agree & Continue) onclick handler
-if(btn3) {
-  btn3.onclick = () => {
-  // Log final step completion and redirect
-  if(window.ADMENSION_ENGAGEMENT) {
-    try {
-      window.ADMENSION_ENGAGEMENT.logEvent('interstitial_complete', {
-        code: code,
-        adm_code: admCode || 'none',
-        destUrl: linkData.destUrl,
-        chain: linkData.chain,
-        hasAddr: !!linkData.addr
-      });
-    } catch(e) {}
-  }
-  
-  // Redirect to destination URL (validate URL to prevent open redirects)
-  if(linkData && linkData.destUrl) {
-    // Security: Only allow http:// or https:// URLs
-    const url = linkData.destUrl;
-    if(url.startsWith('http://') || url.startsWith('https://')) {
-      location.href = url;
-    } else {
-      alert('Invalid destination URL. Only http:// and https:// URLs are allowed.');
-      location.href = './';
-    }
-  } else {
-    alert('No destination URL found.');
-    location.href = './';
-  }
-  };
-}
 </script>
 
 </body>

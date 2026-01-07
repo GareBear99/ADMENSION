@@ -1,0 +1,18 @@
+name = "admension-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# KV namespace binding
+[[kv_namespaces]]
+binding = "ADMENSION_LINKS"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
+# You'll get this ID after running: wrangler kv:namespace create "ADMENSION_LINKS"
+
+# Routes - configure after deploying
+# [env.production]
+# routes = [
+#   { pattern = "yourdomain.com/api/*", zone_name = "yourdomain.com" }
+# ]
+
+# Workers.dev subdomain (free tier)
+workers_dev = true

@@ -20,6 +20,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CFAMM + ADMENSION</title>
 <meta id="metaDesc" name="description" content="Single-file ad base + stats tracker + ADMENSION link creator." />
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290"
+     crossorigin="anonymous"></script>
 <style>
 :root{
   --bg:#0b0a10;--text:rgba(255,255,255,.92);--muted:rgba(255,255,255,.66);
@@ -503,8 +506,10 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290"
      crossorigin="anonymous"></script>
 
-<!-- ADMENSION Revenue System - Selectively enabled -->
+<!-- ADMENSION Revenue System -->
     <script src="src/daily-quotes.js"></script>
+    <script src="src/anti-abuse-system.js"></script>
+    <script src="src/engagement-system.js"></script>
     <!-- Disabled for now to prevent conflicts:
     <script src="src/consent.js"></script>
     <script src="src/ad-impression-validator.js"></script>
@@ -527,12 +532,12 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
       ◼ CFAMM + ADMENSION <span class="badge" id="bVer">v1.2 Advanced Publisher Stack</span>
     </div>
     <nav class="nav" id="nav">
-      <a href="#home" data-page="home">Home</a>
-      <a href="#stats" data-page="stats">Stats</a>
-      <a href="#create" data-page="create">Create</a>
-      <a href="#manage" data-page="manage">Manage</a>
-      <a href="#docs" data-page="docs">Docs</a>
-      <a href="#admin" data-page="admin" id="adminNavLink">🔒 Admin</a>
+      <a href="?page=home" data-page="home">Home</a>
+      <a href="?page=stats" data-page="stats">Stats</a>
+      <a href="?page=create" data-page="create">Create</a>
+      <a href="?page=manage" data-page="manage">Manage</a>
+      <a href="?page=docs" data-page="docs">Docs</a>
+      <a href="?page=admin" data-page="admin" id="adminNavLink">🔒 Admin</a>
       <a href="#" onclick="captureFullPageScreenshot(); return false;" style="background: rgba(34,211,238,.15); border-color: rgba(34,211,238,.4);">📸 Screenshot</a>
     </nav>
   </div>
@@ -659,11 +664,15 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
 
               <!-- Step 1 Demo -->
               <div id="demo_step1" style="margin-top:12px">
+                <div id="demo_tos_error" class="notice warnNote" style="margin-bottom:12px;display:none">
+                  <b>❌ You didn't agree to Terms of Service.</b><br>
+                  Please review and agree to continue to the destination.
+                </div>
                 <div class="notice goodNote">
                   <h3 style="margin:0 0 8px 0">Demo Link Name</h3>
-                  <p style="margin:0;opacity:0.9">Step 1 of 3 - Wait for timer to complete</p>
+                  <p style="margin:0;opacity:0.9">Step 1 of 3 - Click Next to start timer</p>
                   <div style="font-size:32px;font-weight:700;margin:12px 0;color:#f59e0b" id="demo_timer1">3</div>
-                  <button class="btn primary" id="demo_btn1" disabled>Next</button>
+                  <button class="btn primary" id="demo_btn1">Next</button>
                 </div>
               </div>
 
@@ -683,18 +692,23 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
                   <h3 style="margin:0 0 8px 0">Demo Link Name</h3>
                   <p style="margin:0 0 8px 0;opacity:0.9">This is your custom message area!</p>
                   <div class="notice warnNote" style="margin:8px 0">
-                    <b>⚠️ Disclaimer:</b><br>
+                    <b>⚠️ Terms of Service:</b><br>
                     We do not condone or associate with malicious links. This service is provided as-is for legitimate use only. Use at your own discretion.
                   </div>
-                  <div class="notice" style="background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.3);margin:8px 0">
-                    <b>Step 3 of 3 — Final step:</b><br>
-                    Timer starts when you click "Next". Once complete, choose to agree and continue or go back.
+                  <div style="margin:12px 0;padding:12px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.1)">
+                    <div style="margin-bottom:8px;font-weight:600">Do you agree to the Terms of Service?</div>
+                    <label style="display:block;margin-bottom:8px;cursor:pointer">
+                      <input type="radio" name="demo_tos" value="disagree" checked style="margin-right:8px">
+                      <span>❌ Disagree (will return to Step 1)</span>
+                    </label>
+                    <label style="display:block;cursor:pointer">
+                      <input type="radio" name="demo_tos" value="agree" style="margin-right:8px">
+                      <span>✅ Agree to Terms of Service</span>
+                    </label>
                   </div>
+                  <p style="margin:8px 0;opacity:0.9;font-size:14px">Click Next to start the 10-second timer</p>
                   <div style="font-size:32px;font-weight:700;margin:12px 0;color:#f59e0b" id="demo_timer3">10</div>
-                  <div style="display:flex;gap:10px;margin-top:12px" id="demo_step3_buttons">
-                    <button class="btn" id="demo_btn3_disagree" style="flex:1;background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.5);pointer-events:none;opacity:0.5">Disagree & Go Back</button>
-                    <a href="https://garebear99.github.io/" class="btn primary" id="demo_btn3" style="flex:1;pointer-events:none;opacity:0.5;text-decoration:none;display:inline-block;text-align:center" target="_blank">Agree & Continue</a>
-                  </div>
+                  <button class="btn primary" id="demo_btn3" style="width:100%">Next</button>
                 </div>
               </div>
 
@@ -743,9 +757,9 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
   <h2>After Step 3: Explore (optional)</h2>
   <div class="small" style="opacity:.9;margin-top:-6px">Optional routes that extend session depth without timers or incentives.</div>
   <div class="pillRow" style="margin-top:10px">
-    <a href="#stats" id="apsExploreA" class="pill">View transparency stats</a>
-    <a href="#docs" id="apsExploreB" class="pill">Read how ads are processed</a>
-    <a href="#create" id="apsExploreC" class="pill">Start another run</a>
+    <a href="?page=stats" id="apsExploreA" class="pill">View transparency stats</a>
+    <a href="?page=docs" id="apsExploreB" class="pill">Read how ads are processed</a>
+    <a href="?page=create" id="apsExploreC" class="pill">Start another run</a>
   </div>
 </div>
 </section>
@@ -1959,8 +1973,19 @@ function cid(){const a=new Uint8Array(16);crypto.getRandomValues(a);return Array
 
 /* ===== currentPage function (must be early) ===== */
 function currentPage(){
-  const h = (location.hash||"#home").replace("#","");
-  return ["home","stats","create","manage","docs","admin"].includes(h) ? h : "home";
+  // Check query params first (?page=stats), fallback to hash (#stats) for backwards compatibility
+  const params = new URLSearchParams(location.search);
+  const pageParam = params.get('page');
+  const validPages = ["home","stats","create","manage","docs","admin"];
+  
+  // If query param exists and is valid, use it
+  if (pageParam && validPages.includes(pageParam)) {
+    return pageParam;
+  }
+  
+  // Fallback to hash
+  const h = (location.hash||"").replace("#","");
+  return validPages.includes(h) ? h : "home";
 }
 
 const u = new URL(location.href);
@@ -2121,8 +2146,8 @@ function showPage(name){
   if(name==="manage") renderManageList();
   // update stats when entering stats
   if(name==="stats") refreshStatsUI();
-  // restart demo when navigating to home
-  if(name==="home" && window.ADMENSION_DEMO_START) window.ADMENSION_DEMO_START();
+  // Demo is handled by its own initialization logic that checks demo_step URL param
+  // Don't reset demo when navigating to home, let it maintain state from URL
   try{ spRenderSticky(); 
   setupSideStickyButtons();
 }catch(e){}
@@ -2742,12 +2767,27 @@ if(admCopyLinkBtn){
     if(demo_step2) demo_step2.style.display = 'none';
     if(demo_step3) demo_step3.style.display = 'none';
     
+    // Check if user returned from ToS disagree
+    const urlParams = new URLSearchParams(location.search);
+    const tosMsg = urlParams.get('tos_msg');
+    const tosError = document.getElementById('demo_tos_error');
+    if(tosMsg === '1' && tosError) {
+      tosError.style.display = 'block';
+      // Clean URL
+      const nu = new URL(location.href);
+      nu.searchParams.delete('tos_msg');
+      history.replaceState(null, '', nu.toString());
+    }
+    
     // Don't auto-start timer - user must click Next first
     if(timer) clearInterval(timer);
     if(demo_timer1) demo_timer1.textContent = '3';
     if(demo_btn1) {
       demo_btn1.disabled = false;
       demo_btn1.textContent = 'Next';
+      demo_btn1.style.background = '';
+      demo_btn1.style.cursor = 'pointer';
+      demo_btn1.onclick = runTimer1;
     }
   }
   
@@ -2755,6 +2795,8 @@ if(admCopyLinkBtn){
     if(demo_btn1) {
       demo_btn1.disabled = true;
       demo_btn1.textContent = 'Please wait...';
+      demo_btn1.style.background = 'rgba(255,255,255,0.1)';
+      demo_btn1.style.cursor = 'not-allowed';
     }
     let countdown = 3;
     timer = setInterval(() => {
@@ -2763,14 +2805,26 @@ if(admCopyLinkBtn){
       if(demo_timer1) demo_timer1.textContent = countdown;
       if(countdown === 0){
         clearInterval(timer);
-        // Trigger page reload after timer completes
-        const nu = new URL(location.href);
-        nu.searchParams.set('demo_step', '2');
-        location.href = nu.toString();
+        // Enable button for user to click again
+        if(demo_btn1) {
+          demo_btn1.disabled = false;
+          demo_btn1.textContent = '✅ Complete - Next';
+          demo_btn1.style.background = 'rgba(34,197,94,0.2)';
+          demo_btn1.style.borderColor = 'rgba(34,197,94,0.5)';
+          demo_btn1.style.cursor = 'pointer';
+          demo_btn1.onclick = () => {
+            // Now trigger page reload
+            const nu = new URL(location.href);
+            nu.searchParams.set('demo_step', '2');
+            location.href = nu.toString();
+          };
+        }
       }
     }, 1000);
   }
 
+  let step2Phase = 'unlock'; // 'unlock' | 'unlocked' | 'timer' | 'complete'
+  
   function startStep2(){
     currentStep = 2;
     updateProgress();
@@ -2781,10 +2835,21 @@ if(admCopyLinkBtn){
     // Render daily quote in Step 2
     renderDemoQuote();
     
+    // Auto-start unlock timer
+    step2Phase = 'unlock';
+    runUnlockTimer();
+  }
+  
+  function runUnlockTimer() {
     if(timer) clearInterval(timer);
+    if(demo_btn2) {
+      demo_btn2.disabled = true;
+      demo_btn2.textContent = 'Unlocking...';
+      demo_btn2.style.background = 'rgba(255,255,255,0.1)';
+      demo_btn2.style.cursor = 'not-allowed';
+    }
     let countdown = 3;
     if(demo_timer2) demo_timer2.textContent = countdown;
-    if(demo_btn2) demo_btn2.disabled = true;
     
     timer = setInterval(() => {
       countdown--;
@@ -2792,7 +2857,55 @@ if(admCopyLinkBtn){
       if(demo_timer2) demo_timer2.textContent = countdown;
       if(countdown === 0){
         clearInterval(timer);
-        if(demo_btn2) demo_btn2.disabled = false;
+        step2Phase = 'unlocked';
+        // Enable button for user to click to start main timer
+        if(demo_btn2) {
+          demo_btn2.disabled = false;
+          demo_btn2.textContent = '✅ Unlocked - Next';
+          demo_btn2.style.background = 'rgba(34,197,94,0.2)';
+          demo_btn2.style.borderColor = 'rgba(34,197,94,0.5)';
+          demo_btn2.style.cursor = 'pointer';
+          demo_btn2.onclick = () => {
+            step2Phase = 'timer';
+            runTimer2();
+          };
+        }
+      }
+    }, 1000);
+  }
+  
+  function runTimer2() {
+    if(timer) clearInterval(timer);
+    if(demo_btn2) {
+      demo_btn2.disabled = true;
+      demo_btn2.textContent = 'Please wait...';
+      demo_btn2.style.background = 'rgba(255,255,255,0.1)';
+      demo_btn2.style.cursor = 'not-allowed';
+    }
+    let countdown = 3;
+    if(demo_timer2) demo_timer2.textContent = countdown;
+    
+    timer = setInterval(() => {
+      countdown--;
+      if(countdown < 0) countdown = 0;
+      if(demo_timer2) demo_timer2.textContent = countdown;
+      if(countdown === 0){
+        clearInterval(timer);
+        step2Phase = 'complete';
+        // Enable button for user to click again
+        if(demo_btn2) {
+          demo_btn2.disabled = false;
+          demo_btn2.textContent = '✅ Complete - Next';
+          demo_btn2.style.background = 'rgba(34,197,94,0.2)';
+          demo_btn2.style.borderColor = 'rgba(34,197,94,0.5)';
+          demo_btn2.style.cursor = 'pointer';
+          demo_btn2.onclick = () => {
+            // Now trigger page reload
+            const nu = new URL(location.href);
+            nu.searchParams.set('demo_step', '3');
+            location.href = nu.toString();
+          };
+        }
       }
     }, 1000);
   }
@@ -2874,6 +2987,8 @@ if(admCopyLinkBtn){
     }
   }
 
+  let step3Phase = 'ready'; // 'ready' | 'timer' | 'complete'
+  
   function startStep3(){
     currentStep = 3;
     updateProgress();
@@ -2881,13 +2996,44 @@ if(admCopyLinkBtn){
     if(demo_step2) demo_step2.style.display = 'none';
     if(demo_step3) demo_step3.style.display = 'block';
     
+    // Check if user returned from disagree
+    const urlParams = new URLSearchParams(location.search);
+    const tosError = urlParams.get('tos_error');
+    
+    if(tosError === '1') {
+      // Redirect to step 1 with error message
+      const nu = new URL(location.href);
+      nu.searchParams.delete('demo_step');
+      nu.searchParams.delete('tos_error');
+      nu.searchParams.set('demo_step', '1');
+      nu.searchParams.set('tos_msg', '1');
+      location.href = nu.toString();
+      return;
+    }
+    
     if(timer) clearInterval(timer);
+    step3Phase = 'ready';
+    if(demo_timer3) demo_timer3.textContent = '10';
+    if(demo_btn3) {
+      demo_btn3.disabled = false;
+      demo_btn3.textContent = 'Next';
+      demo_btn3.style.background = '';
+      demo_btn3.style.cursor = 'pointer';
+      demo_btn3.onclick = runTimer3;
+    }
+  }
+  
+  function runTimer3() {
+    if(timer) clearInterval(timer);
+    step3Phase = 'timer';
+    if(demo_btn3) {
+      demo_btn3.disabled = true;
+      demo_btn3.textContent = 'Please wait...';
+      demo_btn3.style.background = 'rgba(255,255,255,0.1)';
+      demo_btn3.style.cursor = 'not-allowed';
+    }
     let countdown = 10;
     if(demo_timer3) demo_timer3.textContent = countdown;
-    if(demo_btn3){
-      demo_btn3.style.pointerEvents = 'none';
-      demo_btn3.style.opacity = '0.5';
-    }
     
     timer = setInterval(() => {
       countdown--;
@@ -2895,17 +3041,56 @@ if(admCopyLinkBtn){
       if(demo_timer3) demo_timer3.textContent = countdown;
       if(countdown === 0){
         clearInterval(timer);
-        if(demo_btn3){
-          demo_btn3.style.pointerEvents = 'auto';
-          demo_btn3.style.opacity = '1';
+        step3Phase = 'complete';
+        // Enable button for user to click again
+        if(demo_btn3) {
+          demo_btn3.disabled = false;
+          demo_btn3.textContent = '✅ Complete - Continue';
+          demo_btn3.style.background = 'rgba(34,197,94,0.2)';
+          demo_btn3.style.borderColor = 'rgba(34,197,94,0.5)';
+          demo_btn3.style.cursor = 'pointer';
+          demo_btn3.onclick = handleStep3Continue;
         }
       }
     }, 1000);
   }
-
-  // Button click handlers - start timer, which then triggers page reload
-  if(demo_btn1) demo_btn1.onclick = runTimer1;
-  if(demo_btn2) demo_btn2.onclick = runTimer2;
+  
+  function handleStep3Continue() {
+    // Check ToS selection
+    const tosRadios = document.querySelectorAll('input[name="demo_tos"]');
+    let agreed = false;
+    tosRadios.forEach(radio => {
+      if(radio.checked && radio.value === 'agree') {
+        agreed = true;
+      }
+    });
+    
+    if(agreed) {
+      // Redirect to destination immediately
+      window.open('https://garebear99.github.io/', '_blank');
+    } else {
+      // Show countdown and redirect to Step 1
+      if(demo_btn3) {
+        let countdown = 3;
+        demo_btn3.disabled = true;
+        demo_btn3.textContent = `You must agree to ToS. Redirecting in ${countdown}...`;
+        demo_btn3.style.background = 'rgba(239,68,68,0.2)';
+        demo_btn3.style.borderColor = 'rgba(239,68,68,0.5)';
+        
+        const countdownTimer = setInterval(() => {
+          countdown--;
+          if(demo_btn3) demo_btn3.textContent = `You must agree to ToS. Redirecting in ${countdown}...`;
+          if(countdown === 0) {
+            clearInterval(countdownTimer);
+            const nu = new URL(location.href);
+            nu.searchParams.set('demo_step', '1');
+            nu.searchParams.set('tos_msg', '1');
+            location.href = nu.toString();
+          }
+        }, 1000);
+      }
+    }
+  }
 
   // Expose start function globally so it can be re-called on navigation
   window.ADMENSION_DEMO_START = startStep1;

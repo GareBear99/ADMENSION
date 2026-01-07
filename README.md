@@ -25,7 +25,6 @@ No signup. No dashboard. No referrals. Share a link → people browse → ads ru
 - **Wallet Cap:** Max 1% per wallet with transparent overflow redistribution
 - **Walletless Rule:** Proceeds from links without wallets go to founder (not pool)
 - **Bootstrap Phase:** No payouts until Month 3 (first payout April 1, 2026)
-- **Daily Quotes:** Engagement-gated motivational content for session depth
 
 ### 🛠️ Technical Stack
 - **Frontend:** Pure HTML/CSS/JS (no build step)
@@ -85,13 +84,13 @@ Visitor clicks short link
   ↓
 Arrives at interstitial page with ?code=ABC123
   ↓
-Step 1 (3s): Link name + custom message shown
+Step 1 (3s): Link name + timer instructions
   ↓
-Step 2 (3s): Instructions about how the system works
+Step 2 (3s): Simple timer wait
   ↓
-Step 3 (10s): Final countdown to destination
+Step 3 (10s): Custom message + disclaimer + click to continue
   ↓
-Redirect to destination URL
+User clicks button → redirects to destination URL
   ↓
 Ads shown on all steps (sidebars + anchor bar)
   ↓
@@ -160,8 +159,9 @@ ADMENSION/
 - **Short URL:** Clean `interstitial.html?code=CODE` format
 - **Full URL:** Tracking link with `?adm=CODE` attribution parameters
 - **3-Step Flow:** Timed interstitial (3s → 3s → 10s) before destination
-- **Custom Messages:** Link creator can add personalized message on Step 1
-- **Link Names:** Friendly display names shown to visitors
+- **Custom Messages:** Link creator can add personalized message shown on Step 3
+- **Link Names:** Friendly display names shown on Step 1 and Step 3
+- **Manual Redirect:** User must click button after Step 3 timer (no auto-redirect)
 - **Ad Display:** Sidebar ads + anchor bar on all 3 steps
 - **Attribution:** `?adm=CODE` tracked throughout entire flow
 

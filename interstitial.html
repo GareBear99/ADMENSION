@@ -169,22 +169,30 @@
   </div>
 </div>
 
-<!-- Step 3: Custom message + click to redirect -->
+<!-- Step 3: Custom message + disclaimer + Agree/Disagree -->
 <div id="step3" class="hidden">
   <div id="mainCard">
     <h1 id="linkName3">—</h1>
     <div class="message" id="customMessage">—</div>
+    <div class="message" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);">
+      <strong>⚠️ Disclaimer:</strong><br>
+      We do not condone or associate with malicious links. This service is provided as-is for legitimate use only. Use at your own discretion.
+    </div>
     <div class="instructions">
-      <strong>Step 3 of 3 — How this works:</strong>
-      <p style="margin-top:8px;">You're viewing a shortened link created via ADMENSION. This brief interstitial helps support the link creator through ad revenue. Wait for the timer to reach 0, then click the button below to continue to your destination.</p>
+      <strong>Step 3 of 3 — Final step:</strong>
+      <p style="margin-top:8px;">Click "Next" to start the timer. Once complete, choose to agree and continue to your destination, or disagree and go back.</p>
     </div>
     <div class="progress">
       <div class="dot"></div>
       <div class="dot"></div>
       <div class="dot active"></div>
     </div>
+    <button class="btn" id="btn3_next" style="margin-bottom:1rem">Next</button>
     <div class="countdown" id="timer3Big">10</div>
-    <button class="btn" id="btn3" disabled>Click to continue</button>
+    <div id="step3_actions" style="display:none;flex-direction:column;gap:0.75rem;margin-top:1rem">
+      <button class="btn" id="btn3_disagree" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.5)">Disagree & Go Back</button>
+      <button class="btn" id="btn3" disabled style="opacity:0.4">Agree & Continue</button>
+    </div>
     <div class="footer">Powered by <a href="./">ADMENSION</a></div>
   </div>
 </div>
@@ -196,15 +204,29 @@
 // localStorage keys (sync with main index.html)
 const K = { adm_refs: 'cfamm.adm_refs' };
 
-// Parse URL to get code
+// Parse URL to get code and step
 const params = new URLSearchParams(location.search);
 const code = params.get('code') || '';
+const istep = parseInt(params.get('istep') || '1', 10);
 
 // Load link data from localStorage
 let linkData = null;
 try {
   const refs = JSON.parse(localStorage.getItem(K.adm_refs) || '[]');
   linkData = refs.find(r => r.code === code.toUpperCase());
+  
+  // Update lastPageview and totalPageviews for traffic tracking
+  if(linkData) {
+    linkData.lastPageview = Date.now();
+    linkData.totalPageviews = (linkData.totalPageviews || 0) + 1;
+    // Save back to localStorage
+    const refs = JSON.parse(localStorage.getItem(K.adm_refs) || '[]');
+    const idx = refs.findIndex(r => r.code === code.toUpperCase());
+    if(idx >= 0) {
+      refs[idx] = linkData;
+      localStorage.setItem(K.adm_refs, JSON.stringify(refs));
+    }
+  }
 } catch(e) {
   console.error('Failed to load link data:', e);
 }
@@ -265,53 +287,97 @@ if(window.ADMENSION_ENGAGEMENT) {
   } catch(e) {}
 }
 
-// Show step 1
-step1El.classList.remove('hidden');
-
-// Timer for step 1 (3 seconds)
-let countdown1 = 3;
-timer1El.textContent = countdown1;
-const interval1 = setInterval(() => {
-  countdown1--;
-  if(countdown1 < 0) countdown1 = 0;
-  timer1El.textContent = countdown1;
-  if(countdown1 === 0) {
-    clearInterval(interval1);
-    btn1.disabled = false;
-  }
-}, 1000);
-
-btn1.onclick = () => {
-  // Log step 1 completion
-  if(window.ADMENSION_ENGAGEMENT) {
-    try {
-      window.ADMENSION_ENGAGEMENT.logEvent('interstitial_step1_complete', {
-        code: code,
-        adm_code: admCode || 'none'
-      });
-    } catch(e) {}
-  }
+// Show the appropriate step based on istep parameter
+if(istep === 1) {
+  step1El.classList.remove('hidden');
+  // Timer doesn't auto-start - user must click Next
+  timer1El.textContent = '3';
+  btn1.disabled = false;
+  btn1.textContent = 'Next';
   
-  step1El.classList.add('hidden');
+  btn1.onclick = () => {
+    btn1.disabled = true;
+    btn1.textContent = 'Please wait...';
+    
+    let countdown1 = 3;
+    const interval1 = setInterval(() => {
+      countdown1--;
+      if(countdown1 < 0) countdown1 = 0;
+      timer1El.textContent = countdown1;
+      if(countdown1 === 0) {
+        clearInterval(interval1);
+        // Page reload to step 2 (new pageview = more ads)
+        const nu = new URL(location.href);
+        nu.searchParams.set('istep', '2');
+        location.href = nu.toString();
+      }
+    }, 1000);
+  };
+} else if(istep === 2) {
   step2El.classList.remove('hidden');
-  currentStep = 2;
-  
-  // Render daily quote in Step 2
   renderDailyQuoteStep2();
   
-  // Timer for step 2 (3 seconds)
-  let countdown2 = 3;
-  timer2El.textContent = countdown2;
-  const interval2 = setInterval(() => {
-    countdown2--;
-    if(countdown2 < 0) countdown2 = 0;
-    timer2El.textContent = countdown2;
-    if(countdown2 === 0) {
-      clearInterval(interval2);
-      btn2.disabled = false;
-    }
-  }, 1000);
-};
+  // Timer doesn't auto-start - user must click Next
+  timer2El.textContent = '3';
+  btn2.disabled = false;
+  btn2.textContent = 'Next';
+  
+  btn2.onclick = () => {
+    btn2.disabled = true;
+    btn2.textContent = 'Please wait...';
+    
+    let countdown2 = 3;
+    const interval2 = setInterval(() => {
+      countdown2--;
+      if(countdown2 < 0) countdown2 = 0;
+      timer2El.textContent = countdown2;
+      if(countdown2 === 0) {
+        clearInterval(interval2);
+        // Page reload to step 3 (new pageview = more ads)
+        const nu = new URL(location.href);
+        nu.searchParams.set('istep', '3');
+        location.href = nu.toString();
+      }
+    }, 1000);
+  };
+} else if(istep === 3) {
+  step3El.classList.remove('hidden');
+  
+  // Timer doesn't auto-start - user must click Next
+  timer3BigEl.textContent = '10';
+  const btn3Next = document.getElementById('btn3_next');
+  const step3Actions = document.getElementById('step3_actions');
+  const btn3Disagree = document.getElementById('btn3_disagree');
+  
+  if(btn3Next) {
+    btn3Next.onclick = () => {
+      btn3Next.style.display = 'none';
+      
+      let countdown3 = 10;
+      const interval3 = setInterval(() => {
+        countdown3--;
+        if(countdown3 < 0) countdown3 = 0;
+        timer3BigEl.textContent = countdown3;
+        if(countdown3 === 0) {
+          clearInterval(interval3);
+          // Show Agree/Disagree buttons
+          if(step3Actions) step3Actions.style.display = 'flex';
+          btn3.disabled = false;
+          btn3.style.opacity = '1';
+          
+          // Disagree button - go back to Step 1 (new pageview)
+          if(btn3Disagree) {
+            btn3Disagree.onclick = () => {
+              const nu = new URL(location.href);
+              nu.searchParams.set('istep', '1');
+              location.href = nu.toString();
+            };
+          }
+        }
+      }, 1000);
+    };
+  }
+}
 
 function renderDailyQuoteStep2() {
   const container = document.getElementById('dailyQuoteStep2');
@@ -391,36 +457,9 @@ function renderDailyQuoteStep2() {
   }
 };
 
-btn2.onclick = () => {
-  // Log step 2 completion
-  if(window.ADMENSION_ENGAGEMENT) {
-    try {
-      window.ADMENSION_ENGAGEMENT.logEvent('interstitial_step2_complete', {
-        code: code,
-        adm_code: admCode || 'none'
-      });
-    } catch(e) {}
-  }
-  
-  step2El.classList.add('hidden');
-  step3El.classList.remove('hidden');
-  currentStep = 3;
-  
-  // Timer for step 3 (10 seconds)
-  let countdown3 = 10;
-  timer3BigEl.textContent = countdown3;
-  const interval3 = setInterval(() => {
-    countdown3--;
-    if(countdown3 < 0) countdown3 = 0;
-    timer3BigEl.textContent = countdown3;
-    if(countdown3 === 0) {
-      clearInterval(interval3);
-      btn3.disabled = false;
-    }
-  }, 1000);
-};
-
-btn3.onclick = () => {
+// btn3 (Agree & Continue) onclick handler
+if(btn3) {
+  btn3.onclick = () => {
   // Log final step completion and redirect
   if(window.ADMENSION_ENGAGEMENT) {
     try {
@@ -448,7 +487,8 @@ btn3.onclick = () => {
     alert('No destination URL found.');
     location.href = './';
   }
-};
+  };
+}
 </script>
 
 </body>

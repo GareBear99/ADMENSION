@@ -2866,17 +2866,9 @@ if(admCopyLinkBtn){
     }, 1000);
   }
 
-  // Revenue maximization: each demo step triggers a page reload (new pageview = fresh ad impressions)
-  if(demo_btn1) demo_btn1.onclick = () => {
-    const nu = new URL(location.href);
-    nu.searchParams.set('demo_step', '2');
-    location.href = nu.toString();
-  };
-  if(demo_btn2) demo_btn2.onclick = () => {
-    const nu = new URL(location.href);
-    nu.searchParams.set('demo_step', '3');
-    location.href = nu.toString();
-  };
+  // Button click handlers - start timer, which then triggers page reload
+  if(demo_btn1) demo_btn1.onclick = runTimer1;
+  if(demo_btn2) demo_btn2.onclick = runTimer2;
 
   // Expose start function globally so it can be re-called on navigation
   window.ADMENSION_DEMO_START = startStep1;

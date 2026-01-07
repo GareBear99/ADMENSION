@@ -131,11 +131,10 @@
 </head>
 <body>
 
-<!-- Step 1: Link name + custom message -->
+<!-- Step 1: Link name only -->
 <div id="step1" class="hidden">
   <div id="mainCard">
     <h1 id="linkName">—</h1>
-    <div class="message" id="customMessage">—</div>
     <div class="progress">
       <div class="dot active"></div>
       <div class="dot"></div>
@@ -171,18 +170,18 @@
   </div>
 </div>
 
-<!-- Step 3: Final countdown -->
+<!-- Step 3: Custom message + click to redirect -->
 <div id="step3" class="hidden">
   <div id="mainCard">
-    <h1>Preparing your destination…</h1>
-    <div class="message">Your link will be ready in <span id="timer3">10</span> seconds.</div>
+    <h1 id="linkName3">—</h1>
+    <div class="message" id="customMessage">—</div>
     <div class="progress">
       <div class="dot"></div>
       <div class="dot"></div>
       <div class="dot active"></div>
     </div>
     <div class="countdown" id="timer3Big">10</div>
-    <button class="btn" id="btn3" disabled>Continue to destination</button>
+    <button class="btn" id="btn3" disabled>Click to continue</button>
     <div class="footer">Powered by <a href="./">ADMENSION</a></div>
   </div>
 </div>
@@ -223,23 +222,28 @@ const step1El = document.getElementById('step1');
 const step2El = document.getElementById('step2');
 const step3El = document.getElementById('step3');
 const linkNameEl = document.getElementById('linkName');
+const linkName3El = document.getElementById('linkName3');
 const customMessageEl = document.getElementById('customMessage');
 const timer1El = document.getElementById('timer1');
 const timer2El = document.getElementById('timer2');
-const timer3El = document.getElementById('timer3');
 const timer3BigEl = document.getElementById('timer3Big');
 const btn1 = document.getElementById('btn1');
 const btn2 = document.getElementById('btn2');
 const btn3 = document.getElementById('btn3');
 
-// Populate step 1 with link data
+// Populate step 1 with link name
 if(linkNameEl && linkData.linkName) {
   linkNameEl.textContent = linkData.linkName;
+}
+
+// Populate step 3 with link name and custom message (will be set when step 3 loads)
+if(linkName3El && linkData.linkName) {
+  linkName3El.textContent = linkData.linkName;
 }
 if(customMessageEl && linkData.message) {
   customMessageEl.textContent = linkData.message;
 } else if(customMessageEl) {
-  customMessageEl.textContent = 'No custom message provided.';
+  customMessageEl.textContent = 'Click the button below to continue to your destination.';
 }
 
 let currentStep = 1;
@@ -319,12 +323,10 @@ btn2.onclick = () => {
   
   // Timer for step 3 (10 seconds)
   let countdown3 = 10;
-  timer3El.textContent = countdown3;
   timer3BigEl.textContent = countdown3;
   const interval3 = setInterval(() => {
     countdown3--;
     if(countdown3 < 0) countdown3 = 0;
-    timer3El.textContent = countdown3;
     timer3BigEl.textContent = countdown3;
     if(countdown3 === 0) {
       clearInterval(interval3);

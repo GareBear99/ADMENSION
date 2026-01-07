@@ -2125,6 +2125,9 @@ btnCopy.onclick = async () => {
 logEvent("pageview",{adsShown:"route_marked",score,adm_present:!!adm});
 renderStepUI();
 
+/* ===== Initial page load ===== */
+showPage(currentPage());
+
 /* ===== Stats computations ===== */
 function within(ms){ const cut=Date.now()-ms; return (t)=>t>=cut; }
 function uniqSids(arr){ return new Set(arr.map(x=>x.sid)).size; }

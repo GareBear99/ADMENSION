@@ -530,6 +530,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
       <a href="#manage" data-page="manage">Manage</a>
       <a href="#docs" data-page="docs">Docs</a>
       <a href="#admin" data-page="admin">Admin</a>
+      <a href="#" onclick="captureFullPageScreenshot(); return false;" style="background: rgba(34,211,238,.15); border-color: rgba(34,211,238,.4);">📸 Screenshot</a>
     </nav>
   </div>
 </header>
@@ -4010,6 +4011,88 @@ function apsInitAdminControls(){
     </div>
   </div>
 </div>
+
+<!-- ===== Screenshot Functionality ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+/**
+ * Full-page screenshot functionality
+ * Captures the entire scrollable page content, not just the viewport
+ */
+function captureFullPageScreenshot() {
+  // Show loading indicator
+  const originalText = event.target ? event.target.textContent : '📸 Screenshot';
+  if (event.target) {
+    event.target.textContent = '⏳ Capturing...';
+    event.target.style.pointerEvents = 'none';
+  }
+  
+  // Get the page name for filename
+  const activePage = document.querySelector('.page.active');
+  const pageId = activePage ? activePage.id.replace('page-', '') : 'page';
+  const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+  const filename = `ADMENSION_${pageId}_${timestamp}.png`;
+  
+  // Capture the entire document body
+  html2canvas(document.body, {
+    allowTaint: true,
+    useCORS: true,
+    scrollY: -window.scrollY,
+    scrollX: -window.scrollX,
+    windowWidth: document.documentElement.scrollWidth,
+    windowHeight: document.documentElement.scrollHeight,
+    width: document.documentElement.scrollWidth,
+    height: document.documentElement.scrollHeight,
+    x: 0,
+    y: window.scrollY,
+    scale: 2, // Higher quality (2x resolution)
+    logging: false,
+    backgroundColor: '#0b0a10'
+  }).then(canvas => {
+    // Convert canvas to blob and download
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      
+      // Reset button
+      if (event.target) {
+        event.target.textContent = '✅ Saved!';
+        setTimeout(() => {
+          event.target.textContent = originalText;
+          event.target.style.pointerEvents = '';
+        }, 2000);
+      }
+      
+      // Log event
+      try {
+        if (typeof logEvent === 'function') {
+          logEvent('screenshot_captured', { page: pageId });
+        }
+      } catch(e) {}
+    });
+  }).catch(err => {
+    console.error('Screenshot failed:', err);
+    alert('Screenshot failed. Please try again or use browser screenshot tools.');
+    
+    // Reset button
+    if (event.target) {
+      event.target.textContent = originalText;
+      event.target.style.pointerEvents = '';
+    }
+  });
+}
+
+// Make function globally available
+window.captureFullPageScreenshot = captureFullPageScreenshot;
+</script>
+<!-- ===== /Screenshot Functionality ===== -->
 
 </body>
 </html>

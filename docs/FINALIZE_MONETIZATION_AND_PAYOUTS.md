@@ -31,14 +31,20 @@ B. Wire the site to your collector
 
 C. Publish the events CSV for the workflow
 - File → Share → Publish to web → Sheet `events` → CSV → copy the public CSV URL.
+- (Optional) Publish the `wallets` sheet as CSV for the cap to apply per wallet instead of per adm_code.
 - In your GitHub repo: Settings → Variables → Repository variables → add
-  - `SHEET_EVENTS_CSV_URL` = the CSV URL you copied.
+  - `SHEET_EVENTS_CSV_URL` = the events CSV URL
+  - `SHEET_WALLETS_CSV_URL` = the wallets CSV URL (optional)
+  - `WALLET_CAP_PCT` = `0.01`
+  - `CREATOR_ADM_CODE` = your ADM code to receive overflow (optional)
 
 ## 3) Monthly payout ledger (runs on the 1st, free)
 This repo ships with a GitHub Action: `.github/workflows/payouts.yml`.
 - Schedule: 00:30 UTC on the **1st of each month**.
 - It downloads last month's events CSV, keeps only **viewable + non‑IVT** ad events, and aggregates units by `adm_code`.
 - Pool = `min(13% × received_revenue_usd, $10,000)`.
+- Enforces a hard cap of **1% of pool per wallet** (water‑filling redistribution). Set via `WALLET_CAP_PCT` (default 0.01).
+- Optional: If everyone is capped and there’s overflow, set `CREATOR_ADM_CODE` to receive remainder; otherwise it’s recorded as UNALLOCATED in the ledger.
 - Outputs ledger files at `payouts/YYYY-MM/ledger.json` and `ledger.csv` and commits them.
 
 Admin step once per month:

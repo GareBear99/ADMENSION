@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 
+const EPS = 1e-9;
+
 function fetchText(url){
   return new Promise((resolve,reject)=>{
     https.get(url,(res)=>{
@@ -15,7 +17,10 @@ function fetchText(url){
 
 function parseCSV(text){
   const lines = text.trim().split(/\r?\n/);
-  return lines.map(l=>l.split(',').map(s=>s.replace(/^\"|\"$/g,'')));
+  return lines.map(l=>{
+    // naive CSV split; acceptable for our simple sheets
+    return l.split(',').map(s=>s.replace(/^\"|\"$/g,''));
+  });
 }
 
 function lastMonthUTC(){
@@ -40,8 +45,8 @@ function writeLedger(tag, rows, pool, meta){
   fs.mkdirSync(outDir, { recursive: true });
   const json = { tag, generatedAt: new Date().toISOString(), poolUSD: pool, meta, rows };
   fs.writeFileSync(path.join(outDir, 'ledger.json'), JSON.stringify(json,null,2));
-  const csvHead = 'adm_code,units,share,amount_usd\n';
-  const csvBody = rows.map(r=>`${r.adm_code},${r.units},${r.share.toFixed(6)},${r.amount_usd.toFixed(2)}`).join('\n');
+  const csvHead = 'adm_code,wallet,units,share,amount_usd,capped,cap_reason\n';
+  const csvBody = rows.map(r=>`${r.adm_code},${r.wallet||''},${r.units},${r.share.toFixed(6)},${r.amount_usd.toFixed(2)},${r.capped?1:0},${r.cap_reason||''}`).join('\n');
   fs.writeFileSync(path.join(outDir,'ledger.csv'), csvHead+csvBody);
 }
 
@@ -62,6 +67,9 @@ async function main(){
     console.error('Missing SHEET_EVENTS_CSV_URL env var');
     process.exit(1);
   }
+  const SHEET_WALLETS_CSV_URL = process.env.SHEET_WALLETS_CSV_URL || '';
+  const WALLET_CAP_PCT = Number(process.env.WALLET_CAP_PCT || '0.01');
+  const CREATOR_ADM_CODE = process.env.CREATOR_ADM_CODE || '';
 
   const {start, end, tag} = lastMonthUTC();
 
@@ -102,13 +110,117 @@ async function main(){
   const poolCap = 10000;
   const pool = Math.min(received*0.13, poolCap);
 
-  const rowsOut = Array.from(unitsByAdm.entries()).map(([adm_code, units])=>{
-    const share = units/totalUnits;
-    return { adm_code, units, share, amount_usd: share*pool };
-  }).sort((a,b)=>b.amount_usd-a.amount_usd);
+  // Optional wallet mapping
+  let walletByAdm = new Map();
+  if(SHEET_WALLETS_CSV_URL){
+    try{
+      const walletsCSV = await fetchText(SHEET_WALLETS_CSV_URL);
+      const wrows = parseCSV(walletsCSV);
+      // Expect: ts,adm_code,chain,address,signature
+      for(let i=1;i<wrows.length;i++){
+        const r = wrows[i];
+        const adm_code = (r[1]||'').toUpperCase();
+        const chain = (r[2]||'').toLowerCase();
+        const addr = (r[3]||'').toLowerCase();
+        if(adm_code && chain && addr){
+          walletByAdm.set(adm_code, `${chain}:${addr}`);
+        }
+      }
+    }catch(e){
+      console.error('Wallet CSV fetch failed, proceeding without wallet map');
+    }
+  }
+  // Default: cap per adm_code if no wallet map
+  const walletKeyForAdm = (adm)=> walletByAdm.get(adm) || adm;
 
-  writeLedger(tag, rowsOut, pool, { totalUnits, received, poolCap });
-  console.log(`Ledger for ${tag} written with ${rowsOut.length} rows. Pool $${pool.toFixed(2)}.`);
+  // Prepare allocations by units (initial)
+  const baseRows = Array.from(unitsByAdm.entries()).map(([adm_code, units])=>({
+    adm_code, units, wallet: walletKeyForAdm(adm_code)
+  }));
+
+  const finalRows = enforceWalletCapWaterfill(baseRows, pool, WALLET_CAP_PCT, CREATOR_ADM_CODE);
+
+  writeLedger(tag, finalRows, pool, { totalUnits, received, poolCap, walletCapPct: WALLET_CAP_PCT, creatorRecipient: CREATOR_ADM_CODE||null });
+  console.log(`Ledger for ${tag} written with ${finalRows.length} rows. Pool $${pool.toFixed(2)}.`);
+}
+
+function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
+  const cap = pool * capPct;
+  const out = [];
+  let poolRemaining = pool;
+  const assignedWallets = new Set();
+
+  // Compute units per wallet
+  const unitsByWallet = new Map();
+  for(const r of rows){
+    unitsByWallet.set(r.wallet, (unitsByWallet.get(r.wallet)||0) + r.units);
+  }
+
+  // water-filling
+  let remaining = rows.slice();
+  while(remaining.length && poolRemaining > EPS){
+    const unitsTotal = remaining.reduce((s,r)=>s+r.units,0) || 1;
+    // proposed allocation
+    const proposedByWallet = new Map();
+    for(const r of remaining){
+      const amount = poolRemaining * (r.units/unitsTotal);
+      proposedByWallet.set(r.wallet, (proposedByWallet.get(r.wallet)||0) + amount);
+    }
+    // any wallet exceeding cap?
+    const over = Array.from(proposedByWallet.entries()).filter(([w,a])=> a > cap + EPS && !assignedWallets.has(w));
+    if(over.length===0){
+      // Assign as proposed and finish
+      for(const r of remaining){
+        const amount = poolRemaining * (r.units/unitsTotal);
+        out.push({ adm_code: r.adm_code, wallet: r.wallet, units: r.units, share: amount/pool, amount_usd: amount, capped:false });
+      }
+      poolRemaining = 0;
+      break;
+    }
+    // Cap all over-wallets this round proportionally by their units within the wallet
+    for(const [w,totalAlloc] of over){
+      // collect rows for this wallet
+      const walletRows = remaining.filter(r=>r.wallet===w);
+      const unitsWallet = walletRows.reduce((s,r)=>s+r.units,0) || 1;
+      for(const r of walletRows){
+        const amount = cap * (r.units/unitsWallet);
+        out.push({ adm_code: r.adm_code, wallet: r.wallet, units: r.units, share: amount/pool, amount_usd: amount, capped:true, cap_reason:'wallet_cap_1pct' });
+      }
+      // remove wallet rows from remaining
+      remaining = remaining.filter(r=>r.wallet!==w);
+      assignedWallets.add(w);
+      poolRemaining -= cap;
+      if(poolRemaining <= EPS) break;
+    }
+  }
+
+  // If any poolRemaining and no remaining recipients (all capped), allocate to creator or mark unallocated
+  if(poolRemaining > EPS){
+    if(creatorAdm){
+      out.push({ adm_code: creatorAdm, wallet: creatorAdm, units: 0, share: poolRemaining/pool, amount_usd: poolRemaining, capped:false, cap_reason:'creator_overflow' });
+      poolRemaining = 0;
+    } else {
+      // append metadata pseudo-row
+      out.push({ adm_code: 'UNALLOCATED', wallet: '', units: 0, share: poolRemaining/pool, amount_usd: poolRemaining, capped:false, cap_reason:'all_wallets_capped' });
+      poolRemaining = 0;
+    }
+  }
+
+  // Merge rows for same adm_code if duplicated
+  const merged = new Map();
+  for(const r of out){
+    const k = r.adm_code + '|' + r.wallet;
+    const prev = merged.get(k);
+    if(prev){
+      prev.units += r.units;
+      prev.share += r.share;
+      prev.amount_usd += r.amount_usd;
+      prev.capped = prev.capped || r.capped;
+    } else {
+      merged.set(k, { ...r });
+    }
+  }
+  return Array.from(merged.values()).sort((a,b)=>b.amount_usd-a.amount_usd);
 }
 
 main().catch(e=>{ console.error(e); process.exit(1); });

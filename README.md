@@ -25,6 +25,7 @@ No signup. No dashboard. No referrals. Share a link → people browse → ads ru
 - **Wallet Cap:** Max 1% per wallet with transparent overflow redistribution
 - **Walletless Rule:** Proceeds from links without wallets go to founder (not pool)
 - **Bootstrap Phase:** No payouts until Month 3 (first payout April 1, 2026)
+- **Daily Quotes:** 365 motivational money/hustle quotes with rotating GIF backgrounds
 
 ### 🛠️ Technical Stack
 - **Frontend:** Pure HTML/CSS/JS (no build step)

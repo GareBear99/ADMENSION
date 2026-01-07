@@ -2059,13 +2059,15 @@ function showPage(name){
   if(name==="manage") renderManageList();
   // update stats when entering stats
   if(name==="stats") refreshStatsUI();
+  // restart demo when navigating to home
+  if(name==="home" && window.ADMENSION_DEMO_START) window.ADMENSION_DEMO_START();
   try{ spRenderSticky(); 
   setupSideStickyButtons();
 }catch(e){}
 
   
   try{ admRender(); }catch(e){}
-try{ admRender(); }catch(e){}
+try{ admRender(); }catch(e){}}
 }
 window.addEventListener("hashchange", ()=>{ setRobotsForRoute(); initSkinAndTierControls();
 showPage(currentPage()); });
@@ -2671,6 +2673,9 @@ if(admCopyLinkBtn){
 
   if(demo_btn1) demo_btn1.onclick = startStep2;
   if(demo_btn2) demo_btn2.onclick = startStep3;
+
+  // Expose start function globally so it can be re-called on navigation
+  window.ADMENSION_DEMO_START = startStep1;
 
   // Auto-start demo on page load
   startStep1();

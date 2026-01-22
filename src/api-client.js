@@ -255,6 +255,36 @@ async function checkApiHealth() {
   }
 }
 
+/**
+ * Get global link statistics
+ * @returns {Promise<Object>} - {totalCreated, totalActive, totalRemoved, lastUpdated}
+ */
+async function getGlobalStats() {
+  try {
+    const response = await fetchWithTimeout(`${API_CONFIG.baseUrl}/api/stats`, {
+      method: 'GET',
+    }, 5000);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch stats');
+    }
+    
+    const result = await response.json();
+    return result.stats;
+  } catch (error) {
+    console.warn('Stats unavailable:', error.message);
+    // Return local stats as fallback
+    const links = getAllLinks();
+    return {
+      totalCreated: links.length,
+      totalActive: links.length,
+      totalRemoved: 0,
+      lastUpdated: Date.now(),
+      offline: true,
+    };
+  }
+}
+
 // ============================================
 // EXPORT API
 // ============================================
@@ -266,6 +296,7 @@ if (typeof window !== 'undefined') {
     updateLink,
     getAllLinks,
     checkApiHealth,
+    getGlobalStats,
     config: API_CONFIG,
   };
 }

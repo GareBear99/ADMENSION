@@ -59,6 +59,11 @@ export default {
         return jsonResponse({ status: 'ok', timestamp: Date.now() });
       }
 
+      // GET /api/stats - Global link statistics (no rate limit)
+      if (request.method === 'GET' && path === '/api/stats') {
+        return await getGlobalStats(env);
+      }
+
       // GET /api/limits/:ip - Check rate limit status (admin)
       if (request.method === 'GET' && path.startsWith('/api/limits/')) {
         const ip = path.split('/').pop();
@@ -136,6 +141,9 @@ async function createLink(data, env) {
     JSON.stringify(linkData),
     { expirationTtl: 7776000 }
   );
+
+  // Update global stats: increment total created
+  await incrementGlobalStat(env, 'created');
 
   return jsonResponse({
     success: true,
@@ -401,6 +409,70 @@ function formatDuration(seconds) {
   if (seconds < 60) return `${seconds} seconds`;
   if (seconds < 3600) return `${Math.ceil(seconds / 60)} minutes`;
   return `${Math.ceil(seconds / 3600)} hours`;
+}
+
+/**
+ * Get global link statistics
+ */
+async function getGlobalStats(env) {
+  try {
+    const stats = await env.ADMENSION_LINKS.get('global:stats');
+    
+    if (!stats) {
+      // Initialize if doesn't exist
+      const initialStats = {
+        totalCreated: 0,
+        totalActive: 0,
+        totalRemoved: 0,
+        lastUpdated: Date.now(),
+      };
+      return jsonResponse({
+        success: true,
+        stats: initialStats,
+      });
+    }
+    
+    return jsonResponse({
+      success: true,
+      stats: JSON.parse(stats),
+    });
+  } catch (error) {
+    return jsonResponse({
+      success: false,
+      error: error.message,
+    }, 500);
+  }
+}
+
+/**
+ * Increment global statistic counter
+ */
+async function incrementGlobalStat(env, statName) {
+  try {
+    const stats = await env.ADMENSION_LINKS.get('global:stats');
+    let statsData = stats ? JSON.parse(stats) : {
+      totalCreated: 0,
+      totalActive: 0,
+      totalRemoved: 0,
+      lastUpdated: Date.now(),
+    };
+    
+    // Increment the specified stat
+    if (statName === 'created') {
+      statsData.totalCreated = (statsData.totalCreated || 0) + 1;
+      statsData.totalActive = (statsData.totalActive || 0) + 1;
+    } else if (statName === 'removed') {
+      statsData.totalRemoved = (statsData.totalRemoved || 0) + 1;
+      statsData.totalActive = Math.max(0, (statsData.totalActive || 0) - 1);
+    }
+    
+    statsData.lastUpdated = Date.now();
+    
+    // Store without expiration (permanent stats)
+    await env.ADMENSION_LINKS.put('global:stats', JSON.stringify(statsData));
+  } catch (error) {
+    console.error('Failed to increment global stat:', error);
+  }
 }
 
 /**

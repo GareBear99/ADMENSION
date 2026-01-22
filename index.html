@@ -577,6 +577,31 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
       <!-- Daily Motivational Quote (365 quotes + 27 rotating GIFs) -->
       <div id="dailyQuoteContainer"></div>
 
+      <!-- ADMENSION Link Statistics -->
+      <div class="card" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(34, 211, 238, 0.15) 100%); border: 2px solid rgba(168, 85, 247, 0.3); margin-bottom: 16px;">
+        <h2 style="margin-top: 0; color: #a855f7; font-size: 24px;">🔗 ADMENSION Global Network</h2>
+        <div class="grid2" style="margin-top: 12px; grid-template-columns: repeat(3, 1fr);">
+          <div class="card" style="background: rgba(12, 12, 16, 0.6); border: 1px solid rgba(34, 211, 238, 0.3);">
+            <div class="kpiSub" style="color: #22d3ee;">Active Links</div>
+            <div class="kpi" id="globalLinksActive" style="color: #00ff88; font-size: 36px;">—</div>
+            <div class="mini" style="opacity: 0.85; margin-top: 4px;">Currently live & earning globally</div>
+          </div>
+          <div class="card" style="background: rgba(12, 12, 16, 0.6); border: 1px solid rgba(168, 85, 247, 0.3);">
+            <div class="kpiSub" style="color: #a855f7;">Total Created</div>
+            <div class="kpi" id="globalLinksCreated" style="color: #ffd700; font-size: 36px;">—</div>
+            <div class="mini" style="opacity: 0.85; margin-top: 4px;">All-time links generated</div>
+          </div>
+          <div class="card" style="background: rgba(12, 12, 16, 0.6); border: 1px solid rgba(255, 136, 0, 0.3);">
+            <div class="kpiSub" style="color: #ff8800;">Expired</div>
+            <div class="kpi" id="globalLinksRemoved" style="color: #999; font-size: 36px;">—</div>
+            <div class="mini" style="opacity: 0.85; margin-top: 4px;">Auto-removed after 90 days idle</div>
+          </div>
+        </div>
+        <div class="mini" style="margin-top: 12px; padding: 10px; background: rgba(168, 85, 247, 0.1); border-radius: 8px;">
+          💡 <b>Real-time stats from Cloudflare API:</b> Links expire after 90 days with no traffic. Every visit resets the timer.
+        </div>
+      </div>
+
       <!-- Eye-Catching Revenue Dashboard -->
       <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%); border: 2px solid rgba(102, 126, 234, 0.3); margin-bottom: 16px;">
         <h2 style="margin-top: 0; color: #667eea; font-size: 24px;">🎯 Live Revenue Tracking</h2>
@@ -818,9 +843,11 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
 
       <div class="stack">
         <div class="card col-12"><div id="ad-stats-banner" class="ad-container" style="min-height: 90px;"></div></div>
-        <div class="card col-4 kpi"><span class="mini">ADMENSION Pool %</span><b>13%</b><span class="mini">fixed (post-revenue)</span></div>
-        <div class="card col-4 kpi"><span class="mini">Sponsored Active (now)</span><b id="k_sp_active">—</b></div>
-        <div class="card col-4 kpi"><span class="mini">Sponsored Scheduled (90d)</span><b id="k_sp_sched">—</b></div>
+        
+        <div class="card col-3 kpi"><span class="mini">🔗 Active Links</span><b id="globalLinksActive">—</b><span class="mini">globally earning</span></div>
+        <div class="card col-3 kpi"><span class="mini">🎉 Total Created</span><b id="globalLinksCreated">—</b><span class="mini">all-time links</span></div>
+        <div class="card col-3 kpi"><span class="mini">⏳ Expired Links</span><b id="globalLinksRemoved">—</b><span class="mini">auto-removed 90d</span></div>
+        <div class="card col-3 kpi"><span class="mini">ADMENSION Pool %</span><b>13%</b><span class="mini">fixed (post-revenue)</span></div>
 
         <div class="card col-12">
           <h2>Conservative projections (planning only)</h2>
@@ -2498,6 +2525,17 @@ function refreshStatsUI(){
     } catch(e) {
       console.warn('Anti-abuse stats display error:', e);
     }
+  }
+  
+  // Global link statistics (async)
+  if(window.ADMENSION_API) {
+    window.ADMENSION_API.getGlobalStats().then(stats => {
+      if(byId("globalLinksActive")) byId("globalLinksActive").textContent = (stats.totalActive || 0).toLocaleString();
+      if(byId("globalLinksCreated")) byId("globalLinksCreated").textContent = (stats.totalCreated || 0).toLocaleString();
+      if(byId("globalLinksRemoved")) byId("globalLinksRemoved").textContent = (stats.totalRemoved || 0).toLocaleString();
+    }).catch(err => {
+      console.warn('Global stats fetch error:', err);
+    });
   }
 }
 

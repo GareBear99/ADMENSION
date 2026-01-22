@@ -2635,45 +2635,47 @@ if(admCreateBtn){
       alert("Destination URL must start with http:// or https://"); return;
     }
     
-    const code = genAdmCode();
-    const rec = { 
-      code, 
-      chain, 
-      addr: addr || "", 
-      created: Date.now(),
-      lastPageview: Date.now(),  // Track for 90-day deletion
-      totalPageviews: 0,          // Track link activity
-      addr_set: !!addr,
-      linkName,
-      destUrl,
-      message
-    };
-    admRefs.push(rec); saveAdmRefs();
-    
-    const shortLink = makeShortLink(code);
-    const fullLink = makeAdmLink(code);
-    
-    admOutEl.textContent = shortLink;
-    if(admOutFullEl) admOutFullEl.textContent = fullLink;
-    
-    try{ await navigator.clipboard.writeText(shortLink); }catch(e){}
-    logEvent("adm_create",{code, chain, has_addr: !!addr, has_dest: !!destUrl});
-    
-    // Engagement system: validate link and track creation
-    if(window.ADMENSION_ENGAGEMENT) {
-      try {
-        const validation = window.ADMENSION_ENGAGEMENT.validateLink(link);
-        if(!validation.valid) {
-          console.warn('Link validation warnings:', validation.errors);
+    try {
+      // Use API client (with localStorage fallback)
+      const result = await window.ADMENSION_API.createLink({
+        linkName,
+        destUrl,
+        message,
+        chain,
+        addr
+      });
+      
+      if (result.success) {
+        admOutEl.textContent = result.shortLink;
+        if(admOutFullEl) admOutFullEl.textContent = result.fullLink || makeAdmLink(result.code);
+        
+        try{ await navigator.clipboard.writeText(result.shortLink); }catch(e){}
+        logEvent("adm_create",{code: result.code, chain, has_addr: !!addr, has_dest: !!destUrl, offline: result.offline});
+        
+        // Engagement system: validate link and track creation
+        if(window.ADMENSION_ENGAGEMENT) {
+          try {
+            window.ADMENSION_ENGAGEMENT.onLinkCreated();
+          } catch(e) {
+            console.warn('Link validation error:', e);
+          }
         }
-        window.ADMENSION_ENGAGEMENT.onLinkCreated();
-      } catch(e) {
-        console.warn('Link validation error:', e);
+        
+        // Refresh manage list to show new link
+        renderManageList();
+        
+        if(!addr){ admWarnEl.style.display="block"; } else { admWarnEl.style.display="none"; }
+        
+        if(result.offline) {
+          alert("⚠️ Link created locally (API offline). Link will only work in this browser until API reconnects.");
+        } else {
+          alert("ADMENSION link created ✅ (copied). Share it anywhere!");
+        }
       }
+    } catch(error) {
+      console.error('Failed to create link:', error);
+      alert('Error creating link: ' + error.message);
     }
-    
-    if(!addr){ admWarnEl.style.display="block"; } else { admWarnEl.style.display="none"; }
-    alert("ADMENSION link created ✅ (copied).");
   };
 }
 if(admCopyBtn){
@@ -2698,18 +2700,31 @@ const admSave = document.getElementById("admSaveAddr");
 const admCopyLinkBtn = document.getElementById("admCopyLink");
 function findRec(code){ return admRefs.find(r=>r.code===String(code||"").trim().toUpperCase()); }
 if(admSave){
-  admSave.onclick = () => {
+  admSave.onclick = async () => {
     const code = document.getElementById("admCodeUpdate").value.trim().toUpperCase();
     const addr = document.getElementById("admAddrUpdate").value.trim();
+    const chain = admChainEl?.value || document.getElementById("admChain")?.value || "ethereum";
+    
     if(!code){ alert("Enter an ADM code."); return; }
-    const rec = findRec(code);
-    if(!rec){ alert("Code not found in this browser storage."); return; }
-    rec.addr = addr;
-    rec.addr_set = !!addr;
-    saveAdmRefs();
-    renderManageList();
-    logEvent("adm_set_addr",{code, has_addr:!!addr});
-    alert(addr ? "Saved ✅" : "Address cleared ⚠");
+    
+    try {
+      // Use API client (with localStorage fallback)
+      const result = await window.ADMENSION_API.updateLink(code, { addr, chain });
+      
+      if(result.success) {
+        renderManageList();
+        logEvent("adm_set_addr",{code, has_addr:!!addr, offline: result.offline});
+        
+        if(result.offline) {
+          alert(addr ? "⚠️ Address updated locally (API offline)" : "Address cleared ⚠️");
+        } else {
+          alert(addr ? "Saved ✅" : "Address cleared ⚠️");
+        }
+      }
+    } catch(error) {
+      console.error('Failed to update wallet:', error);
+      alert('Error: ' + error.message);
+    }
   };
 }
 if(admCopyLinkBtn){
@@ -4434,6 +4449,14 @@ function apsInitAdminControls(){
     </div>
   </div>
 </div>
+
+<!-- ===== Cloudflare Worker API Configuration ===== -->
+<script>
+  // Set Cloudflare Worker API URL
+  window.ADMENSION_API_URL = 'https://admension-api.admension.workers.dev';
+</script>
+<!-- Load API client library -->
+<script src="./src/api-client.js"></script>
 
 <!-- ===== Screenshot Functionality ===== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

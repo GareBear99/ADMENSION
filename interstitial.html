@@ -211,45 +211,49 @@
   </div>
 </div>
 
+<!-- Cloudflare Worker API Configuration -->
+<script>
+  // Set Cloudflare Worker API URL
+  window.ADMENSION_API_URL = 'https://admension-api.admension.workers.dev';
+</script>
+<!-- Load API client library -->
+<script src="./src/api-client.js"></script>
+
 <script src="./src/daily-quotes.js"></script>
 <script src="./universal-ads/admension-ads.js"></script>
 <script>
 /* ===== ADMENSION Interstitial Page ===== */
-// localStorage keys (sync with main index.html)
-const K = { adm_refs: 'cfamm.adm_refs' };
 
 // Parse URL to get code and step
 const params = new URLSearchParams(location.search);
 const code = params.get('code') || '';
 const istep = parseInt(params.get('istep') || '1', 10);
 
-// Load link data from localStorage
+// Load link data from API (with localStorage fallback)
 let linkData = null;
-try {
-  const refs = JSON.parse(localStorage.getItem(K.adm_refs) || '[]');
-  linkData = refs.find(r => r.code === code.toUpperCase());
-  
-  // Update lastPageview and totalPageviews for traffic tracking
-  if(linkData) {
-    linkData.lastPageview = Date.now();
-    linkData.totalPageviews = (linkData.totalPageviews || 0) + 1;
-    // Save back to localStorage
-    const refs = JSON.parse(localStorage.getItem(K.adm_refs) || '[]');
-    const idx = refs.findIndex(r => r.code === code.toUpperCase());
-    if(idx >= 0) {
-      refs[idx] = linkData;
-      localStorage.setItem(K.adm_refs, JSON.stringify(refs));
-    }
-  }
-} catch(e) {
-  console.error('Failed to load link data:', e);
-}
 
-// If no link data found, redirect to home
-if(!linkData) {
-  alert('Invalid or expired link code.');
-  location.href = './';
-}
+(async function loadLink() {
+  if(!code) {
+    alert('No link code provided.');
+    location.href = './';
+    return;
+  }
+  
+  try {
+    // Fetch from API (falls back to localStorage if API is offline)
+    linkData = await window.ADMENSION_API.getLink(code);
+    
+    // Track pageview via API
+    await window.ADMENSION_API.trackPageview(code);
+    
+    // Initialize the page now that we have link data
+    initializeInterstitial();
+  } catch(error) {
+    console.error('Failed to load link:', error);
+    alert('Invalid or expired link code.');
+    location.href = './';
+  }
+})();
 
 // Track attribution (if ?adm=CODE present)
 const admCode = params.get('adm');
@@ -257,52 +261,60 @@ if(admCode) {
   sessionStorage.setItem('admension_code', admCode);
 }
 
-// DOM elements
-const step1El = document.getElementById('step1');
-const step2El = document.getElementById('step2');
-const step3El = document.getElementById('step3');
-const linkNameEl = document.getElementById('linkName');
-const linkName3El = document.getElementById('linkName3');
-const customMessageEl = document.getElementById('customMessage');
-const timer1El = document.getElementById('timer1');
-const timer2El = document.getElementById('timer2');
-const timer3BigEl = document.getElementById('timer3Big');
-const btn1 = document.getElementById('btn1');
-const btn2 = document.getElementById('btn2');
-const btn3 = document.getElementById('btn3');
+function initializeInterstitial() {
+  // If no link data found, redirect to home
+  if(!linkData) {
+    alert('Invalid or expired link code.');
+    location.href = './';
+    return;
+  }
 
-// Populate step 1 with link name
-if(linkNameEl && linkData.linkName) {
-  linkNameEl.textContent = linkData.linkName;
-}
+  // DOM elements
+  const step1El = document.getElementById('step1');
+  const step2El = document.getElementById('step2');
+  const step3El = document.getElementById('step3');
+  const linkNameEl = document.getElementById('linkName');
+  const linkName3El = document.getElementById('linkName3');
+  const customMessageEl = document.getElementById('customMessage');
+  const timer1El = document.getElementById('timer1');
+  const timer2El = document.getElementById('timer2');
+  const timer3BigEl = document.getElementById('timer3Big');
+  const btn1 = document.getElementById('btn1');
+  const btn2 = document.getElementById('btn2');
+  const btn3 = document.getElementById('btn3');
 
-// Populate step 3 with link name and custom message (will be set when step 3 loads)
-if(linkName3El && linkData.linkName) {
-  linkName3El.textContent = linkData.linkName;
-}
-if(customMessageEl && linkData.message) {
-  customMessageEl.textContent = linkData.message;
-} else if(customMessageEl) {
-  customMessageEl.textContent = 'Click the button below to continue to your destination.';
-}
+  // Populate step 1 with link name
+  if(linkNameEl && linkData.linkName) {
+    linkNameEl.textContent = linkData.linkName;
+  }
 
-let currentStep = 1;
+  // Populate step 3 with link name and custom message (will be set when step 3 loads)
+  if(linkName3El && linkData.linkName) {
+    linkName3El.textContent = linkData.linkName;
+  }
+  if(customMessageEl && linkData.message) {
+    customMessageEl.textContent = linkData.message;
+  } else if(customMessageEl) {
+    customMessageEl.textContent = 'Click the button below to continue to your destination.';
+  }
 
-// Analytics: log page load
-if(window.ADMENSION_ENGAGEMENT) {
-  try {
-    window.ADMENSION_ENGAGEMENT.logEvent('interstitial_load', {
-      code: code,
-      adm_code: admCode || 'none',
-      step: 1,
-      linkName: linkData.linkName,
-      hasMessage: !!linkData.message
-    });
-  } catch(e) {}
-}
+  let currentStep = 1;
 
-// Show the appropriate step based on istep parameter
-if(istep === 1) {
+  // Analytics: log page load
+  if(window.ADMENSION_ENGAGEMENT) {
+    try {
+      window.ADMENSION_ENGAGEMENT.logEvent('interstitial_load', {
+        code: code,
+        adm_code: admCode || 'none',
+        step: 1,
+        linkName: linkData.linkName,
+        hasMessage: !!linkData.message
+      });
+    } catch(e) {}
+  }
+
+  // Show the appropriate step based on istep parameter
+  if(istep === 1) {
   step1El.classList.remove('hidden');
   
   // Check if user returned from ToS disagree
@@ -491,6 +503,7 @@ if(istep === 1) {
     }, 1000);
   };
 }
+} // end initializeInterstitial
 
 function renderDailyQuoteStep2() {
   const container = document.getElementById('dailyQuoteStep2');

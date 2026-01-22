@@ -5,8 +5,7 @@ compatibility_date = "2024-01-01"
 # KV namespace binding
 [[kv_namespaces]]
 binding = "ADMENSION_LINKS"
-id = "YOUR_KV_NAMESPACE_ID_HERE"
-# You'll get this ID after running: wrangler kv:namespace create "ADMENSION_LINKS"
+id = "cad2d001ea9a42009b58cc57c9911f35"
 
 # Routes - configure after deploying
 # [env.production]

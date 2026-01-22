@@ -35,3 +35,29 @@ dist/
 build/
 .cache/
 .DS_Store
+
+# Development files
+*.pyc
+__pycache__/
+*.log
+.env.local
+
+# Screenshots and test artifacts
+*.png
+screenshots/
+debug-*.js
+capture-*.js
+screenshot*.js
+screenshot*.py
+screenshot*.sh
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

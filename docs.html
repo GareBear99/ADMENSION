@@ -813,13 +813,15 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
           </div>
 
           <div class="notice goodNote">
-            <b>✅ Cloudflare Workers + KV Backend:</b> Complete centralized link storage system.
+            <b>✅ Cloudflare Workers + KV Backend (DEPLOYED):</b> Complete centralized link storage system - LIVE and operational.
             <ul style="margin:8px 0 0 20px">
-              <li><b>API Endpoints:</b> POST /api/links (create), GET /api/links/:code (fetch), PUT /api/links/:code (update wallet)</li>
-              <li><b>Free Tier:</b> 100,000 reads/day, 1,000 writes/day, 1GB storage</li>
+              <li><b>Live API:</b> https://admension-api.admension.workers.dev</li>
+              <li><b>Status:</b> ✅ Deployed, health checks passing, ready for production traffic</li>
+              <li><b>Endpoints:</b> POST /api/links (create), GET /api/links/:code (fetch), PUT /api/links/:code (update wallet), GET /api/health (status)</li>
+              <li><b>Free Tier:</b> 100,000 API requests/day, 1,000 writes/day, 1GB KV storage</li>
               <li><b>Capacity:</b> Supports 20,000-100,000 visitors/day on free tier</li>
-              <li><b>Bandwidth Protection:</b> Single IP limited to ~10% of daily quota</li>
-              <li><b>See:</b> CLOUDFLARE_SETUP.md, FRONTEND_INTEGRATION.md for deployment</li>
+              <li><b>Failover:</b> Automatic localStorage fallback if API offline</li>
+              <li><b>See:</b> CLOUDFLARE_API_DEPLOYED.md for full documentation</li>
             </ul>
           </div>
 
@@ -837,13 +839,17 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
           </div>
 
           <div class="notice goodNote">
-            <b>✅ Anti-Abuse System:</b> Policy-safe fraud prevention with stagnation refresh.
+            <b>✅ Anti-Fraud System (PRODUCTION-GRADE):</b> Multi-layer fraud prevention protects earnings pool.
             <ul style="margin:8px 0 0 20px">
-              <li><b>Stagnation Refresh:</b> Random 5-7 minute refresh if page is inactive (only when no recent user activity detected)</li>
-              <li><b>IVT Detection:</b> Invalid Traffic scoring identifies bots and suspicious patterns</li>
-              <li><b>Refresh Limits:</b> 10 per session, 15 per hour max (policy-safe)</li>
-              <li><b>Viewability Standards:</b> 50%+ visible for 1+ second (Google standard)</li>
-              <li><b>Auto-Detection:</b> Headless browsers, rapid refreshes, bot signatures</li>
+              <li><b>IVT Detection:</b> 5-factor scoring system (0-100 scale), 70+ = excluded from payouts</li>
+              <li><b>Rate Limiting:</b> 10 refreshes/session, 15/hour max (prevents rapid refresh spam)</li>
+              <li><b>Viewability Standards:</b> 50%+ visible for 1+ second (only billable impressions count)</li>
+              <li><b>Bot Detection:</b> Webdriver, user agent patterns, timing analysis</li>
+              <li><b>Activity Tracking:</b> Mouse, keyboard, scroll monitoring (detects AFK farming)</li>
+              <li><b>Stagnation Refresh:</b> Random 5-7 min refresh only if no activity detected (policy-safe)</li>
+              <li><b>Wallet Cap:</b> Max 1% per wallet prevents whale dominance of pool</li>
+              <li><b>Walletless Burn:</b> Links without wallets → earnings to founder (prevents spam)</li>
+              <li><b>See:</b> ANTI_FRAUD_AND_EARNING_MECHANICS.md for complete documentation</li>
             </ul>
           </div>
 
@@ -859,18 +865,20 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
           </div>
 
           <div class="notice goodNote">
-            <b>✅ Link Creation & Management:</b> Full localStorage-based system (API integration ready).
+            <b>✅ Link Creation & Management (API INTEGRATED):</b> Links now work globally across all devices and browsers.
             <ul style="margin:8px 0 0 20px">
-              <li><b>Create Links:</b> 6-character codes, auto-copy, wallet warning</li>
-              <li><b>Track Traffic:</b> Pageviews, last view, 90-day expiration</li>
-              <li><b>Manage Wallets:</b> Update wallet address per link code</li>
-              <li><b>Current:</b> localStorage only (works in creator's browser)</li>
-              <li><b>After API:</b> Works across all devices/browsers globally</li>
+              <li><b>✅ Global Links:</b> Create a link on your phone, share it, works on any device worldwide</li>
+              <li><b>✅ API Backend:</b> Cloudflare KV storage with automatic localStorage cache</li>
+              <li><b>✅ Offline Mode:</b> Falls back to localStorage if API unavailable (link works in same browser)</li>
+              <li><b>Create Links:</b> 6-character codes, auto-copy to clipboard, wallet warnings</li>
+              <li><b>Track Traffic:</b> Pageviews, last view timestamp, 90-day auto-expiration</li>
+              <li><b>Manage Wallets:</b> Update wallet address for any link code (syncs via API)</li>
+              <li><b>Test Link:</b> Try code <span class="code">A4AGRZ</span> to verify global link sharing works</li>
             </ul>
           </div>
 
-          <div class="notice warnNote">
-            <b>⏳ Pending Deployment:</b> Cloudflare Worker API for cross-device link sharing. Currently links work in creator's browser only. Deploy Worker to enable global link sharing.
+          <div class="notice goodNote">
+            <b>✅ Production Ready:</b> All systems deployed and verified. Links created now work globally. Create your first link on the Create page and share it anywhere!
           </div>
         </div>
 
@@ -922,7 +930,56 @@ window.__geoTier; // 1, 2, or 3
 window.__page; // "home", "stats", "create", etc.
 
 // Re-start homepage demo
-window.ADMENSION_DEMO_START();</code></pre>
+window.ADMENSION_DEMO_START();
+
+// ===== ANTI-ABUSE & FRAUD PREVENTION =====
+
+// Get abuse tracker stats
+window.getAbuseStats(); // Shows table of all anti-fraud metrics
+
+// Get IVT score (0-100, 70+ = high risk)
+window.ADMENSION_ANTI_ABUSE.ivtScore;
+
+// Check if session is healthy
+window.ADMENSION_ANTI_ABUSE.isHealthy(); // true/false
+
+// View refresh log (rate limiting)
+window.ADMENSION_ANTI_ABUSE.getRefreshLog();
+
+// Get complete stats
+window.ADMENSION_ANTI_ABUSE.getStats();
+
+// Reset abuse tracker (admin only)
+window.ADMENSION_ANTI_ABUSE.reset();
+
+// ===== API TESTING =====
+
+// Check API health
+await window.ADMENSION_API.checkApiHealth(); // true/false
+
+// Create a test link via API
+await window.ADMENSION_API.createLink({
+  linkName: "My Test Link",
+  destUrl: "https://example.com",
+  message: "Test message",
+  chain: "ethereum",
+  addr: "0x..."
+});
+
+// Fetch a link by code
+await window.ADMENSION_API.getLink("A4AGRZ");
+
+// Update wallet for a link
+await window.ADMENSION_API.updateLink("A4AGRZ", {
+  addr: "0xYourNewWallet",
+  chain: "ethereum"
+});
+
+// List all cached links
+window.ADMENSION_API.listLinks();
+
+// Track pageview for a code
+await window.ADMENSION_API.trackPageview("A4AGRZ");</code></pre>
           </div>
 
           <h3 style="margin-top:1.5rem">CLI Tools (External)</h3>

@@ -2528,15 +2528,27 @@ function refreshStatsUI(){
   }
   
   // Global link statistics (async)
-  if(window.ADMENSION_API) {
-    window.ADMENSION_API.getGlobalStats().then(stats => {
-      if(byId("globalLinksActive")) byId("globalLinksActive").textContent = (stats.totalActive || 0).toLocaleString();
-      if(byId("globalLinksCreated")) byId("globalLinksCreated").textContent = (stats.totalCreated || 0).toLocaleString();
-      if(byId("globalLinksRemoved")) byId("globalLinksRemoved").textContent = (stats.totalRemoved || 0).toLocaleString();
-    }).catch(err => {
-      console.warn('Global stats fetch error:', err);
-    });
-  }
+  const loadGlobalStats = () => {
+    if(window.ADMENSION_API && window.ADMENSION_API.getGlobalStats) {
+      window.ADMENSION_API.getGlobalStats().then(stats => {
+        console.log('[ADMENSION] Global stats loaded:', stats);
+        const active = byId("globalLinksActive");
+        const created = byId("globalLinksCreated");
+        const removed = byId("globalLinksRemoved");
+        
+        if(active) active.textContent = (stats.totalActive || 0).toLocaleString();
+        if(created) created.textContent = (stats.totalCreated || 0).toLocaleString();
+        if(removed) removed.textContent = (stats.totalRemoved || 0).toLocaleString();
+      }).catch(err => {
+        console.warn('[ADMENSION] Global stats fetch error:', err);
+      });
+    } else {
+      // API not loaded yet, retry in 500ms
+      console.log('[ADMENSION] API client not ready, retrying...');
+      setTimeout(loadGlobalStats, 500);
+    }
+  };
+  loadGlobalStats();
 }
 
 /* ===== Export / Import (Stats page) ===== */

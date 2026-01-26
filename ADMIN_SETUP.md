@@ -1,64 +1,42 @@
 # Admin Setup Guide
 
-## Setting Your Admin PIN
+## Secure Admin PIN Initialization
 
-For security, you should set a custom admin PIN instead of using the default.
+⚠️ **IMPORTANT:** For security, admin PINs are stored as SHA-256 hashes, not plaintext.
 
-### Option 1: LocalStorage (Recommended for GitHub Pages)
+### Quick Setup (Recommended)
 
-Add this to your browser's console or create a bookmarklet:
+1. **Open the PIN initialization page:**
+   ```
+   https://your-username.github.io/ADMENSION/init-admin-pin.html
+   ```
 
-```javascript
-// Set your custom PIN (choose a secure 6-digit number)
-localStorage.setItem('admension_admin_pin', 'YOUR_PIN_HERE');
+2. **Enter your 6-digit PIN** (choose a strong number)
+3. **Confirm your PIN**
+4. **Click "Initialize Admin PIN"**
 
-// Verify it's set
-console.log('Admin PIN set:', localStorage.getItem('admension_admin_pin'));
-```
+Your PIN will be securely hashed using SHA-256 and stored in `localStorage['admension_pin_hash']`.
 
-### Option 2: Environment Variable (For Self-Hosted)
+### Manual Setup (Advanced)
 
-If you're hosting on your own server with build process:
-
-```bash
-# .env file
-VITE_ADMIN_PIN=123456
-```
-
-Then in your code:
-```javascript
-const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || '979899';
-```
-
-### Current Default PIN
-
-⚠️ **WARNING:** The current default PIN is `979899`
-
-This is visible in the source code and should be changed for production use.
-
-### How to Change PIN in Code
-
-1. Open `index.html`, `admin.html`, `stats.html`, `manage.html`, `create.html`
-2. Find all instances of `"979899"`
-3. Replace with your custom PIN
-4. Commit and push changes
-
-### Better Approach: Dynamic PIN Check
-
-Replace hardcoded PIN checks with:
+If you prefer to set it via console:
 
 ```javascript
-function checkAdminPIN() {
-  const customPIN = localStorage.getItem('admension_admin_pin');
-  const defaultPIN = '979899'; // Fallback only
-  const pin = prompt('Enter Admin PIN:');
-  
-  if (pin === null) return false;
-  
-  // Check custom PIN first, then fallback to default
-  const validPIN = customPIN || defaultPIN;
-  return String(pin).trim() === validPIN;
+// SHA-256 hash function
+async function hashPIN(pin) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+// Set your PIN (replace '123456' with your actual PIN)
+const myPIN = '123456';
+hashPIN(myPIN).then(hash => {
+  localStorage.setItem('admension_pin_hash', hash);
+  console.log('✅ Admin PIN hash stored securely');
+});
 ```
 
 ### Security Best Practices

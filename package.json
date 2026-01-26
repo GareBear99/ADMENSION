@@ -1,4 +1,32 @@
 {
+  "name": "admension",
+  "version": "1.0.0",
+  "description": "The Only Link Shortener That Pays You — Automatically. No signup, no dashboard, just share links and earn from ad revenue.",
+  "keywords": [
+    "link-shortener",
+    "url-shortener",
+    "monetization",
+    "adsense",
+    "revenue-sharing",
+    "web-monetization",
+    "interstitial",
+    "github-pages",
+    "cryptocurrency",
+    "passive-income"
+  ],
+  "homepage": "https://garebear99.github.io/ADMENSION/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GareBear99/ADMENSION.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GareBear99/ADMENSION/issues"
+  },
+  "license": "MIT",
+  "author": "GareBear99",
+  "scripts": {
+    "payout": "node scripts/compute_payouts.mjs"
+  },
   "devDependencies": {
     "playwright": "^1.57.0"
   },

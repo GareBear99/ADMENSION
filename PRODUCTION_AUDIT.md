@@ -143,6 +143,24 @@ adsenseSlot: '/XXXXXXX/sticky-footer', // Need real slot IDs
 
 ---
 
+### 4. Admin PIN Hardcoded 🔐
+**Priority:** MEDIUM (for public deployments)  
+**Impact:** Default admin PIN `979899` is visible in source code
+
+**Location:** `index.html`, `admin.html`, `stats.html`, `manage.html`, `create.html`
+
+**Current Status:** Default PIN works but is public ⚠️
+
+**Solution:** See `ADMIN_SETUP.md` for instructions on setting custom PIN via localStorage
+
+**Action Required:** 
+- For personal use: Set custom PIN via localStorage
+- For public deployment: Either remove admin features or implement proper auth
+
+**Note:** This is acceptable for personal/testing use. Admin features only affect browser localStorage (not server data).
+
+---
+
 ## 🎉 EXCELLENT PRACTICES
 
 ### 1. Bootstrap Phase Implementation ⭐

@@ -1,5 +1,12 @@
 # ADMENSION
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/GareBear99/ADMENSION/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/GareBear99/ADMENSION?style=social)](https://github.com/GareBear99/ADMENSION/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/GareBear99/ADMENSION)](https://github.com/GareBear99/ADMENSION/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://garebear99.github.io/ADMENSION/)
+
 **The Only Link Shortener That Pays You — Automatically**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)

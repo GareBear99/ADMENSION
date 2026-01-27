@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADMENSION Admin PIN Setup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    .notice {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #856404;
+    }
+    .success {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+    .error {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 16px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.3s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .code-block {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 12px;
+      overflow-x: auto;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔐 Admin PIN Setup</h1>
+    <p class="subtitle">Initialize your secure admin PIN for ADMENSION</p>
+    
+    <div id="warning" class="notice">
+      <strong>⚠️ Security Notice:</strong> Choose a strong 6-digit PIN. Never share it publicly.
+    </div>
+    
+    <div id="status" class="hidden"></div>
+    
+    <form id="pinForm">
+      <label for="pin">Enter Your Admin PIN (6 digits)</label>
+      <input 
+        type="password" 
+        id="pin" 
+        pattern="[0-9]{6}" 
+        minlength="6" 
+        maxlength="6" 
+        placeholder="123456"
+        required
+      />
+      
+      <label for="confirmPin">Confirm Your PIN</label>
+      <input 
+        type="password" 
+        id="confirmPin" 
+        pattern="[0-9]{6}" 
+        minlength="6" 
+        maxlength="6" 
+        placeholder="123456"
+        required
+      />
+      
+      <button type="submit">Initialize Admin PIN</button>
+    </form>
+    
+    <div id="result" class="hidden">
+      <div class="notice success">
+        <strong>✅ PIN Initialized Successfully!</strong>
+      </div>
+      <p style="margin: 16px 0; font-size: 14px; color: #666;">
+        Your admin PIN has been securely hashed and stored in localStorage.
+        You can now use ADMENSION admin features with your PIN.
+      </p>
+      <div class="code-block" id="hashDisplay"></div>
+    </div>
+  </div>
+
+  <script>
+    // SHA-256 hash function (secure PIN storage)
+    async function hashPIN(pin) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(pin);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    
+    // Show status message
+    function showStatus(message, isError = false) {
+      const status = document.getElementById('status');
+      status.className = isError ? 'notice error' : 'notice success';
+      status.textContent = message;
+      status.classList.remove('hidden');
+      setTimeout(() => status.classList.add('hidden'), 5000);
+    }
+    
+    // Handle form submission
+    document.getElementById('pinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const pin = document.getElementById('pin').value;
+      const confirmPin = document.getElementById('confirmPin').value;
+      
+      // Validation
+      if (pin !== confirmPin) {
+        showStatus('❌ PINs do not match!', true);
+        return;
+      }
+      
+      if (!/^\d{6}$/.test(pin)) {
+        showStatus('❌ PIN must be exactly 6 digits!', true);
+        return;
+      }
+      
+      // Weak PIN check
+      const weakPins = ['000000', '111111', '222222', '333333', '444444', 
+                        '555555', '666666', '777777', '888888', '999999',
+                        '123456', '654321', '000001', '999999'];
+      if (weakPins.includes(pin)) {
+        if (!confirm('⚠️ This PIN is weak and easily guessable. Use it anyway?')) {
+          return;
+        }
+      }
+      
+      try {
+        // Hash the PIN
+        const hash = await hashPIN(pin);
+        
+        // Store hash in localStorage
+        localStorage.setItem('admension_pin_hash', hash);
+        
+        // Show success
+        document.getElementById('pinForm').classList.add('hidden');
+        document.getElementById('warning').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('hashDisplay').textContent = 
+          `Hash: ${hash.substring(0, 32)}...\\nStored in: localStorage['admension_pin_hash']`;
+        
+        // Clear inputs
+        document.getElementById('pin').value = '';
+        document.getElementById('confirmPin').value = '';
+        
+      } catch (error) {
+        showStatus('❌ Error: ' + error.message, true);
+      }
+    });
+    
+    // Check if PIN is already set
+    window.addEventListener('DOMContentLoaded', () => {
+      const existingHash = localStorage.getItem('admension_pin_hash');
+      if (existingHash) {
+        document.getElementById('warning').innerHTML = `
+          <strong>✅ Admin PIN Already Set</strong><br/>
+          To change it, clear localStorage first or update the hash manually.
+        `;
+        document.getElementById('warning').className = 'notice success';
+      }
+    });
+  </script>
+</body>
+</html>

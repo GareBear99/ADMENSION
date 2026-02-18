@@ -15,7 +15,7 @@
 const AD_CONFIG = {
   // REPLACE THESE WITH YOUR ACTUAL IDS
   adsense: {
-    client: 'ca-pub-XXXXXXXXXXXXXXXX', // Your AdSense publisher ID
+    client: 'ca-pub-5584590642779290', // Your AdSense publisher ID
     enabled: true,
     autoAds: false // We use manual placement for better control
   },

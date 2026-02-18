@@ -96,10 +96,16 @@ export default {
       }
 
       // PUT /api/links/:code - Update link (wallet address)
-      if (request.method === 'PUT' && path.startsWith('/api/links/')) {
+      if (request.method === 'PUT' && path.startsWith('/api/links/') && !path.includes('/pageview')) {
         const code = path.split('/').pop().toUpperCase();
         const body = await request.json();
         return await updateLink(code, body, env);
+      }
+
+      // POST /api/links/:code/pageview - Track a pageview
+      if (request.method === 'POST' && path.match(/\/api\/links\/[A-Z0-9]+\/pageview$/i)) {
+        const code = path.split('/').slice(-2, -1)[0].toUpperCase();
+        return await trackPageview(code, env);
       }
 
       return jsonResponse({ error: 'Not found' }, 404);
@@ -169,20 +175,45 @@ async function getLink(code, env) {
 
   const linkData = JSON.parse(data);
 
-  // Update traffic stats
-  linkData.lastPageview = Date.now();
-  linkData.totalPageviews = (linkData.totalPageviews || 0) + 1;
-
-  // Save updated stats back to KV
-  await env.ADMENSION_LINKS.put(
-    `link:${code}`,
-    JSON.stringify(linkData),
-    { expirationTtl: 7776000 } // Reset 90-day expiration on activity
-  );
+  // Note: Pageview tracking is handled by dedicated POST /api/links/:code/pageview endpoint
+  // This endpoint only fetches data without modifying stats
 
   return jsonResponse({
     success: true,
     data: linkData,
+  });
+}
+
+/**
+ * Track a pageview for a link
+ */
+async function trackPageview(code, env) {
+  if (!code || code.length !== 6) {
+    return jsonResponse({ error: 'Invalid code format' }, 400);
+  }
+
+  const data = await env.ADMENSION_LINKS.get(`link:${code}`);
+  
+  if (!data) {
+    return jsonResponse({ error: 'Link not found or expired' }, 404);
+  }
+
+  const linkData = JSON.parse(data);
+
+  // Update traffic stats
+  linkData.lastPageview = Date.now();
+  linkData.totalPageviews = (linkData.totalPageviews || 0) + 1;
+
+  // Save updated stats back to KV (resets 90-day expiration)
+  await env.ADMENSION_LINKS.put(
+    `link:${code}`,
+    JSON.stringify(linkData),
+    { expirationTtl: 7776000 }
+  );
+
+  return jsonResponse({
+    success: true,
+    totalPageviews: linkData.totalPageviews,
   });
 }
 

@@ -6,9 +6,8 @@
 
 // API Configuration
 const API_CONFIG = {
-  // Set this to your Cloudflare Worker URL after deployment
-  // Example: 'https://admension-api.your-subdomain.workers.dev'
-  baseUrl: window.ADMENSION_API_URL || 'https://admension-api.your-subdomain.workers.dev',
+  // Cloudflare Worker API URL
+  baseUrl: window.ADMENSION_API_URL || 'https://admension-api.admension.workers.dev',
   timeout: 10000, // 10 second timeout
 };
 
@@ -165,11 +164,17 @@ function createLinkOffline(linkData) {
 
   saveLinkToLocalStorage(linkRecord);
 
+  // Generate absolute URLs for the interstitial page
+  const baseUrl = new URL(window.location.href);
+  const basePath = baseUrl.pathname.replace(/\/[^/]*$/, '');
+  const shortLink = `${baseUrl.origin}${basePath}/interstitial.html?code=${code}`;
+  const fullLink = `${shortLink}&adm=${code}`;
+
   return {
     success: true,
     code,
-    shortLink: `interstitial.html?code=${code}`,
-    fullLink: `interstitial.html?code=${code}&adm=${code}`,
+    shortLink,
+    fullLink,
     offline: true,
   };
 }
@@ -256,6 +261,58 @@ async function checkApiHealth() {
 }
 
 /**
+ * Track a pageview for a link
+ * @param {string} code - 6-character link code
+ * @returns {Promise<Object>} - {success, totalPageviews}
+ */
+async function trackPageview(code) {
+  try {
+    // Try API first
+    const response = await fetchWithTimeout(`${API_CONFIG.baseUrl}/api/links/${code}/pageview`, {
+      method: 'POST',
+    }, API_CONFIG.timeout);
+
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to track pageview');
+    }
+
+    // Update localStorage stats
+    updateLocalPageviewStats(code);
+
+    return result;
+  } catch (error) {
+    console.warn('API unavailable, tracking pageview locally:', error.message);
+    
+    // Fallback to localStorage
+    return trackPageviewOffline(code);
+  }
+}
+
+/**
+ * Track pageview in localStorage only
+ */
+function trackPageviewOffline(code) {
+  updateLocalPageviewStats(code);
+  return { success: true, offline: true };
+}
+
+/**
+ * Update pageview stats in localStorage
+ */
+function updateLocalPageviewStats(code) {
+  const links = getAllLinks();
+  const linkIndex = links.findIndex(l => l.code === code.toUpperCase());
+  
+  if (linkIndex >= 0) {
+    links[linkIndex].lastPageview = Date.now();
+    links[linkIndex].totalPageviews = (links[linkIndex].totalPageviews || 0) + 1;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+  }
+}
+
+/**
  * Get global link statistics
  * @returns {Promise<Object>} - {totalCreated, totalActive, totalRemoved, lastUpdated}
  */
@@ -295,6 +352,7 @@ if (typeof window !== 'undefined') {
     getLink,
     updateLink,
     getAllLinks,
+    trackPageview,
     checkApiHealth,
     getGlobalStats,
     config: API_CONFIG,

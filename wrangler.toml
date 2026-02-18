@@ -2,6 +2,9 @@ name = "admension-api"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
+# Workers.dev subdomain (free tier)
+workers_dev = true
+
 # KV namespace binding
 [[kv_namespaces]]
 binding = "ADMENSION_LINKS"
@@ -12,6 +15,3 @@ id = "cad2d001ea9a42009b58cc57c9911f35"
 # routes = [
 #   { pattern = "yourdomain.com/api/*", zone_name = "yourdomain.com" }
 # ]
-
-# Workers.dev subdomain (free tier)
-workers_dev = true

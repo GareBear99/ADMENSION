@@ -59,6 +59,7 @@
     'ad-interstitial-sticky': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },
     'ad-interstitial-left': { size: [[160, 600]], desktop: true },
     'ad-interstitial-right': { size: [[160, 600]], desktop: true },
+    'ad-interstitial-bottom': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },
     
     // Anchor (sticky footer)
     'ad-anchor': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },

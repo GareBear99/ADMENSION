@@ -36,18 +36,29 @@
     // Create page
     'ad-create-banner': { size: [[728, 90], [320, 50]], responsive: true },
     'ad-create-rail': { size: [[160, 600]], desktop: true },
+    'ad-create-tall': { size: [[300, 600], [300, 250]], responsive: true },
+    'ad-create-footer': { size: [[728, 90], [320, 50]], responsive: true },
     
     // Manage page
     'ad-manage-banner': { size: [[728, 90], [320, 50]], responsive: true },
     'ad-manage-rail': { size: [[160, 600]], desktop: true },
+    'ad-manage-tall': { size: [[300, 600], [300, 250]], responsive: true },
+    'ad-manage-footer': { size: [[728, 90], [320, 50]], responsive: true },
     
     // Docs page
     'ad-docs-banner': { size: [[728, 90], [320, 50]], responsive: true },
     'ad-docs-rail': { size: [[160, 600]], desktop: true },
+    'ad-docs-tall': { size: [[300, 600], [300, 250]], responsive: true },
     
     // Admin page
+    'ad-admin-banner': { size: [[728, 90], [320, 50]], responsive: true },
     'ad-admin-rail': { size: [[160, 600]], desktop: true },
     'ad-admin-tall': { size: [[300, 600]], responsive: true },
+    
+    // Interstitial page
+    'ad-interstitial-sticky': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },
+    'ad-interstitial-left': { size: [[160, 600]], desktop: true },
+    'ad-interstitial-right': { size: [[160, 600]], desktop: true },
     
     // Anchor (sticky footer)
     'ad-anchor': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },

@@ -151,11 +151,14 @@ async function createLink(data, env) {
   // Update global stats: increment total created
   await incrementGlobalStat(env, 'created');
 
+  // Live site base URL
+  const SITE_BASE = 'https://garebear99.github.io/ADMENSION';
+
   return jsonResponse({
     success: true,
     code,
-    shortLink: `interstitial.html?code=${code}`,
-    fullLink: `interstitial.html?code=${code}&adm=${code}`,
+    shortLink: `${SITE_BASE}/interstitial.html?code=${code}`,
+    fullLink: `${SITE_BASE}/interstitial.html?code=${code}&adm=${code}`,
   }, 201);
 }
 

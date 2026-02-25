@@ -441,6 +441,124 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 }
 /* ===== /Floating Action Buttons ===== */
 
+/* ===== EVE Chatbot Modal ===== */
+.eveChatModal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.60);
+  z-index: 100001;
+  display: none;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 18px;
+}
+.eveChatModal.open{ display: flex; }
+.eveChatBox{
+  width: min(400px, 100%);
+  max-height: min(600px, 80vh);
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: rgba(18,18,24,.96);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 20px 60px rgba(0,0,0,.65);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+.eveChatHeader{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: rgba(168,85,247,.12);
+}
+.eveChatHeader h3{
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+.eveChatHeader .eveDot{
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(34,197,94,.85);
+  box-shadow: 0 0 12px rgba(34,197,94,.6);
+}
+.eveChatMessages{
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.eveMsg{
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.eveMsg.bot{
+  background: rgba(168,85,247,.18);
+  border: 1px solid rgba(168,85,247,.30);
+  align-self: flex-start;
+}
+.eveMsg.user{
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.15);
+  align-self: flex-end;
+}
+.eveMsg a{ color: rgba(168,85,247,.90); text-decoration: underline; }
+.eveChatInput{
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.25);
+}
+.eveChatInput input{
+  flex: 1;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+}
+.eveChatInput input::placeholder{ color: rgba(255,255,255,.45); }
+.eveChatInput button{
+  background: rgba(168,85,247,.35);
+  border: 1px solid rgba(168,85,247,.50);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.eveChatInput button:hover{ background: rgba(168,85,247,.50); }
+.eveQuickBtns{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.15);
+}
+.eveQuickBtns button{
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.85);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.eveQuickBtns button:hover{ background: rgba(255,255,255,.14); }
+/* ===== /EVE Chatbot Modal ===== */
+
 
 /* ===== RPM Optimization Layer (v1.1) ===== */
 .reveal{ opacity:0; transform: translateY(4px); transition: opacity .35s ease, transform .35s ease; }
@@ -3865,14 +3983,177 @@ function setupSideStickyButtons(){
 
 
 
-// ===== EVE Chat Bubble (Coming Soon) =====
+// ===== EVE Rule-Based AI Chatbot =====
 (function(){
   const btn = document.getElementById("eveBtn");
-  if(btn){
-    btn.addEventListener("click", ()=>{
-      alert("EVE chat is coming soon. 👁️\n\nFor now, use the Support button for info + links.");
+  const modal = document.getElementById("eveChatModal");
+  const closeBtn = document.getElementById("eveChatClose");
+  const messagesBox = document.getElementById("eveChatMessages");
+  const inputField = document.getElementById("eveChatInputField");
+  const sendBtn = document.getElementById("eveChatSend");
+  const quickBtns = document.getElementById("eveQuickBtns");
+
+  // Rule-based response patterns
+  const EVE_RULES = [
+    {
+      patterns: [/create.*link/i, /make.*link/i, /new.*link/i, /shorten.*url/i, /how.*start/i],
+      response: `To create a link:\n1. Go to the <b>Create</b> page\n2. Enter a <b>Link Name</b> (what you call it)\n3. Enter the <b>Destination URL</b> (where visitors go)\n4. Click <b>Create Link</b>\n\nYou'll get a shareable interstitial link! 🔗`
+    },
+    {
+      patterns: [/interstitial/i, /how.*work/i, /3.*step/i, /three.*step/i, /what.*happen/i],
+      response: `The interstitial is a 3-step process:\n\n<b>Step 1:</b> Visitor sees a quote card + ad (5s countdown)\n<b>Step 2:</b> Visitor gets the destination URL to copy\n<b>Step 3:</b> Agree to ToS → redirected to destination\n\nThis creates ad impressions that generate revenue! 💰`
+    },
+    {
+      patterns: [/expir/i, /how long/i, /90.*day/i, /delete/i, /remove.*link/i],
+      response: `Links expire after <b>90 days of inactivity</b>.\n\nEvery time someone visits your interstitial, the timer resets! Active links stay alive indefinitely.\n\nYou can see days remaining on the <b>Manage</b> page. ⏱️`
+    },
+    {
+      patterns: [/ad/i, /adsense/i, /earn/i, /money/i, /revenue/i, /monetiz/i],
+      response: `ADMENSION uses <b>Google AdSense</b> for monetization.\n\n• Ads display during the interstitial flow\n• Revenue depends on visitor geography & engagement\n• AdSense approval takes 1-2 weeks\n• We don't do click-to-earn or incentivized ads\n\nThis is passive income from your shared links! 📈`
+    },
+    {
+      patterns: [/manage/i, /my links/i, /view.*link/i, /edit.*link/i, /list/i],
+      response: `On the <b>Manage</b> page you can:\n\n• See all your created links\n• Copy the share link for any code\n• View the interstitial in a new tab\n• See expiration warnings\n• Click a code to auto-fill the input\n\nLinks are stored locally in your browser. 📋`
+    },
+    {
+      patterns: [/support/i, /donate/i, /help.*site/i, /contribute/i],
+      response: `You can support ADMENSION by:\n\n• Watching the optional 30s sponsor clip (Support button)\n• Sharing your links with others\n• Donating via crypto (TRON/ETH/BTC)\n\nAll support is optional and doesn't affect your links! 💜`
+    },
+    {
+      patterns: [/api/i, /worker/i, /cloudflare/i, /backend/i],
+      response: `ADMENSION uses a <b>Cloudflare Worker</b> API:\n\n• <code>POST /api/links</code> — create a link\n• <code>GET /api/links/:code</code> — get link details\n• <code>POST /api/links/:code/view</code> — track pageview\n\nThe API handles storage, tracking, and expiration automatically. ⚙️`
+    },
+    {
+      patterns: [/stats/i, /analytics/i, /views/i, /clicks/i, /traffic/i],
+      response: `Check the <b>Stats</b> page for:\n\n• Total links created\n• Active vs expired links\n• Pageview estimates\n• Local analytics data\n\nNote: detailed per-link stats require the API. 📊`
+    },
+    {
+      patterns: [/privacy/i, /data/i, /cookie/i, /gdpr/i, /tracking/i],
+      response: `Privacy info:\n\n• Links are stored locally (browser) + on our API\n• We use Google AdSense (their privacy policy applies)\n• No personal data is sold\n• See our <b>Privacy Policy</b> page for full details\n\nWe respect your privacy! 🔒`
+    },
+    {
+      patterns: [/who.*you/i, /what.*eve/i, /your name/i, /^eve$/i],
+      response: `I'm <b>EVE</b> — your ADMENSION assistant! 👁️\n\nI can help you with:\n• Creating and managing links\n• Understanding how interstitials work\n• Questions about ads and revenue\n• Support and site info\n\nAsk me anything!`
+    },
+    {
+      patterns: [/hello/i, /hi$/i, /hey/i, /^hi /i, /good morning/i, /good evening/i],
+      response: `Hello! 👋 I'm EVE, your ADMENSION assistant.\n\nHow can I help you today? Try asking about creating links, the interstitial process, or earnings!`
+    },
+    {
+      patterns: [/thank/i, /thanks/i, /thx/i, /ty$/i],
+      response: `You're welcome! 😊\n\nLet me know if you have any other questions about ADMENSION!`
+    },
+    {
+      patterns: [/bye/i, /goodbye/i, /see you/i, /later/i],
+      response: `Goodbye! 👋\n\nCome back anytime you have questions. Happy link sharing! 🔗`
+    },
+    {
+      patterns: [/error/i, /not work/i, /broken/i, /bug/i, /issue/i, /problem/i],
+      response: `Having issues? Try these steps:\n\n1. <b>Refresh</b> the page\n2. <b>Clear browser cache</b>\n3. Check your <b>internet connection</b>\n4. Make sure the <b>Destination URL</b> is valid\n\nIf problems persist, open the browser console (F12) and check for errors. 🔧`
+    },
+    {
+      patterns: [/code/i, /short.*code/i, /link.*code/i],
+      response: `Each link gets a unique <b>6-character code</b> (like "abc123").\n\nThis code is used in the interstitial URL:\n<code>interstitial.html?code=abc123</code>\n\nYou can find your codes on the <b>Manage</b> page! 🏷️`
+    }
+  ];
+
+  // Default response when no pattern matches
+  const DEFAULT_RESPONSE = `I'm not sure about that specific question. 🤔\n\nTry asking about:\n• Creating links\n• How interstitials work\n• Link expiration (90 days)\n• Ads and earnings\n• Managing your links\n\nOr click one of the quick buttons below!`;
+
+  function getResponse(input) {
+    const text = input.trim().toLowerCase();
+    if (!text) return null;
+    
+    for (const rule of EVE_RULES) {
+      for (const pattern of rule.patterns) {
+        if (pattern.test(text)) {
+          return rule.response;
+        }
+      }
+    }
+    return DEFAULT_RESPONSE;
+  }
+
+  function addMessage(text, isUser) {
+    if (!messagesBox) return;
+    const div = document.createElement("div");
+    div.className = `eveMsg ${isUser ? "user" : "bot"}`;
+    div.innerHTML = text.replace(/\n/g, "<br>");
+    messagesBox.appendChild(div);
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+  }
+
+  function sendMessage() {
+    if (!inputField) return;
+    const text = inputField.value.trim();
+    if (!text) return;
+    
+    addMessage(text, true);
+    inputField.value = "";
+    
+    // Small delay for natural feel
+    setTimeout(() => {
+      const response = getResponse(text);
+      if (response) addMessage(response, false);
+    }, 300);
+    
+    try { logEvent("eve_chat", { query: text.slice(0, 50) }); } catch(e) {}
+  }
+
+  function openChat() {
+    if (!modal) return;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    
+    // Welcome message on first open
+    if (messagesBox && messagesBox.children.length === 0) {
+      addMessage(`Hello! 👁️ I'm <b>EVE</b>, your ADMENSION assistant.\n\nAsk me anything about creating links, the interstitial process, ads, or managing your links!\n\nOr tap a quick button below to get started.`, false);
+    }
+    
+    if (inputField) inputField.focus();
+    try { logEvent("eve_open", {}); } catch(e) {}
+  }
+
+  function closeChat() {
+    if (!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  // Event listeners
+  if (btn) btn.addEventListener("click", openChat);
+  if (closeBtn) closeBtn.addEventListener("click", closeChat);
+  if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeChat(); });
+  if (sendBtn) sendBtn.addEventListener("click", sendMessage);
+  if (inputField) {
+    inputField.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); sendMessage(); }
     });
   }
+  
+  // Quick buttons
+  if (quickBtns) {
+    quickBtns.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-q]");
+      if (btn) {
+        const q = btn.getAttribute("data-q");
+        if (q) {
+          addMessage(q, true);
+          setTimeout(() => {
+            const response = getResponse(q);
+            if (response) addMessage(response, false);
+          }, 300);
+          try { logEvent("eve_quick", { query: q }); } catch(e) {}
+        }
+      }
+    });
+  }
+
+  // Escape key to close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal && modal.classList.contains("open")) closeChat();
+  });
+
   // If sticky anchor exists, add class to lift FABs above it
   const sticky = document.getElementById("stickyAnchor") || document.getElementById("stickyAnchorBox") || document.querySelector(".stickyAnchor");
   if(sticky){
@@ -3880,7 +4161,7 @@ function setupSideStickyButtons(){
     document.body.classList.add("hasStickyAnchor");
   }
 })();
-// ===== /EVE Chat Bubble =====
+// ===== /EVE Rule-Based AI Chatbot =====
 
 
 
@@ -4481,8 +4762,31 @@ function apsInitAdminControls(){
 <!-- ===== Support FAB (bottom-left) ===== -->
 <div class="supportFab">
   <button class="btn good" id="btnSupport">Support</button>
-      <button id="eveBtn" class="fab fab-eve" title="EVE chat (coming soon)" aria-label="EVE chat (coming soon)"><span class="fabDot"></span>EVE</button>
+  <button id="eveBtn" class="fab fab-eve" title="Chat with EVE" aria-label="Chat with EVE"><span class="fabDot"></span>EVE</button>
+</div>
 
+<!-- ===== EVE Chatbot Modal ===== -->
+<div class="eveChatModal" id="eveChatModal" aria-hidden="true">
+  <div class="eveChatBox" role="dialog" aria-modal="true" aria-label="EVE Chat">
+    <div class="eveChatHeader">
+      <h3><span class="eveDot"></span> EVE — ADMENSION Assistant</h3>
+      <button class="btn" id="eveChatClose">✕</button>
+    </div>
+    <div class="eveChatMessages" id="eveChatMessages">
+      <!-- Messages will be added here -->
+    </div>
+    <div class="eveQuickBtns" id="eveQuickBtns">
+      <button data-q="How do I create a link?">Create link</button>
+      <button data-q="How does the interstitial work?">Interstitial</button>
+      <button data-q="How long do links last?">Link expiration</button>
+      <button data-q="What about ads?">Ads & earnings</button>
+      <button data-q="How do I manage my links?">Manage links</button>
+    </div>
+    <div class="eveChatInput">
+      <input type="text" id="eveChatInputField" placeholder="Ask EVE anything..." autocomplete="off" />
+      <button id="eveChatSend">Send</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== Support Modal ===== -->

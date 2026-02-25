@@ -556,23 +556,50 @@ let linkData = null;
   }
   
   try {
-    linkData = await window.ADMENSION_API.getLink(code);
-    await window.ADMENSION_API.trackPageview(code);
+    const response = await window.ADMENSION_API.getLink(code);
+    
+    // API client returns data directly (already extracted from response.data)
+    if (response && (response.linkName || response.destUrl)) {
+      linkData = response;
+    } else {
+      throw new Error('Invalid link data');
+    }
+    
+    console.log('[ADMENSION] Loaded link:', linkData);
+    
+    // Track pageview (don't await, fire and forget)
+    window.ADMENSION_API.trackPageview(code).catch(e => console.warn('Pageview track failed:', e));
+    
     initPage();
   } catch(e) {
     console.error('Failed to load link:', e);
-    alert('Invalid or expired link code.');
-    location.href = './';
+    // Show user-friendly error
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;font-family:system-ui;color:#fff;text-align:center;padding:20px">
+        <h1 style="font-size:48px;margin-bottom:16px">😕</h1>
+        <h2 style="margin-bottom:8px">Link Not Found</h2>
+        <p style="opacity:0.7;margin-bottom:24px">This link may have expired or doesn't exist.</p>
+        <a href="./" style="padding:12px 24px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px">← Back to ADMENSION</a>
+      </div>
+    `;
   }
 })();
 
 function initPage() {
-  if (!linkData) return;
+  if (!linkData) {
+    console.error('[ADMENSION] No link data available');
+    return;
+  }
+  
+  console.log('[ADMENSION] Initializing page with data:', linkData);
   
   // Populate link info
-  const name = linkData.linkName || 'Link';
+  const name = linkData.linkName || 'Unknown Link';
   const dest = linkData.destUrl || '';
   const msg = linkData.message || 'Click continue to reach your destination.';
+  
+  // Update page title
+  document.title = name + ' - ADMENSION';
   
   document.querySelectorAll('[id^="linkName"]').forEach(el => el.textContent = name);
   document.querySelectorAll('[id^="linkDest"]').forEach(el => {

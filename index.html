@@ -2681,22 +2681,31 @@ function renderManageList(){
   }
   
   const lines = activeRefs.slice(-25).reverse().map(r=>{
-    const addrTag = r.addr ? "✅ Wallet" : "⚠️ NO WALLET";
+    const addrTag = r.addr ? "✅" : "⚠️";
     const daysSinceView = Math.floor((now - (r.lastPageview || r.created)) / DAY_MS);
     const daysLeft = 90 - daysSinceView;
     const views = r.totalPageviews || 0;
+    const name = r.linkName || 'Unnamed';
     
     let statusTag = "";
     if(daysLeft <= 7) {
-      statusTag = ` | ⚠️ EXPIRES IN ${daysLeft}d`;
+      statusTag = `<span style="color:#ef4444"> ⚠️ ${daysLeft}d</span>`;
     } else if(daysLeft <= 30) {
-      statusTag = ` | ${daysLeft}d left`;
+      statusTag = `<span style="opacity:0.7"> ${daysLeft}d</span>`;
     }
     
-    return `${r.code} | ${r.chain} | ${addrTag} | ${views} views${statusTag} | ${new Date(r.created).toLocaleDateString()}`;
+    return `<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="cursor:pointer;color:#22d3ee;font-weight:700" onclick="document.getElementById('admCodeUpdate').value='${r.code}'">${r.code}</span>
+      <span style="opacity:0.6">${name.slice(0,20)}</span>
+      <span style="opacity:0.5">${r.chain}</span>
+      <span>${addrTag}</span>
+      <span style="opacity:0.7">${views} views</span>
+      ${statusTag}
+      <button style="margin-left:auto;padding:4px 8px;font-size:10px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:4px;color:#fff;cursor:pointer" onclick="window.open('${makeShortLink(r.code)}','_blank')">View</button>
+    </div>`;
   });
   
-  box.innerHTML = `<div style="font-family:monospace;white-space:pre;font-size:12px;line-height:1.6">${lines.join('\n')}</div>
+  box.innerHTML = `<div style="font-size:12px">${lines.join('')}</div>
 <div style="margin-top:8px;padding:8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:8px;font-size:12px">
 💡 <b>90-Day Policy:</b> Links with no traffic for 90 days are automatically deleted. Any pageview resets the timer.
 </div>`;
@@ -2839,10 +2848,8 @@ if(admCopyLinkBtn){
   admCopyLinkBtn.onclick = async () => {
     const code = document.getElementById("admCodeUpdate").value.trim().toUpperCase();
     if(!code){ alert("Enter an ADM code."); return; }
-    const rec = findRec(code);
-    if(!rec){ alert("Code not found in this browser storage."); return; }
-    const link = makeAdmLink(code);
-    try{ await navigator.clipboard.writeText(link); alert("Copied ✅"); }catch(e){ prompt("Copy link:", link); }
+    const link = makeShortLink(code); // Use correct interstitial URL format
+    try{ await navigator.clipboard.writeText(link); alert("Copied ✅\n" + link); }catch(e){ prompt("Copy link:", link); }
     logEvent("adm_copy_for_code",{code, link});
   };
 }

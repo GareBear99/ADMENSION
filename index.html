@@ -2753,7 +2753,8 @@ if (admLinkNameEl) {
       return;
     }
     
-    if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ New name: <b>${name}</b>`;
+    // New name - prompt for URL
+    if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ New name: <b>${name}</b> — now enter a destination URL above`;
   });
 }
 function genAdmCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }

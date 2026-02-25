@@ -1043,9 +1043,9 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
               <div class="mini">Where visitors will be redirected after completing 3 steps.</div>
             </div>
             <div class="col-12">
-              <label class="mini">Link Name <span style="opacity:0.6">(auto-generated from URL)</span></label>
-              <input id="admLinkName" placeholder="Auto-generates from URL..." readonly style="opacity:0.8;cursor:not-allowed" />
-              <div class="mini" id="admNameStatus">✨ Enter a URL above to auto-generate the link name</div>
+              <label class="mini">Link Name <span style="opacity:0.6">(auto-suggested, you can edit)</span></label>
+              <input id="admLinkName" placeholder="Auto-fills from URL, or type your own..." />
+              <div class="mini" id="admNameStatus">✨ Enter a URL above to auto-suggest a name (you can customize it)</div>
             </div>
             <div class="col-12">
               <label class="mini">Custom Message (optional)</label>
@@ -2685,19 +2685,42 @@ if (admDestUrlEl) {
   admDestUrlEl.addEventListener('input', () => {
     const url = admDestUrlEl.value.trim();
     if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
-      admLinkNameEl.value = '';
-      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a valid URL to auto-generate the link name';
+      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a valid URL to auto-suggest a name';
       return;
     }
     
-    const baseName = generateLinkName(url);
-    const { name, isDuplicate } = checkNameAvailability(baseName);
-    admLinkNameEl.value = name;
+    // Only auto-fill if name field is empty or was auto-generated
+    const currentName = admLinkNameEl.value.trim();
+    if (!currentName || admLinkNameEl.dataset.autoFilled === 'true') {
+      const baseName = generateLinkName(url);
+      const { name, isDuplicate } = checkNameAvailability(baseName);
+      admLinkNameEl.value = name;
+      admLinkNameEl.dataset.autoFilled = 'true';
+      
+      if (isDuplicate) {
+        if (admNameStatusEl) admNameStatusEl.innerHTML = `⚠️ "${baseName}" taken - suggested: <b>${name}</b> (edit if you want)`;
+      } else {
+        if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ Suggested: <b>${name}</b> (edit if you want)`;
+      }
+    }
+  });
+}
+
+// Check duplicates when user manually types a name
+if (admLinkNameEl) {
+  admLinkNameEl.addEventListener('input', () => {
+    admLinkNameEl.dataset.autoFilled = 'false'; // Mark as manually edited
+    const name = admLinkNameEl.value.trim();
+    if (!name) {
+      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a name or let URL auto-suggest one';
+      return;
+    }
     
-    if (isDuplicate) {
-      if (admNameStatusEl) admNameStatusEl.innerHTML = `⚠️ "${baseName}" already exists - using "${name}" instead`;
+    const existingNames = admRefs.map(r => r.linkName?.toLowerCase() || '');
+    if (existingNames.includes(name.toLowerCase())) {
+      if (admNameStatusEl) admNameStatusEl.innerHTML = `⚠️ "${name}" already exists - pick a different name`;
     } else {
-      if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ Link name: <b>${name}</b>`;
+      if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ Name available: <b>${name}</b>`;
     }
   });
 }

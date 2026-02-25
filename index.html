@@ -1038,14 +1038,14 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
           </div>
           <div class="stack">
             <div class="col-12">
-              <label class="mini">Link Name</label>
-              <input id="admLinkName" placeholder="Give your link a name (e.g. 'My Referral Link')" />
-              <div class="mini">This is what visitors will see on the first step.</div>
-            </div>
-            <div class="col-12">
               <label class="mini">Destination URL</label>
               <input id="admDestUrl" placeholder="https://example.com/your-page" />
               <div class="mini">Where visitors will be redirected after completing 3 steps.</div>
+            </div>
+            <div class="col-12">
+              <label class="mini">Link Name <span style="opacity:0.6">(auto-generated from URL)</span></label>
+              <input id="admLinkName" placeholder="Auto-generates from URL..." readonly style="opacity:0.8;cursor:not-allowed" />
+              <div class="mini" id="admNameStatus">✨ Enter a URL above to auto-generate the link name</div>
             </div>
             <div class="col-12">
               <label class="mini">Custom Message (optional)</label>
@@ -2643,7 +2643,64 @@ const admMessageEl = document.getElementById("admMessage");
 const admOutEl = document.getElementById("admOut");
 const admCodeOutEl = document.getElementById("admCodeOut");
 const admWarnEl = document.getElementById("admWarn");
+const admNameStatusEl = document.getElementById("admNameStatus");
 let lastCreatedCode = null; // Store last created code for Manage button
+
+// Auto-generate link name from URL
+function generateLinkName(url) {
+  try {
+    const urlObj = new URL(url);
+    let name = urlObj.hostname.replace('www.', '');
+    // Capitalize first letter of each part
+    name = name.split('.')[0];
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    // Add path hint if exists
+    const path = urlObj.pathname.replace(/\//g, ' ').trim();
+    if (path && path.length > 1 && path.length < 20) {
+      const pathPart = path.split(' ').filter(p => p.length > 1).slice(0, 2).join(' ');
+      if (pathPart) name += ' - ' + pathPart.charAt(0).toUpperCase() + pathPart.slice(1);
+    }
+    return name || 'My Link';
+  } catch(e) {
+    return 'My Link';
+  }
+}
+
+// Check if name exists and suggest alternatives
+function checkNameAvailability(baseName) {
+  const existingNames = admRefs.map(r => r.linkName?.toLowerCase() || '');
+  let name = baseName;
+  let counter = 1;
+  
+  while (existingNames.includes(name.toLowerCase())) {
+    counter++;
+    name = `${baseName} ${counter}`;
+  }
+  
+  return { name, isDuplicate: counter > 1 };
+}
+
+// Update name when URL changes
+if (admDestUrlEl) {
+  admDestUrlEl.addEventListener('input', () => {
+    const url = admDestUrlEl.value.trim();
+    if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+      admLinkNameEl.value = '';
+      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a valid URL to auto-generate the link name';
+      return;
+    }
+    
+    const baseName = generateLinkName(url);
+    const { name, isDuplicate } = checkNameAvailability(baseName);
+    admLinkNameEl.value = name;
+    
+    if (isDuplicate) {
+      if (admNameStatusEl) admNameStatusEl.innerHTML = `⚠️ "${baseName}" already exists - using "${name}" instead`;
+    } else {
+      if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ Link name: <b>${name}</b>`;
+    }
+  });
+}
 function genAdmCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
 function makeAdmLink(code){
   const nu = new URL(location.href);
@@ -2706,17 +2763,24 @@ const admCopyBtn = document.getElementById("admCopy");
 const admCopyFullBtn = document.getElementById("admCopyFull");
 if(admCreateBtn){
   admCreateBtn.onclick = async () => {
-    const linkName = (admLinkNameEl?.value || "").trim();
     const destUrl = (admDestUrlEl?.value || "").trim();
     const message = (admMessageEl?.value || "").trim();
     const chain = admChainEl.value;
     const addr = (admAddrEl.value||"").trim();
     
     // Validation
-    if(!linkName){ alert("Please enter a link name."); return; }
     if(!destUrl){ alert("Please enter a destination URL."); return; }
     if(!destUrl.startsWith("http://") && !destUrl.startsWith("https://")){
       alert("Destination URL must start with http:// or https://"); return;
+    }
+    
+    // Auto-generate link name if not set
+    let linkName = (admLinkNameEl?.value || "").trim();
+    if (!linkName) {
+      const baseName = generateLinkName(destUrl);
+      const { name } = checkNameAvailability(baseName);
+      linkName = name;
+      admLinkNameEl.value = linkName;
     }
     
     try {

@@ -1065,17 +1065,26 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
               <input id="admAddr" placeholder="TRON / ETH / BTC address (optional)" />
             </div>
             <div class="col-12 row" style="margin-top:10px">
-              <button class="btn primary" id="admCreate">Generate Short Link</button>
-              <button class="btn" id="admCopy">Copy Short Link</button>
-              <button class="btn" id="admCopyFull">Copy Full Link</button>
+              <button class="btn primary" id="admCreate">Generate Link</button>
             </div>
-            <div class="col-12" style="margin-top:10px">
-              <label class="mini">Short Link</label>
-              <div class="code" id="admOut" style="padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;word-break:break-all;">—</div>
+            
+            <!-- Code output (for managing) -->
+            <div class="col-4" style="margin-top:10px">
+              <label class="mini">🔑 Your Code</label>
+              <div class="code" id="admCodeOut" style="padding:12px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);border-radius:8px;font-size:20px;font-weight:700;text-align:center;">—</div>
+              <div class="mini" style="margin-top:4px">Use this code in Manage page</div>
             </div>
-            <div class="col-12" style="margin-top:6px">
-              <label class="mini">Full Tracking Link</label>
-              <div class="code" id="admOutFull" style="padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;word-break:break-all;font-size:11px;">—</div>
+            
+            <!-- Share link output -->
+            <div class="col-8" style="margin-top:10px">
+              <label class="mini">🔗 Share Link (give to visitors)</label>
+              <div class="code" id="admOut" style="padding:10px;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.3);border-radius:8px;word-break:break-all;font-size:12px;">—</div>
+            </div>
+            
+            <!-- Action buttons -->
+            <div class="col-12 row" style="margin-top:10px;gap:8px">
+              <button class="btn" id="admCopy" style="background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4)">📋 Copy Share Link</button>
+              <button class="btn" id="admGoManage" style="background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.4)">⚙️ Manage This Link</button>
             </div>
           </div>
 
@@ -2632,8 +2641,9 @@ const admLinkNameEl = document.getElementById("admLinkName");
 const admDestUrlEl = document.getElementById("admDestUrl");
 const admMessageEl = document.getElementById("admMessage");
 const admOutEl = document.getElementById("admOut");
-const admOutFullEl = document.getElementById("admOutFull");
+const admCodeOutEl = document.getElementById("admCodeOut");
 const admWarnEl = document.getElementById("admWarn");
+let lastCreatedCode = null; // Store last created code for Manage button
 function genAdmCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
 function makeAdmLink(code){
   const nu = new URL(location.href);
@@ -2720,8 +2730,12 @@ if(admCreateBtn){
       });
       
       if (result.success) {
+        // Show the code prominently
+        if(admCodeOutEl) admCodeOutEl.textContent = result.code;
+        lastCreatedCode = result.code;
+        
+        // Show the share link
         admOutEl.textContent = result.shortLink;
-        if(admOutFullEl) admOutFullEl.textContent = result.fullLink || makeAdmLink(result.code);
         
         try{ await navigator.clipboard.writeText(result.shortLink); }catch(e){}
         logEvent("adm_create",{code: result.code, chain, has_addr: !!addr, has_dest: !!destUrl, offline: result.offline});
@@ -2743,7 +2757,7 @@ if(admCreateBtn){
         if(result.offline) {
           alert("⚠️ Link created locally (API offline). Link will only work in this browser until API reconnects.");
         } else {
-          alert("ADMENSION link created ✅ (copied). Share it anywhere!");
+          alert("✅ Link created! Share link copied to clipboard.");
         }
       }
     } catch(error) {
@@ -2760,19 +2774,37 @@ if(admCopyBtn){
     logEvent("adm_copy",{link});
   };
 }
-if(admCopyFullBtn){
-  admCopyFullBtn.onclick = async () => {
-    const link = admOutFullEl?.textContent;
-    if(!link || link==="—"){ alert("Create a link first."); return; }
-    try{ await navigator.clipboard.writeText(link); alert("Full link copied ✅"); }catch(e){ prompt("Copy link:", link); }
-    logEvent("adm_copy_full",{link});
+// Manage This Link button - goes to Manage page with code pre-filled
+const admGoManageBtn = document.getElementById("admGoManage");
+if(admGoManageBtn){
+  admGoManageBtn.onclick = () => {
+    if(!lastCreatedCode){ alert("Create a link first."); return; }
+    // Navigate to Manage page and pre-fill the code
+    const manageUrl = new URL(location.href);
+    manageUrl.searchParams.set('page', 'manage');
+    manageUrl.searchParams.set('code', lastCreatedCode);
+    location.href = manageUrl.toString();
   };
 }
 
 /* ===== ADMENSION manage ===== */
 const admSave = document.getElementById("admSaveAddr");
 const admCopyLinkBtn = document.getElementById("admCopyLink");
+const admCodeUpdateEl = document.getElementById("admCodeUpdate");
 function findRec(code){ return admRefs.find(r=>r.code===String(code||"").trim().toUpperCase()); }
+
+// Auto-fill code field if arriving with ?code=XXX param
+(function(){
+  const urlParams = new URLSearchParams(location.search);
+  const codeParam = urlParams.get('code');
+  if(codeParam && admCodeUpdateEl) {
+    admCodeUpdateEl.value = codeParam.toUpperCase();
+    // Clean the URL
+    const nu = new URL(location.href);
+    nu.searchParams.delete('code');
+    history.replaceState(null, '', nu.toString());
+  }
+})();
 if(admSave){
   admSave.onclick = async () => {
     const code = document.getElementById("admCodeUpdate").value.trim().toUpperCase();

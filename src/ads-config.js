@@ -541,7 +541,7 @@ class AdManager {
       this.loadWithPrebid(unit, div);
     } else if (AD_CONFIG.adsense.enabled) {
       // Load AdSense directly
-      this.loadAdSense Unit(unit, div);
+      this.loadAdSenseUnit(unit, div);
     }
     
     this.loadedUnits.add(unitId);

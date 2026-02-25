@@ -2680,48 +2680,80 @@ function checkNameAvailability(baseName) {
   return { name, isDuplicate: counter > 1 };
 }
 
-// Update name when URL changes
+// Bidirectional auto-fill: URL <-> Name
+let isAutoFilling = false; // Prevent infinite loops
+
+// URL input → auto-fill name
 if (admDestUrlEl) {
   admDestUrlEl.addEventListener('input', () => {
+    if (isAutoFilling) return;
     const url = admDestUrlEl.value.trim();
+    
     if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
-      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a valid URL to auto-suggest a name';
+      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a URL to auto-suggest a name';
       return;
     }
     
-    // Only auto-fill if name field is empty or was auto-generated
+    // Check if this URL matches an existing link
+    const existingLink = admRefs.find(r => r.destUrl === url);
+    if (existingLink) {
+      isAutoFilling = true;
+      admLinkNameEl.value = existingLink.linkName;
+      admLinkNameEl.dataset.autoFilled = 'true';
+      if (admNameStatusEl) admNameStatusEl.innerHTML = `🔄 Found existing link: <b>${existingLink.linkName}</b> (code: ${existingLink.code})`;
+      isAutoFilling = false;
+      return;
+    }
+    
+    // Generate new name from URL
     const currentName = admLinkNameEl.value.trim();
     if (!currentName || admLinkNameEl.dataset.autoFilled === 'true') {
+      isAutoFilling = true;
       const baseName = generateLinkName(url);
       const { name, isDuplicate } = checkNameAvailability(baseName);
       admLinkNameEl.value = name;
       admLinkNameEl.dataset.autoFilled = 'true';
       
       if (isDuplicate) {
-        if (admNameStatusEl) admNameStatusEl.innerHTML = `⚠️ "${baseName}" taken - suggested: <b>${name}</b> (edit if you want)`;
+        if (admNameStatusEl) admNameStatusEl.innerHTML = `⚠️ "${baseName}" taken - suggested: <b>${name}</b>`;
       } else {
-        if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ Suggested: <b>${name}</b> (edit if you want)`;
+        if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ Name: <b>${name}</b>`;
       }
+      isAutoFilling = false;
     }
   });
 }
 
-// Check duplicates when user manually types a name
+// Name input → auto-fill URL if existing link found
 if (admLinkNameEl) {
   admLinkNameEl.addEventListener('input', () => {
-    admLinkNameEl.dataset.autoFilled = 'false'; // Mark as manually edited
+    if (isAutoFilling) return;
+    admLinkNameEl.dataset.autoFilled = 'false';
     const name = admLinkNameEl.value.trim();
+    
     if (!name) {
-      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a name or let URL auto-suggest one';
+      if (admNameStatusEl) admNameStatusEl.innerHTML = '✨ Enter a name or URL to get started';
       return;
     }
     
-    const existingNames = admRefs.map(r => r.linkName?.toLowerCase() || '');
-    if (existingNames.includes(name.toLowerCase())) {
-      if (admNameStatusEl) admNameStatusEl.innerHTML = `⚠️ "${name}" already exists - pick a different name`;
-    } else {
-      if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ Name available: <b>${name}</b>`;
+    // Check if name matches an existing link → auto-fill URL
+    const existingLink = admRefs.find(r => r.linkName?.toLowerCase() === name.toLowerCase());
+    if (existingLink) {
+      isAutoFilling = true;
+      admDestUrlEl.value = existingLink.destUrl;
+      if (admNameStatusEl) admNameStatusEl.innerHTML = `🔄 Found existing link: <b>${existingLink.linkName}</b> (code: ${existingLink.code}) - URL auto-filled`;
+      isAutoFilling = false;
+      return;
     }
+    
+    // Check for similar names (partial match)
+    const similarLink = admRefs.find(r => r.linkName?.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(r.linkName?.toLowerCase() || ''));
+    if (similarLink && name.length >= 3) {
+      if (admNameStatusEl) admNameStatusEl.innerHTML = `💡 Similar: "${similarLink.linkName}" exists - <a href="#" onclick="document.getElementById('admLinkName').value='${similarLink.linkName}';document.getElementById('admLinkName').dispatchEvent(new Event('input'));return false;">use it?</a>`;
+      return;
+    }
+    
+    if (admNameStatusEl) admNameStatusEl.innerHTML = `✅ New name: <b>${name}</b>`;
   });
 }
 function genAdmCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }

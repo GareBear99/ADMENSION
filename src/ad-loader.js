@@ -1,479 +1,507 @@
 /**
- * ADMENSION Bulletproof Ad Loader
- * Guarantees ads load with multiple fallback layers
- * No matter what fails, something renders
+ * ADMENSION Manual Ad Placement System v2.0
+ * 
+ * NO Auto Ads. Every placement is explicitly defined and validated.
+ * 
+ * SETUP INSTRUCTIONS:
+ * 1. Go to AdSense → Ads → By ad unit → + New ad unit → Display ads
+ * 2. Create THREE ad units:
+ *    a) "ADMENSION Banner"    → Responsive → Horizontal → Copy slot ID
+ *    b) "ADMENSION Rectangle" → Responsive → Square     → Copy slot ID
+ *    c) "ADMENSION Vertical"  → Responsive → Vertical   → Copy slot ID
+ * 3. Paste each slot ID into SLOT_IDS below
+ * 4. Deploy. Ads will render in every container mapped to that type.
+ * 
+ * VALIDATION: After page load, open DevTools console and run:
+ *   ADMENSION_AD_LOADER.diagnose()
  */
 
 (function() {
   'use strict';
 
-  // AdSense Publisher ID
+  // ============================================================
+  // CONFIGURATION — FILL IN YOUR REAL ADSENSE SLOT IDS HERE
+  // ============================================================
   const ADSENSE_CLIENT = 'ca-pub-5584590642779290';
-  
-  // Configuration
-  const CONFIG = {
-    maxRetries: 3,
-    retryDelay: 2000, // 2 seconds between retries
-    loadTimeout: 10000, // 10 second timeout for AdSense script
-    lazyLoadThreshold: 200, // pixels from viewport
-    enableLazyLoad: true,
-    showPlaceholders: true,
+
+  // Create these 3 ad units in your AdSense dashboard, then paste the slot IDs:
+  const SLOT_IDS = {
+    BANNER:    '',  // Paste your "Display ads → Horizontal" slot ID here (e.g. '1234567890')
+    RECTANGLE: '',  // Paste your "Display ads → Square" slot ID here
+    VERTICAL:  '',  // Paste your "Display ads → Vertical" slot ID here
   };
 
-  // Ad slot definitions - EVERY ad placement in the app
-  const AD_SLOTS = {
+  // ============================================================
+  // AD CONTAINER MAP — Every placement on the site
+  // Maps container div ID → ad type (BANNER, RECTANGLE, or VERTICAL)
+  // ============================================================
+  const CONTAINER_MAP = {
     // Homepage
-    'ad-top-banner': { size: [[728, 90], [320, 50]], responsive: true },
-    'ad-rail-right': { size: [[160, 600], [120, 600]], desktop: true },
-    'ad-in-content-tall': { size: [[300, 250], [336, 280]], responsive: true },
-    'ad-footer-banner': { size: [[728, 90], [320, 50]], responsive: true },
-    
+    'ad-top-banner':       { type: 'BANNER',    page: 'home',   format: 'horizontal', sizes: '728x90' },
+    'ad-rail-right':       { type: 'VERTICAL',  page: 'home',   format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-in-content-tall':  { type: 'RECTANGLE', page: 'home',   format: 'rectangle',  sizes: '300x250' },
+    'ad-footer-banner':    { type: 'BANNER',    page: 'home',   format: 'horizontal', sizes: '728x90' },
+
     // Stats page
-    'ad-stats-banner': { size: [[728, 90], [320, 50]], responsive: true },
-    'ad-stats-tall': { size: [[300, 600], [300, 250]], responsive: true },
-    'ad-stats-rail': { size: [[160, 600]], desktop: true },
-    
+    'ad-stats-banner':     { type: 'BANNER',    page: 'stats',  format: 'horizontal', sizes: '728x90' },
+    'ad-stats-tall':       { type: 'RECTANGLE', page: 'stats',  format: 'rectangle',  sizes: '300x600' },
+    'ad-stats-rail':       { type: 'VERTICAL',  page: 'stats',  format: 'vertical',   sizes: '160x600', desktopOnly: true },
+
     // Create page
-    'ad-create-banner': { size: [[728, 90], [320, 50]], responsive: true },
-    'ad-create-rail': { size: [[160, 600]], desktop: true },
-    'ad-create-tall': { size: [[300, 600], [300, 250]], responsive: true },
-    'ad-create-footer': { size: [[728, 90], [320, 50]], responsive: true },
-    
+    'ad-create-banner':    { type: 'BANNER',    page: 'create', format: 'horizontal', sizes: '728x90' },
+    'ad-create-rail':      { type: 'VERTICAL',  page: 'create', format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-create-tall':      { type: 'RECTANGLE', page: 'create', format: 'rectangle',  sizes: '300x600' },
+    'ad-create-footer':    { type: 'BANNER',    page: 'create', format: 'horizontal', sizes: '728x90' },
+
     // Manage page
-    'ad-manage-banner': { size: [[728, 90], [320, 50]], responsive: true },
-    'ad-manage-rail': { size: [[160, 600]], desktop: true },
-    'ad-manage-tall': { size: [[300, 600], [300, 250]], responsive: true },
-    'ad-manage-footer': { size: [[728, 90], [320, 50]], responsive: true },
-    
+    'ad-manage-banner':    { type: 'BANNER',    page: 'manage', format: 'horizontal', sizes: '728x90' },
+    'ad-manage-rail':      { type: 'VERTICAL',  page: 'manage', format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-manage-tall':      { type: 'RECTANGLE', page: 'manage', format: 'rectangle',  sizes: '300x600' },
+    'ad-manage-footer':    { type: 'BANNER',    page: 'manage', format: 'horizontal', sizes: '728x90' },
+
     // Docs page
-    'ad-docs-banner': { size: [[728, 90], [320, 50]], responsive: true },
-    'ad-docs-rail': { size: [[160, 600]], desktop: true },
-    'ad-docs-tall': { size: [[300, 600], [300, 250]], responsive: true },
-    
+    'ad-docs-banner':      { type: 'BANNER',    page: 'docs',   format: 'horizontal', sizes: '728x90' },
+    'ad-docs-rail':        { type: 'VERTICAL',  page: 'docs',   format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-docs-tall':        { type: 'RECTANGLE', page: 'docs',   format: 'rectangle',  sizes: '300x600' },
+
     // Admin page
-    'ad-admin-banner': { size: [[728, 90], [320, 50]], responsive: true },
-    'ad-admin-rail': { size: [[160, 600]], desktop: true },
-    'ad-admin-tall': { size: [[300, 600]], responsive: true },
-    
-    // Interstitial page
-    'ad-interstitial-sticky': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },
-    'ad-interstitial-left': { size: [[160, 600]], desktop: true },
-    'ad-interstitial-right': { size: [[160, 600]], desktop: true },
-    'ad-interstitial-bottom': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },
-    
-    // Anchor (sticky footer)
-    'ad-anchor': { size: [[728, 90], [320, 50]], responsive: true, sticky: true },
+    'ad-admin-banner':     { type: 'BANNER',    page: 'admin',  format: 'horizontal', sizes: '728x90' },
+    'ad-admin-rail':       { type: 'VERTICAL',  page: 'admin',  format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-admin-tall':       { type: 'RECTANGLE', page: 'admin',  format: 'rectangle',  sizes: '300x600' },
   };
 
-  // State tracking
+  // ============================================================
+  // LOADER SETTINGS
+  // ============================================================
+  const CONFIG = {
+    lazyLoadMargin: '300px',    // Start loading ads this far before viewport
+    renderTimeout: 5000,        // Time to wait for ad to render before marking failed
+    retryAttempts: 2,           // Retry failed placements
+    retryDelay: 3000,           // Delay between retries
+    showPlaceholders: true,     // Show placeholder boxes when slot IDs not configured
+    validateAfterMs: 6000,      // Run validation this many ms after page load
+  };
+
+  // ============================================================
+  // STATE
+  // ============================================================
   const state = {
-    adsenseLoaded: false,
+    adsenseReady: false,
     adsenseBlocked: false,
-    loadAttempts: 0,
-    initializedSlots: new Set(),
-    failedSlots: new Set(),
-    observers: new Map(),
+    configured: false,
+    placements: {},  // containerId → { status, ins, attempts, rendered }
   };
 
-  /**
-   * Initialize ad system
-   */
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
   function init() {
-    console.log('[AdLoader] Initializing bulletproof ad system...');
-    
-    // Wait for DOM ready
+    // Check if any slot IDs are configured
+    state.configured = Object.values(SLOT_IDS).some(id => id && id.length > 0);
+
+    if (!state.configured) {
+      console.warn(
+        '%c[ADMENSION AdLoader] ⚠️ NO SLOT IDs CONFIGURED\n' +
+        'Ads will NOT render until you create ad units in AdSense and paste slot IDs into src/ad-loader.js.\n' +
+        'See SLOT_IDS at the top of the file.',
+        'color: #ff6600; font-weight: bold; font-size: 14px;'
+      );
+    } else {
+      console.log('%c[ADMENSION AdLoader] ✅ Slot IDs configured', 'color: #00ff00; font-weight: bold;');
+      console.log('  BANNER:   ', SLOT_IDS.BANNER || '(not set)');
+      console.log('  RECTANGLE:', SLOT_IDS.RECTANGLE || '(not set)');
+      console.log('  VERTICAL: ', SLOT_IDS.VERTICAL || '(not set)');
+    }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => initAds());
+      document.addEventListener('DOMContentLoaded', onDomReady);
     } else {
-      initAds();
+      onDomReady();
     }
   }
 
-  /**
-   * Main initialization
-   */
-  function initAds() {
-    console.log('[AdLoader] DOM ready, starting ad initialization...');
-    
-    // Check if AdSense script is already loaded
-    if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
-      console.log('[AdLoader] AdSense already loaded');
-      state.adsenseLoaded = true;
-      initAllSlots();
-    } else {
-      // Wait for AdSense to load with timeout
-      waitForAdSense();
-    }
+  function onDomReady() {
+    console.log('[ADMENSION AdLoader] DOM ready — scanning for ad containers...');
+
+    // Wait for AdSense script to be available
+    waitForAdSense(function() {
+      scanAndPlaceAds();
+
+      // Run validation after ads have had time to render
+      setTimeout(validateAllPlacements, CONFIG.validateAfterMs);
+    });
   }
 
-  /**
-   * Wait for AdSense script to load
-   */
-  function waitForAdSense() {
-    console.log('[AdLoader] Waiting for AdSense script...');
-    
-    let attempts = 0;
-    const maxAttempts = 50; // 10 seconds total (50 * 200ms)
-    
-    const checkInterval = setInterval(() => {
-      attempts++;
-      
-      if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
-        clearInterval(checkInterval);
-        console.log('[AdLoader] AdSense loaded successfully');
-        state.adsenseLoaded = true;
-        initAllSlots();
-      } else if (attempts >= maxAttempts) {
-        clearInterval(checkInterval);
-        console.warn('[AdLoader] AdSense failed to load - using fallbacks');
+  // ============================================================
+  // ADSENSE DETECTION
+  // ============================================================
+  function waitForAdSense(callback) {
+    var checks = 0;
+    var maxChecks = 50; // 10 seconds
+
+    var interval = setInterval(function() {
+      checks++;
+
+      if (window.adsbygoogle) {
+        clearInterval(interval);
+        state.adsenseReady = true;
+        console.log('[ADMENSION AdLoader] ✅ AdSense script detected');
+        callback();
+        return;
+      }
+
+      if (checks >= maxChecks) {
+        clearInterval(interval);
         state.adsenseBlocked = true;
-        initAllSlots(); // Still init with placeholders
+        console.error(
+          '%c[ADMENSION AdLoader] ❌ AdSense script NOT detected after 10s.\n' +
+          'Possible causes: ad blocker, script removed, network error.',
+          'color: #ff0000; font-weight: bold;'
+        );
+        callback(); // Still run to show placeholders
       }
     }, 200);
   }
 
-  /**
-   * Initialize all ad slots
-   */
-  function initAllSlots() {
-    console.log('[AdLoader] Initializing all ad slots...');
-    
-    Object.keys(AD_SLOTS).forEach(slotId => {
-      const container = document.getElementById(slotId);
-      if (container) {
-        initSlot(slotId, container);
+  // ============================================================
+  // AD PLACEMENT ENGINE
+  // ============================================================
+  function scanAndPlaceAds() {
+    var containerIds = Object.keys(CONTAINER_MAP);
+    var placed = 0;
+    var skipped = 0;
+
+    containerIds.forEach(function(containerId) {
+      var container = document.getElementById(containerId);
+      var config = CONTAINER_MAP[containerId];
+
+      if (!container) {
+        return;
+      }
+
+      // Skip desktop-only placements on mobile
+      if (config.desktopOnly && window.innerWidth < 980) {
+        skipped++;
+        return;
+      }
+
+      var slotId = SLOT_IDS[config.type];
+
+      if (!slotId) {
+        // No slot ID configured for this type
+        if (CONFIG.showPlaceholders) {
+          renderPlaceholder(container, containerId, config);
+        }
+        state.placements[containerId] = { status: 'no-slot-id', ins: null, attempts: 0, rendered: false };
+        return;
+      }
+
+      // Place the ad using lazy loading or immediate
+      if (isNearViewport(container)) {
+        placeAd(containerId, container, config, slotId, 1);
+        placed++;
+      } else {
+        setupLazyLoad(containerId, container, config, slotId);
+        placed++;
       }
     });
+
+    console.log('[ADMENSION AdLoader] Scan complete: ' + placed + ' placed, ' + skipped + ' skipped (mobile)');
   }
 
   /**
-   * Initialize a single ad slot
+   * Place a single AdSense ad unit into a container
    */
-  function initSlot(slotId, container) {
-    // Skip if already initialized
-    if (state.initializedSlots.has(slotId)) {
-      console.log(`[AdLoader] Slot ${slotId} already initialized`);
-      return;
-    }
+  function placeAd(containerId, container, config, slotId, attempt) {
+    attempt = attempt || 1;
 
-    const slotConfig = AD_SLOTS[slotId];
-    if (!slotConfig) {
-      console.warn(`[AdLoader] No config for slot ${slotId}`);
-      return;
-    }
+    console.log('[ADMENSION AdLoader] Placing ad: #' + containerId + ' (' + config.type + ', slot=' + slotId + ', attempt=' + attempt + ')');
 
-    // Check desktop-only slots
-    if (slotConfig.desktop && window.innerWidth < 980) {
-      console.log(`[AdLoader] Skipping desktop-only slot ${slotId} on mobile`);
-      return;
-    }
-
-    console.log(`[AdLoader] Initializing slot: ${slotId}`);
-
-    // Clear existing content
+    // Clear container
     container.innerHTML = '';
-    container.style.minHeight = slotConfig.size[0][1] + 'px';
 
-    if (CONFIG.enableLazyLoad && !isInViewport(container)) {
-      // Lazy load - wait until near viewport
-      setupLazyLoad(slotId, container);
-    } else {
-      // Load immediately
-      loadSlot(slotId, container);
-    }
-  }
+    // Create the <ins> element — this is the core AdSense manual placement
+    var ins = document.createElement('ins');
+    ins.className = 'adsbygoogle';
+    ins.style.display = 'block';
+    ins.setAttribute('data-ad-client', ADSENSE_CLIENT);
+    ins.setAttribute('data-ad-slot', slotId);
 
-  /**
-   * Load ad slot with AdSense or fallback
-   */
-  function loadSlot(slotId, container) {
-    state.initializedSlots.add(slotId);
-    
-    if (state.adsenseLoaded && !state.adsenseBlocked) {
-      // Load real AdSense ad
-      loadAdSenseAd(slotId, container);
-    } else {
-      // Load fallback placeholder
-      loadFallbackAd(slotId, container);
-    }
-  }
-
-  /**
-   * Load AdSense ad unit
-   */
-  function loadAdSenseAd(slotId, container) {
-    console.log(`[AdLoader] Loading AdSense ad for ${slotId}`);
-    
-    try {
-      const slotConfig = AD_SLOTS[slotId];
-      
-      // Create AdSense ins element
-      const ins = document.createElement('ins');
-      ins.className = 'adsbygoogle';
-      ins.style.display = 'block';
-      ins.setAttribute('data-ad-client', ADSENSE_CLIENT);
-      ins.setAttribute('data-ad-slot', generateSlotId(slotId)); // Auto-generate slot IDs
-      
-      // Set ad format based on configuration
-      if (slotConfig.responsive) {
+    // Set format based on ad type
+    switch (config.format) {
+      case 'horizontal':
+        ins.setAttribute('data-ad-format', 'horizontal');
+        ins.setAttribute('data-full-width-responsive', 'true');
+        break;
+      case 'vertical':
+        ins.setAttribute('data-ad-format', 'vertical');
+        break;
+      case 'rectangle':
+        ins.setAttribute('data-ad-format', 'rectangle');
+        ins.setAttribute('data-full-width-responsive', 'true');
+        break;
+      default:
         ins.setAttribute('data-ad-format', 'auto');
         ins.setAttribute('data-full-width-responsive', 'true');
-      } else {
-        const [width, height] = slotConfig.size[0];
-        ins.style.width = width + 'px';
-        ins.style.height = height + 'px';
-      }
-
-      // Add to container
-      container.appendChild(ins);
-
-      // Push to AdSense queue with retry
-      pushAdWithRetry(ins, slotId, container);
-      
-    } catch (error) {
-      console.error(`[AdLoader] Error loading AdSense for ${slotId}:`, error);
-      state.failedSlots.add(slotId);
-      loadFallbackAd(slotId, container);
-    }
-  }
-
-  /**
-   * Push ad to AdSense queue with retry logic
-   */
-  function pushAdWithRetry(ins, slotId, container, attempt = 1) {
-    try {
-      (adsbygoogle = window.adsbygoogle || []).push({});
-      console.log(`[AdLoader] AdSense push successful for ${slotId}`);
-      
-      // Check if ad loaded after delay
-      setTimeout(() => {
-        if (!isAdLoaded(ins)) {
-          console.warn(`[AdLoader] Ad didn't render for ${slotId}, attempt ${attempt}`);
-          if (attempt < CONFIG.maxRetries) {
-            // Retry
-            container.innerHTML = '';
-            setTimeout(() => {
-              loadSlot(slotId, container);
-            }, CONFIG.retryDelay);
-          } else {
-            // Give up, show fallback
-            console.error(`[AdLoader] Max retries reached for ${slotId}`);
-            state.failedSlots.add(slotId);
-            loadFallbackAd(slotId, container);
-          }
-        }
-      }, 3000);
-      
-    } catch (error) {
-      console.error(`[AdLoader] AdSense push error for ${slotId}:`, error);
-      if (attempt < CONFIG.maxRetries) {
-        setTimeout(() => {
-          pushAdWithRetry(ins, slotId, container, attempt + 1);
-        }, CONFIG.retryDelay);
-      } else {
-        state.failedSlots.add(slotId);
-        loadFallbackAd(slotId, container);
-      }
-    }
-  }
-
-  /**
-   * Check if ad actually loaded
-   */
-  function isAdLoaded(ins) {
-    // Check if ins element has content or AdSense classes
-    return ins.getAttribute('data-ad-status') === 'filled' ||
-           ins.querySelector('iframe') !== null ||
-           ins.clientHeight > 0;
-  }
-
-  /**
-   * Load fallback placeholder ad
-   */
-  function loadFallbackAd(slotId, container) {
-    if (!CONFIG.showPlaceholders) {
-      container.style.display = 'none';
-      return;
     }
 
-    console.log(`[AdLoader] Loading fallback for ${slotId}`);
-    
-    const slotConfig = AD_SLOTS[slotId];
-    const [width, height] = slotConfig.size[0];
-    
-    container.innerHTML = `
-      <div style="
-        width: 100%;
-        min-height: ${height}px;
-        background: rgba(255,255,255,0.03);
-        border: 1px dashed rgba(255,255,255,0.1);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(255,255,255,0.4);
-        font-family: monospace;
-        font-size: 12px;
-        padding: 20px;
-        text-align: center;
-      ">
-        <div>
-          <div style="margin-bottom: 8px; opacity: 0.6;">📢</div>
-          <div>Ad Space</div>
-          <div style="font-size: 10px; margin-top: 4px; opacity: 0.5;">${width}×${height}</div>
-        </div>
-      </div>
-    `;
-    
-    // Track as placeholder
-    if (window.markAd) {
+    container.appendChild(ins);
+
+    // Track placement state
+    state.placements[containerId] = {
+      status: 'pending',
+      ins: ins,
+      attempts: attempt,
+      rendered: false,
+      slotId: slotId,
+      type: config.type,
+      page: config.page,
+      placedAt: Date.now(),
+    };
+
+    // Push to AdSense queue
+    if (state.adsenseReady && !state.adsenseBlocked) {
       try {
-        window.markAd(`${slotId}_placeholder`);
-      } catch (e) {}
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        console.log('[ADMENSION AdLoader] ✅ adsbygoogle.push() for #' + containerId);
+      } catch (err) {
+        console.error('[ADMENSION AdLoader] ❌ adsbygoogle.push() failed for #' + containerId + ':', err.message);
+        state.placements[containerId].status = 'push-error';
+
+        if (attempt < CONFIG.retryAttempts) {
+          setTimeout(function() { placeAd(containerId, container, config, slotId, attempt + 1); }, CONFIG.retryDelay);
+        }
+      }
+    } else {
+      state.placements[containerId].status = 'adsense-not-ready';
+    }
+
+    // Check render status after timeout
+    setTimeout(function() { checkRenderStatus(containerId); }, CONFIG.renderTimeout);
+  }
+
+  // ============================================================
+  // RENDER VALIDATION
+  // ============================================================
+  function checkRenderStatus(containerId) {
+    var placement = state.placements[containerId];
+    if (!placement || !placement.ins) return;
+
+    var ins = placement.ins;
+    var hasIframe = ins.querySelector('iframe') !== null;
+    var adStatus = ins.getAttribute('data-ad-status');
+    var filled = adStatus === 'filled';
+    var unfilled = adStatus === 'unfilled';
+
+    if (filled || hasIframe) {
+      placement.status = 'rendered';
+      placement.rendered = true;
+      console.log('%c[ADMENSION AdLoader] ✅ AD RENDERED: #' + containerId + ' (' + placement.type + ')', 'color: #00ff00;');
+    } else if (unfilled) {
+      placement.status = 'unfilled';
+      console.warn('[ADMENSION AdLoader] ⚠️ AD UNFILLED: #' + containerId + ' — AdSense had no ad to show');
+
+      // Retry if attempts remain
+      var container = document.getElementById(containerId);
+      var config = CONTAINER_MAP[containerId];
+      if (container && config && placement.attempts < CONFIG.retryAttempts) {
+        setTimeout(function() { placeAd(containerId, container, config, placement.slotId, placement.attempts + 1); }, CONFIG.retryDelay);
+      }
+    } else {
+      placement.status = ins.clientHeight > 0 ? 'unknown-with-height' : 'not-rendered';
     }
   }
 
   /**
-   * Setup lazy loading for ad slot
+   * Run validation across ALL placements and generate a report
    */
-  function setupLazyLoad(slotId, container) {
-    console.log(`[AdLoader] Setting up lazy load for ${slotId}`);
-    
-    if (!('IntersectionObserver' in window)) {
-      // No IntersectionObserver support, load immediately
-      loadSlot(slotId, container);
-      return;
-    }
+  function validateAllPlacements() {
+    console.log('%c\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00ffff;');
+    console.log('%c  ADMENSION AD VALIDATION REPORT', 'color: #00ffff; font-weight: bold; font-size: 14px;');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00ffff;');
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          console.log(`[AdLoader] ${slotId} entering viewport, loading...`);
-          observer.unobserve(container);
-          state.observers.delete(slotId);
-          loadSlot(slotId, container);
-        }
-      });
-    }, {
-      rootMargin: `${CONFIG.lazyLoadThreshold}px`
+    var report = { total: 0, rendered: 0, unfilled: 0, failed: 0, noSlotId: 0, skipped: 0, details: [] };
+
+    Object.keys(CONTAINER_MAP).forEach(function(containerId) {
+      var config = CONTAINER_MAP[containerId];
+      report.total++;
+      var placement = state.placements[containerId];
+
+      if (!placement) {
+        report.skipped++;
+        return;
+      }
+
+      if (placement.status === 'no-slot-id') {
+        report.noSlotId++;
+        console.log('%c  ⬜ ' + containerId + ' — NO SLOT ID (' + config.type + ')', 'color: #888;');
+      } else if (placement.rendered) {
+        report.rendered++;
+        console.log('%c  ✅ ' + containerId + ' — RENDERED (' + config.type + ')', 'color: #00ff00;');
+      } else if (placement.status === 'unfilled') {
+        report.unfilled++;
+        console.log('%c  ⚠️  ' + containerId + ' — UNFILLED (' + config.type + ')', 'color: #ff6600;');
+      } else {
+        report.failed++;
+        console.log('%c  ❌ ' + containerId + ' — FAILED: ' + placement.status + ' (' + config.type + ')', 'color: #ff0000;');
+      }
+
+      report.details.push({ container: containerId, type: config.type, page: config.page, status: placement.status, rendered: placement.rendered });
     });
 
+    var scoreColor = report.rendered > 0 ? '#00ff00' : report.noSlotId === report.total ? '#888' : '#ff0000';
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00ffff;');
+    console.log('%c  RENDERED: ' + report.rendered + '/' + report.total, 'color: ' + scoreColor + '; font-weight: bold;');
+    if (report.noSlotId > 0) console.log('%c  NO SLOT ID: ' + report.noSlotId + ' (configure SLOT_IDS in ad-loader.js)', 'color: #ff6600;');
+    if (report.unfilled > 0) console.log('%c  UNFILLED: ' + report.unfilled + ' (AdSense had no ads — normal for new sites)', 'color: #ff6600;');
+    if (report.failed > 0) console.log('%c  FAILED: ' + report.failed, 'color: #ff0000;');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n', 'color: #00ffff;');
+
+    updateDebugPill(report);
+    return report;
+  }
+
+  // ============================================================
+  // LAZY LOADING
+  // ============================================================
+  function setupLazyLoad(containerId, container, config, slotId) {
+    if (!('IntersectionObserver' in window)) {
+      placeAd(containerId, container, config, slotId, 1);
+      return;
+    }
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          observer.unobserve(container);
+          placeAd(containerId, container, config, slotId, 1);
+        }
+      });
+    }, { rootMargin: CONFIG.lazyLoadMargin });
+
     observer.observe(container);
-    state.observers.set(slotId, observer);
   }
 
-  /**
-   * Check if element is in viewport
-   */
-  function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-      rect.top < (window.innerHeight + CONFIG.lazyLoadThreshold) &&
-      rect.bottom > -CONFIG.lazyLoadThreshold
-    );
+  function isNearViewport(el) {
+    var rect = el.getBoundingClientRect();
+    var margin = parseInt(CONFIG.lazyLoadMargin) || 300;
+    return rect.top < (window.innerHeight + margin) && rect.bottom > -margin;
   }
 
-  /**
-   * Generate consistent slot ID from container ID
-   * This creates unique ad slot IDs for AdSense
-   */
-  function generateSlotId(containerId) {
-    // Create a hash-like number from string
-    let hash = 0;
-    for (let i = 0; i < containerId.length; i++) {
-      hash = ((hash << 5) - hash) + containerId.charCodeAt(i);
-      hash = hash & hash; // Convert to 32-bit integer
+  // ============================================================
+  // PLACEHOLDER RENDERING (when slot IDs not configured)
+  // ============================================================
+  function renderPlaceholder(container, containerId, config) {
+    container.innerHTML =
+      '<div style="' +
+        'width:100%;min-height:' + (container.style.minHeight || '90px') + ';' +
+        'background:rgba(255,255,255,0.02);border:1px dashed rgba(255,215,0,0.25);' +
+        'border-radius:8px;display:flex;align-items:center;justify-content:center;' +
+        'color:rgba(255,215,0,0.5);font-family:monospace;font-size:11px;padding:12px;text-align:center;' +
+      '">' +
+        '<div>' +
+          '<div style="margin-bottom:6px">⚙️ Ad Slot: ' + config.type + '</div>' +
+          '<div style="opacity:0.6">' + config.sizes + ' · ' + containerId + '</div>' +
+          '<div style="opacity:0.4;margin-top:4px">Configure SLOT_IDS in ad-loader.js</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // ============================================================
+  // PAGE NAVIGATION REFRESH
+  // ============================================================
+  function refreshAdsForPage(pageName) {
+    console.log('[ADMENSION AdLoader] Refreshing ads for page: ' + pageName);
+
+    Object.keys(CONTAINER_MAP).forEach(function(containerId) {
+      var config = CONTAINER_MAP[containerId];
+      if (config.page !== pageName) return;
+
+      var container = document.getElementById(containerId);
+      if (!container) return;
+
+      var slotId = SLOT_IDS[config.type];
+      if (!slotId) return;
+
+      if (config.desktopOnly && window.innerWidth < 980) return;
+
+      if (isNearViewport(container)) {
+        placeAd(containerId, container, config, slotId, 1);
+      }
+    });
+  }
+
+  window.addEventListener('hashchange', function() {
+    var page = (window.location.hash.replace('#', '') || 'home').replace('page-', '');
+    refreshAdsForPage(page);
+  });
+
+  window.addEventListener('popstate', function() {
+    var params = new URLSearchParams(window.location.search);
+    var page = params.get('page') || 'home';
+    refreshAdsForPage(page);
+  });
+
+  // ============================================================
+  // DEBUG PILL UPDATE
+  // ============================================================
+  function updateDebugPill(report) {
+    var pill = document.getElementById('pillDebug');
+    if (!pill) return;
+
+    if (!state.configured) {
+      pill.textContent = '⚙️ Ads: No slot IDs';
+      pill.style.background = 'rgba(255,165,0,.15)';
+      pill.style.borderColor = 'rgba(255,165,0,.4)';
+    } else if (report.rendered > 0) {
+      pill.textContent = '✅ Ads: ' + report.rendered + '/' + (report.total - report.skipped) + ' live';
+      pill.style.background = 'rgba(34,197,94,.15)';
+      pill.style.borderColor = 'rgba(34,197,94,.4)';
+    } else if (state.adsenseBlocked) {
+      pill.textContent = '🚫 Ads: AdSense blocked';
+      pill.style.background = 'rgba(239,68,68,.15)';
+      pill.style.borderColor = 'rgba(239,68,68,.4)';
+    } else {
+      pill.textContent = '⚠️ Ads: 0/' + (report.total - report.skipped) + ' rendered';
+      pill.style.background = 'rgba(245,158,11,.15)';
+      pill.style.borderColor = 'rgba(245,158,11,.4)';
     }
-    // Return as 10-digit string
-    return Math.abs(hash).toString().padStart(10, '0');
   }
 
-  /**
-   * Refresh specific ad slot (called when page changes)
-   */
-  function refreshSlot(slotId) {
-    const container = document.getElementById(slotId);
-    if (!container) return;
-
-    console.log(`[AdLoader] Refreshing slot ${slotId}`);
-    
-    // Remove from initialized set to allow re-init
-    state.initializedSlots.delete(slotId);
-    state.failedSlots.delete(slotId);
-    
-    // Cancel lazy load observer if exists
-    const observer = state.observers.get(slotId);
-    if (observer) {
-      observer.disconnect();
-      state.observers.delete(slotId);
-    }
-    
-    // Re-initialize
-    initSlot(slotId, container);
-  }
-
-  /**
-   * Refresh all visible ads (called on page navigation)
-   */
-  function refreshAllAds() {
-    console.log('[AdLoader] Refreshing all ads...');
-    
-    // Clear state
-    state.initializedSlots.clear();
-    state.failedSlots.clear();
-    
-    // Disconnect all observers
-    state.observers.forEach(observer => observer.disconnect());
-    state.observers.clear();
-    
-    // Re-initialize all slots
-    initAllSlots();
-  }
-
-  /**
-   * Get system status
-   */
-  function getStatus() {
-    return {
-      adsenseLoaded: state.adsenseLoaded,
-      adsenseBlocked: state.adsenseBlocked,
-      loadAttempts: state.loadAttempts,
-      initializedSlots: Array.from(state.initializedSlots),
-      failedSlots: Array.from(state.failedSlots),
-      totalSlots: Object.keys(AD_SLOTS).length,
-    };
-  }
-
-  /**
-   * Diagnostic function for console
-   */
-  function diagnose() {
-    const status = getStatus();
-    console.group('📢 Ad Loader Status');
-    console.log('AdSense Loaded:', status.adsenseLoaded ? '✅' : '❌');
-    console.log('AdSense Blocked:', status.adsenseBlocked ? '🚫 YES' : '✅ NO');
-    console.log('Initialized Slots:', status.initializedSlots.length, '/', status.totalSlots);
-    console.log('Failed Slots:', status.failedSlots.length);
-    console.log('Active Slots:', status.initializedSlots);
-    console.log('Failed Slots:', Array.from(status.failedSlots));
-    console.groupEnd();
-    return status;
-  }
-
-  // Export API to window
+  // ============================================================
+  // PUBLIC API
+  // ============================================================
   window.ADMENSION_AD_LOADER = {
-    init,
-    refreshSlot,
-    refreshAllAds,
-    getStatus,
-    diagnose,
+    version: '2.0.0',
+    diagnose: function() {
+      console.log('\n=== ADMENSION AD LOADER v2.0 DIAGNOSTIC ===');
+      console.log('Publisher ID:', ADSENSE_CLIENT);
+      console.log('AdSense Ready:', state.adsenseReady ? '✅' : '❌');
+      console.log('AdSense Blocked:', state.adsenseBlocked ? '🚫 YES' : '✅ NO');
+      console.log('Configured:', state.configured ? '✅' : '❌');
+      console.log('Slot IDs:', JSON.stringify(SLOT_IDS));
+      console.log('');
+      return validateAllPlacements();
+    },
+    getState: function() {
+      return { adsenseReady: state.adsenseReady, adsenseBlocked: state.adsenseBlocked, configured: state.configured, slotIds: SLOT_IDS, placements: state.placements, containerCount: Object.keys(CONTAINER_MAP).length };
+    },
+    refreshPage: refreshAdsForPage,
+    refreshSlot: function(containerId) {
+      var container = document.getElementById(containerId);
+      var config = CONTAINER_MAP[containerId];
+      var slotId = config ? SLOT_IDS[config.type] : null;
+      if (container && config && slotId) placeAd(containerId, container, config, slotId, 1);
+    },
+    isRendered: function(containerId) { var p = state.placements[containerId]; return p ? p.rendered : false; },
     config: CONFIG,
-    slots: AD_SLOTS,
+    containerMap: CONTAINER_MAP,
+    slotIds: SLOT_IDS,
+    adsenseClient: ADSENSE_CLIENT,
   };
 
-  // Auto-initialize
+  // Boot
   init();
-
-  console.log('[AdLoader] System ready. Use ADMENSION_AD_LOADER.diagnose() for status');
+  console.log('[ADMENSION AdLoader] v2.0 loaded. Run ADMENSION_AD_LOADER.diagnose() in console for full status.');
 
 })();

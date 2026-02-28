@@ -151,8 +151,8 @@ async function createLink(data, env) {
   // Update global stats: increment total created
   await incrementGlobalStat(env, 'created');
 
-  // Live site base URL
-  const SITE_BASE = 'https://garebear99.github.io/ADMENSION';
+  // Live site base URL (configurable via Cloudflare Worker env variable)
+  const SITE_BASE = env.SITE_BASE_URL || 'https://garebear99.github.io/ADMENSION';
 
   return jsonResponse({
     success: true,

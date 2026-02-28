@@ -14,7 +14,7 @@
 - [x] Create page generates links successfully
 - [x] Manage page displays created links
 - [x] Stats page shows analytics
-- [x] Admin page requires PIN (979899)
+- [x] Admin page requires PIN (SHA-256 hashed, set via init-admin-pin.html)
 - [x] Privacy policy accessible
 - [x] Interstitial flow works (3 steps)
 

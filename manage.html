@@ -479,7 +479,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 .page{display:none;}
 .page.active{display:block;}
 </style>
-</meta>
+
 <script>
 (function(){
   const K = {
@@ -884,7 +884,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <div class="ad" id="docsRail"><div class="adLabel">DOCS — Desktop Rail</div></div></section><section class="page" id="page-stats"><section class="card"><h1>Transparency Stats</h1><p class="sub">Local transparency counters (for optimization only).</p><div class="grid kpis"><div class="kpi"><div class="mini">Sessions (24h)</div><div class="big" id="k_sessions_24">—</div></div><div class="kpi"><div class="mini">Pageviews (24h)</div><div class="big" id="k_pv_24">—</div></div><div class="kpi"><div class="mini">Ads shown (24h)</div><div class="big" id="k_ads_24">—</div></div><div class="kpi"><div class="mini">Ads/PV (24h)</div><div class="big" id="k_apv_24">—</div></div><div class="kpi"><div class="mini">Sessions (7d)</div><div class="big" id="k_sessions_7">—</div></div><div class="kpi"><div class="mini">Pageviews (7d)</div><div class="big" id="k_pv_7">—</div></div><div class="kpi"><div class="mini">PV/session (7d)</div><div class="big" id="k_pvps_7">—</div></div><div class="kpi"><div class="mini">Desktop share</div><div class="big" id="k_desktop">—</div></div><div class="kpi"><div class="mini">Reached Step 3</div><div class="big" id="k_step3">—</div></div><div class="kpi"><div class="mini">Top source</div><div class="big" id="k_topsrc">—</div></div></div></section></section><section class="page" id="page-admin">
 <section class="card">
 <h1>Admin</h1>
-<p class="sub">Local controls, sponsor scheduling, and safety notes. Admin actions require PIN 979899.</p>
+<p class="sub">Local controls, sponsor scheduling, and safety notes. Admin actions require your admin PIN.</p>
 <div class="divider"></div>
 <h2>Projection + last-month inputs (local)</h2>
 <div class="notice">
@@ -935,7 +935,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <h2><span class="not-home">Admin unlock</span></h2>
 <div class="notice warnNote">
             Admin features are locked so random visitors can’t mess with local data.
-            Click <b>Unlock</b> and enter PIN <b>979899</b> to use sponsor controls and reset.
+            Click <b>Unlock</b> and enter your <b>admin PIN</b> to use sponsor controls and reset.
           </div>
 <div class="row" style="margin-top:10px">
 <button class="btn primary" id="btnAdminUnlock">Unlock</button>
@@ -1578,19 +1578,28 @@ function spRenderSticky(){
 let adminUnlocked = false;
 function adminGuard(){
   if(adminUnlocked) return true;
-  alert("Admin is locked. Click Unlock and enter PIN 979899.");
+  alert("Admin is locked. Click Unlock and enter your admin PIN.");
   return false;
 }
-function adminUnlockFlow(){
-  const pin = prompt("Admin PIN:");
-  if(pin===null) return false;
-  if(String(pin).trim() !== "979899"){ alert("Invalid PIN."); return false; }
-  adminUnlocked = true;
-  const st = document.getElementById("adminStatus");
-  if(st) st.textContent = "unlocked";
-  return true;
+async function adminUnlockFlow(){
+if(!window.ADMENSION_ADMIN_AUTH) {
+alert("Admin auth system not loaded. Please refresh the page.");
+return false;
 }
-
+const result = await window.ADMENSION_ADMIN_AUTH.promptAndVerifyPIN("Admin PIN:");
+if(result.error === 'NO_PIN_SET') {
+alert(result.message + "\n\nVisit: " + window.location.origin + "/init-admin-pin.html");
+return false;
+}
+if(!result.valid) {
+alert(result.message);
+return false;
+}
+adminUnlocked = true;
+const st = document.getElementById("adminStatus");
+if(st) st.textContent = "unlocked";
+return true;
+}
 
 
 const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
@@ -1660,7 +1669,7 @@ function showPage(name){
   // v1.3 hard lock: admin page requires PIN
   if(name==="admin" && !adminUnlocked){
     setRobotsForRoute();
-    alert("Admin is locked. Use Unlock (PIN 979899).");
+    alert("Admin is locked. Use Unlock and enter your admin PIN.");
     location.hash = "#home";
     name = "home";
   }
@@ -1880,10 +1889,10 @@ if(fileImport){
 /* ===== Admin reset (PIN) ===== */
 const btnReset = document.getElementById("btnReset");
 if(btnReset){
-  btnReset.onclick = () => {
-    const pin = prompt("Admin PIN to reset stats:");
-    if(pin === null) return;
-    if(String(pin).trim() !== "979899"){ alert("Invalid PIN."); return; }
+  btnReset.onclick = async () => {
+    // Use secure hash-based PIN verification
+    
+    if(!window.ADMENSION_ADMIN_AUTH) { alert("Auth system not loaded."); return; } const r = await window.ADMENSION_ADMIN_AUTH.promptAndVerifyPIN("Admin PIN to reset stats:"); if(!r.valid) { if(r.error !== "CANCELLED") alert(r.message); return; }
     if(!confirm("Reset ALL saved stats and ADMENSION links on this browser?")) return;
     localStorage.removeItem(K.sessions);
     localStorage.removeItem(K.ads);

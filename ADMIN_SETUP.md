@@ -56,24 +56,6 @@ If deploying for public use, consider:
 3. Use proper authentication (OAuth, JWT)
 4. Implement server-side admin API
 
-### Quick Fix for Now
-
-Run this in your browser console on the ADMENSION page:
-
-```javascript
-// Set your custom PIN
-localStorage.setItem('admension_admin_pin', '654321'); // CHANGE THIS
-
-// Update the UI hint
-document.querySelectorAll('*').forEach(el => {
-  if (el.textContent && el.textContent.includes('979899')) {
-    el.textContent = el.textContent.replace('979899', 'YOUR_CUSTOM_PIN');
-  }
-});
-
-alert('Admin PIN updated! Remember your new PIN.');
-```
-
 ## Admin Features Protected by PIN
 
 - Sponsor sticky management

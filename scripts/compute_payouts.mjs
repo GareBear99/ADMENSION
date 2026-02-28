@@ -103,29 +103,6 @@ async function main(){
   // ═══════════════════════════════════════════════════════════════════════════
   // AD IMPRESSION FILTERING - ANTI-FRAUD LAYER
   // ═══════════════════════════════════════════════════════════════════════════
-  // Fetch raw ad events from Google Sheets (logged by anti-abuse-system.js)
-  // Only count impressions that meet ALL quality criteria:
-  // 
-  // 1. TIME RANGE: Last month only (current month excluded)
-  // 2. EVENT TYPE: ad_viewable or ad_request (ignores clicks, loads, etc.)
-  // 3. VIEWABILITY: Must be TRUE (50%+ visible for 1+ second per MRC standard)
-  // 4. IVT STATUS: Must be FALSE (passed Invalid Traffic Detection)
-  // 5. ADM CODE: Must have valid utm parameter with adm=XXXXXX
-  // 
-  // Why these filters?
-  // - Viewability: Only bill for ads actually seen (Google AdSense standard)
-  // - IVT: Block bots, refreshers, scrapers (score 70+ = fraudulent)
-  // - Time range: Prevents real-time gaming (payouts lag 1 month)
-  // - ADM code: Links earnings to specific user's short link
-  // 
-  // Example filtering:
-  // 1000 raw events
-  // - 200 not viewable (user scrolled past) → EXCLUDED
-  // - 100 flagged as IVT (bot traffic) → EXCLUDED  
-  // - 50 missing adm code (direct traffic) → EXCLUDED
-  // = 650 billable impressions counted as "units"
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   const eventsCSV = await fetchText(SHEET_EVENTS_CSV_URL);
   const rows = parseCSV(eventsCSV);
   
@@ -179,45 +156,12 @@ async function main(){
   // ═══════════════════════════════════════════════════════════════════════════
   // UNIT AGGREGATION - GROUP BY LINK CODE
   // ═══════════════════════════════════════════════════════════════════════════
-  // Sum filtered impressions per adm_code (short link)
-  // 
-  // Example:
-  // A4AGRZ: 1,200 valid impressions → 1,200 units
-  // B8XKTY: 850 valid impressions → 850 units
-  // C2MNOP: 300 valid impressions → 300 units
-  // 
-  // Total: 2,350 units
-  // 
-  // These units determine each link's share of the pool:
-  // A4AGRZ gets 1200/2350 = 51.1% of pool
-  // B8XKTY gets 850/2350 = 36.2% of pool
-  // C2MNOP gets 300/2350 = 12.8% of pool
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   const unitsByAdm = aggregate(filtered); // Map of adm_code → unit count
   const totalUnits = Array.from(unitsByAdm.values()).reduce((a,b)=>a+b,0) || 1;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // REVENUE SETTLEMENT - MANUAL VERIFICATION REQUIRED
   // ═══════════════════════════════════════════════════════════════════════════
-  // Read last month's actual revenue from admin/settlements/YYYY-MM.json
-  // 
-  // Format: { "received_revenue_usd": 1234.56 }
-  // 
-  // Why manual?
-  // - AdSense payments arrive 21-60 days after month end
-  // - Founder verifies bank deposit before creating settlement file
-  // - Prevents paying out more than actually received
-  // - Creates audit trail for tax/accounting purposes
-  // 
-  // Example timeline:
-  // - January 2026: Ads run, impressions tracked
-  // - February 21, 2026: AdSense payment received ($1,000)
-  // - February 22, 2026: Founder creates admin/settlements/2026-01.json
-  // - February 22, 2026: Payout script calculates $130 user pool (13%)
-  // - February 28, 2026: Crypto payouts sent to wallets
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   const settlement = readSettlement(tag);
   if(!settlement){
     console.error(`Missing admin/settlements/${tag}.json with { "received_revenue_usd": number }`);
@@ -229,39 +173,7 @@ async function main(){
   // ═══════════════════════════════════════════════════════════════════════════
   // POOL CALCULATION - THE CORE MATH
   // ═══════════════════════════════════════════════════════════════════════════
-  // 
-  // Step 1: Calculate base pool (13% of revenue, capped at $10,000)
-  // ─────────────────────────────────────────────────────────────────────────
-  // Why 13%? 
-  // - Industry standard for affiliate/revenue share: 10-20%
-  // - 13% is generous but sustainable
-  // - Founder keeps 87% to cover: hosting, development, support, growth
-  // 
-  // Why $10,000 cap?
-  // - Prevents depletion if revenue spikes unexpectedly
-  // - Example: $100,000 revenue = $10k pool (not $13k)
-  // - Cap increases to $100k after 3 months of stability
-  // 
-  // Examples:
-  // $1,000 revenue  → $130 pool (13%)
-  // $5,000 revenue  → $650 pool (13%)
-  // $10,000 revenue → $1,300 pool (13%)
-  // $100,000 revenue → $10,000 pool (CAPPED)
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   const fullPool = Math.min(received * 0.13, poolCap);
-  
-  // Step 2: Bootstrap adjustment (first 3 months)
-  // ─────────────────────────────────────────────────────────────────────────
-  // During bootstrap phase, pool is split 50/50:
-  // - Users: 50% of pool (6.5% of revenue)
-  // - Founder: 50% of pool (6.5% of revenue) + base 87% = 93.5% total
-  // 
-  // Why?
-  // - Builds initial treasury for sustainable operations
-  // - Ensures platform can handle Month 4+ when users get full 13%
-  // - Still rewards early adopters with 6.5% (better than 0%)
-  // ═══════════════════════════════════════════════════════════════════════════
   
   let pool = fullPool;           // User pool (will be adjusted if bootstrap)
   let founderPoolShare = 0;      // Extra founder share during bootstrap
@@ -286,26 +198,6 @@ async function main(){
   // ═══════════════════════════════════════════════════════════════════════════
   // WALLET MAPPING - USER CRYPTO ADDRESSES
   // ═══════════════════════════════════════════════════════════════════════════
-  // Fetch wallet addresses from Google Sheets (set by users in UI)
-  // 
-  // Format: timestamp, adm_code, chain, address, signature
-  // Example: 2026-01-15T12:00:00Z, A4AGRZ, solana, 7xKXt...9aB, sig_abc123
-  // 
-  // Purpose:
-  // - Maps adm_code (link) → crypto wallet address
-  // - Supports multiple chains: solana, base, ethereum
-  // - Users can update wallet anytime (latest one used)
-  // 
-  // Special cases:
-  // - NO_WALLET: User never set address → earnings burned (go to founder)
-  // - Multiple links, same wallet: Earnings combined, subject to 1% cap per wallet
-  // 
-  // Why wallet-based capping?
-  // - Prevents one user creating 100 links to dominate pool
-  // - Example: Alice has 10 links earning 15% total → capped at 1% max
-  // - Excess waterfalls to founder (prevents gaming)
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   let walletByAdm = new Map();
   
   if(SHEET_WALLETS_CSV_URL){
@@ -341,22 +233,6 @@ async function main(){
   // ═══════════════════════════════════════════════════════════════════════════
   // WALLETLESS EARNINGS HANDLING ("BURN" MECHANISM)
   // ═══════════════════════════════════════════════════════════════════════════
-  // Problem: User earns units but never sets a wallet address
-  // Solution: Their earnings redirect to founder (not distributed to others)
-  // 
-  // Why not redistribute to other users?
-  // - Could incentivize gaming (create links, don't set wallet, boost others)
-  // - Unfair to early users who set wallets
-  // - Cleaner accounting: earnings always sum to 100% of pool
-  // 
-  // Example:
-  // - Alice: 100 units, has wallet → gets payout
-  // - Bob: 50 units, NO wallet → his share ($X) goes to founder
-  // - Carol: 50 units, has wallet → gets payout
-  // 
-  // Bob's share is "burned" from user pool (founder receives it)
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   let poolAdjusted = pool;
   const unitsTotalAll = baseRows.reduce((s,r)=>s+r.units,0) || 1;
   const noWalletRows = baseRows.filter(r=>r.wallet==='NO_WALLET');
@@ -386,31 +262,6 @@ async function main(){
   // ═══════════════════════════════════════════════════════════════════════════
   // WALLET CAPPING & WATERFALL DISTRIBUTION
   // ═══════════════════════════════════════════════════════════════════════════
-  // Apply 1% per-wallet maximum with waterfall overflow to founder
-  // 
-  // Why 1% cap?
-  // - Prevents monopolization (one user can't earn >1% of monthly pool)
-  // - Example: $10,000 pool → max $100 per wallet per month
-  // - Encourages fair distribution across user base
-  // 
-  // Waterfall algorithm:
-  // 1. Calculate each wallet's natural share based on units
-  // 2. If wallet exceeds 1%, cap at $100 (for $10k pool)
-  // 3. Redistribute capped excess to remaining wallets
-  // 4. Repeat until no wallet exceeds cap
-  // 5. Any final overflow → routes to founder
-  // 
-  // Example:
-  // Pool = $10,000, Cap = $100 (1%)
-  // Alice: 2000 units (50%) → wants $5,000 → CAPPED at $100
-  // Bob: 1000 units (25%) → wants $2,500 → CAPPED at $100  
-  // Carol: 1000 units (25%) → wants $2,500 → CAPPED at $100
-  // Total capped: $300 paid to users
-  // Overflow: $9,700 → routes to founder
-  // 
-  // This protects pool sustainability and ensures fair distribution
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   const finalRows = enforceWalletCapWaterfill(withWalletRows, poolAdjusted, WALLET_CAP_PCT, CREATOR_ADM_CODE);
 
   const ledgerMeta = {
@@ -432,38 +283,10 @@ async function main(){
   if(isBootstrap) console.log(`   Founder Pool Share: $${founderPoolShare.toFixed(2)}`);
   console.log();
 }
-}
 
 // ═════════════════════════════════════════════════════════════════════════════
 // WATERFALL DISTRIBUTION ALGORITHM
 // ═════════════════════════════════════════════════════════════════════════════
-// Enforces per-wallet cap with iterative waterfall redistribution
-// 
-// Algorithm steps:
-// 1. Calculate natural share for each wallet (based on units)
-// 2. Identify wallets exceeding cap (cap = pool × capPct, default 1%)
-// 3. Cap those wallets and remove from distribution pool
-// 4. Redistribute remaining pool among uncapped wallets
-// 5. Repeat until no wallet exceeds cap
-// 6. Route final overflow to founder if all wallets capped
-// 
-// Mathematical example:
-// Pool = $1,000, Cap = $10 (1%)
-// 
-// Round 1:
-// Alice: 500 units (50%) → $500 proposed → EXCEEDS → cap at $10
-// Bob: 300 units (30%) → $300 proposed → EXCEEDS → cap at $10
-// Carol: 200 units (20%) → $200 proposed → EXCEEDS → cap at $10
-// Capped: $30 total, Remaining: $970
-// 
-// Round 2: All wallets capped, $970 overflow → founder
-// 
-// This ensures:
-// - No single wallet dominates payouts
-// - Pool remains sustainable
-// - Excess funds benefit platform operations (founder treasury)
-// ═════════════════════════════════════════════════════════════════════════════
-
 function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
   const cap = pool * capPct;  // Max amount per wallet (e.g., $100 for $10k pool)
   const out = [];             // Final payout rows
@@ -477,12 +300,6 @@ function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
   }
 
   // Step 2: Handle carry amounts (pre-allocated funds from burned wallets)
-  // ───────────────────────────────────────────────────────────────────────────
-  // "Carry" = funds already designated for specific recipient (e.g., founder)
-  // These bypass waterfall logic and are assigned first
-  // Example: $50 from NO_WALLET users → carried directly to founder
-  // ───────────────────────────────────────────────────────────────────────────
-  
   const carryRows = rows.filter(r=>r.carry>EPS);
   if(carryRows.length){
     for(const r of carryRows){
@@ -499,16 +316,8 @@ function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
       poolRemaining -= amount;
     }
   }
+
   // Step 3: Iterative waterfall distribution
-  // ───────────────────────────────────────────────────────────────────────────
-  // Loop until all wallets assigned or pool exhausted
-  // Each iteration:
-  //   1. Calculate proposed share for each remaining wallet
-  //   2. Identify wallets exceeding cap
-  //   3. Cap those wallets and remove from next round
-  //   4. Redistribute remaining pool among uncapped wallets
-  // ───────────────────────────────────────────────────────────────────────────
-  
   let remaining = rows.filter(r=>!(r.carry>EPS));  // Exclude carry rows
   
   while(remaining.length && poolRemaining > EPS){
@@ -572,22 +381,6 @@ function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
   }
 
   // Step 4: Handle overflow (all wallets capped, funds remain)
-  // ───────────────────────────────────────────────────────────────────────────
-  // If poolRemaining > 0 after capping all wallets:
-  // - Route to founder (CREATOR_ADM_CODE) if set
-  // - Otherwise mark as UNALLOCATED (for audit trail)
-  // 
-  // Example scenario:
-  // Pool = $10,000
-  // 100 users, each capped at $100 (1% = $100 max)
-  // Total distributed: $10,000 (100 × $100)
-  // Overflow: $0
-  // 
-  // But if only 5 users exist:
-  // Total distributed: $500 (5 × $100)
-  // Overflow: $9,500 → founder
-  // ───────────────────────────────────────────────────────────────────────────
-  
   if(poolRemaining > EPS){
     if(creatorAdm){
       out.push({ 
@@ -601,7 +394,6 @@ function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
       });
       poolRemaining = 0;
     } else {
-      // No founder configured → mark as unallocated (should never happen)
       out.push({ 
         adm_code: 'UNALLOCATED', 
         wallet: '', 
@@ -616,14 +408,6 @@ function enforceWalletCapWaterfill(rows, pool, capPct, creatorAdm){
   }
 
   // Step 5: Merge duplicate entries and finalize
-  // ───────────────────────────────────────────────────────────────────────────
-  // If same adm_code appears multiple times (e.g., carry + regular payout):
-  // - Combine units, share, and amount_usd
-  // - Preserve capped status if any entry was capped
-  // 
-  // Sort by amount_usd descending (highest earners first in ledger)
-  // ───────────────────────────────────────────────────────────────────────────
-  
   const merged = new Map();
   for(const r of out){
     const k = r.adm_code + '|' + r.wallet;  // Unique key per wallet

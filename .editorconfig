@@ -1,0 +1,43 @@
+# EditorConfig — https://editorconfig.org
+root = true
+
+# Default for all files
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# HTML files
+[*.html]
+indent_size = 2
+
+# JavaScript
+[*.js]
+indent_size = 2
+
+# CSS
+[*.css]
+indent_size = 2
+
+# JSON
+[*.json]
+indent_size = 2
+
+# TOML (wrangler.toml, netlify.toml)
+[*.toml]
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+
+# Shell scripts
+[*.sh]
+indent_size = 4
+
+# YAML
+[*.{yml,yaml}]
+indent_size = 2

@@ -2,9 +2,18 @@
  * ADMENSION Ad Configuration v2.0
  * Production-ready monetization with $6-20 RPM target
  * 
+ * NOTE: Manual ad placement is handled by ad-loader.js (v2.0).
+ * This file provides supplementary config for future Prebid/Amazon TAM
+ * integration and geo-tiered density control.
+ * 
+ * Ad placement flow:
+ *   1. ad-loader.js creates <ins> elements with slot IDs from its SLOT_IDS config
+ *   2. This file's AdManager handles Prebid header bidding (when enabled)
+ *   3. consent.js gates everything behind user consent (GDPR/CCPA)
+ * 
  * Features:
  * - Google AdSense integration
- * - Prebid.js header bidding
+ * - Prebid.js header bidding (disabled until 100+ DAU)
  * - Lazy loading (viewability optimized)
  * - Navigation-based refresh (policy-compliant)
  * - Geo-tiered ad density
@@ -98,13 +107,18 @@ const PAGE_REFRESH_MAP = {
 
 // ===== AD UNIT DEFINITIONS =====
 const AD_UNITS = {
+  // NOTE: adsenseSlot values below are used ONLY when Prebid header bidding is enabled.
+  // For direct AdSense placement, ad-loader.js handles slot IDs via its SLOT_IDS config.
+  // When you create ad units in AdSense, paste the numeric slot ID (e.g. '1234567890')
+  // into ad-loader.js SLOT_IDS — NOT here.
+  
   'sticky-footer': {
     id: 'sticky-footer',
     type: 'banner',
     sizes: [[728, 90], [970, 90], [320, 50]],
     divId: 'ad-sticky-footer',
     priority: 1, // Highest viewability
-    adsenseSlot: '/XXXXXXX/sticky-footer', // Replace with your slot
+    adsenseSlot: '', // Managed by ad-loader.js SLOT_IDS.BANNER
     refreshable: true
   },
   
@@ -114,7 +128,7 @@ const AD_UNITS = {
     sizes: [[728, 90], [970, 90], [320, 100]],
     divId: 'ad-top-banner',
     priority: 2,
-    adsenseSlot: '/XXXXXXX/top-banner',
+    adsenseSlot: '', // Managed by ad-loader.js SLOT_IDS.BANNER
     refreshable: true
   },
   
@@ -124,7 +138,7 @@ const AD_UNITS = {
     sizes: [[300, 250], [300, 600]],
     divId: 'ad-rail-left',
     priority: 3,
-    adsenseSlot: '/XXXXXXX/rail-left',
+    adsenseSlot: '', // Managed by ad-loader.js SLOT_IDS.VERTICAL
     refreshable: true,
     minWidth: 980 // Desktop only
   },
@@ -135,7 +149,7 @@ const AD_UNITS = {
     sizes: [[300, 250], [300, 600]],
     divId: 'ad-rail-right',
     priority: 3,
-    adsenseSlot: '/XXXXXXX/rail-right',
+    adsenseSlot: '', // Managed by ad-loader.js SLOT_IDS.VERTICAL
     refreshable: true,
     minWidth: 980
   },
@@ -146,7 +160,7 @@ const AD_UNITS = {
     sizes: [[300, 600], [300, 250], [336, 280]],
     divId: 'ad-in-content-tall',
     priority: 2,
-    adsenseSlot: '/XXXXXXX/in-content',
+    adsenseSlot: '', // Managed by ad-loader.js SLOT_IDS.RECTANGLE
     refreshable: true
   },
   
@@ -156,7 +170,7 @@ const AD_UNITS = {
     sizes: [[160, 600], [120, 600]],
     divId: 'ad-side-left',
     priority: 4,
-    adsenseSlot: '/XXXXXXX/side-left',
+    adsenseSlot: '', // Managed by ad-loader.js SLOT_IDS.VERTICAL
     refreshable: false,
     minWidth: 1280 // Wide screens only
   },
@@ -167,7 +181,7 @@ const AD_UNITS = {
     sizes: [[160, 600], [120, 600]],
     divId: 'ad-side-right',
     priority: 4,
-    adsenseSlot: '/XXXXXXX/side-right',
+    adsenseSlot: '', // Managed by ad-loader.js SLOT_IDS.VERTICAL
     refreshable: false,
     minWidth: 1280
   }

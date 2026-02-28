@@ -28,9 +28,7 @@
     "payout": "node scripts/compute_payouts.mjs"
   },
   "devDependencies": {
-    "playwright": "^1.57.0"
-  },
-  "dependencies": {
+    "playwright": "^1.57.0",
     "puppeteer": "^24.34.0"
   }
 }

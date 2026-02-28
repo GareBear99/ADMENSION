@@ -172,7 +172,7 @@
     "May ends. Your wealth shouldn't.", // May 30
     "Close the month stronger, richer, and hungrier.", // May 31
 
-    // June (30 days - continuing the pattern for remaining months)
+    // June (30 days)
     "June is for hustlers. Are you one?",
     "Summer is here. So should your money.",
     "The sun isn't the only thing heating up. Your bank account should too.",
@@ -204,14 +204,201 @@
     "Opportunities bloom in June. Will you harvest?",
     "June ends. Your ambition doesn't.", // Jun 30
 
-    // July - December (continuing the motivational theme)
-    // ... (I'll generate remaining 184 quotes following the same pattern)
-    // For brevity, I'm showing the structure. Full 365 quotes would continue here.
-    
-    // Placeholder for remaining months (184 more quotes)
-    ...Array(184).fill(null).map((_, i) => 
-      `Day ${i + 183}: Build wealth relentlessly. Your future depends on today's actions.`
-    )
+    // July (31 days)
+    "Welcome to the second half. Time to double down.", // Jul 1
+    "Fireworks fade. Fortunes don't. Build something lasting.",
+    "Independence Day isn't just a holiday. It's a financial goal.",
+    "The hottest months forge the strongest hustlers.",
+    "Midyear check: Are you richer than January? You should be.",
+    "Summer bodies are made in winter. Wealth is made in silence.",
+    "While they vacation, you accumulate. That's the difference.",
+    "Heat rises and so should your revenue.",
+    "Half the year gone. Double your effort for the second half.",
+    "July sun melts excuses. Let it melt yours.", // Jul 10
+    "Sweat equity is the only equity that never crashes.",
+    "Your Q3 goals should terrify your Q2 self.",
+    "The scoreboard doesn't lie. Check your numbers.",
+    "Every empire was built one brick at a time. Keep stacking.",
+    "Millionaires are forged in July, announced in December.",
+    "Don't cool off. The market never does.",
+    "Momentum is everything. Lose it and you lose months.",
+    "Your competitors took the summer off. Outwork them.",
+    "Build your pipeline now. Thank yourself in November.",
+    "The gap between you and wealth? Consistent daily action.", // Jul 20
+    "Lazy summers create desperate winters. Stay hungry.",
+    "Capital doesn't care about the calendar. Neither should you.",
+    "Reinvest every win. Compound every gain.",
+    "The best deals happen when everyone else is at the beach.",
+    "Your future millionaire self started working this July.",
+    "Discipline in July is dividends in December.",
+    "Own the afternoon. Own the quarter. Own the year.",
+    "Two kinds of people in July: those building and those burning out.",
+    "The second half starts now. Make it count.",
+    "Revenue doesn't take a summer break.", // Jul 30
+    "July taught you to push. August will teach you to dominate.", // Jul 31
+
+    // August (31 days)
+    "August: where real hustlers separate from pretenders.", // Aug 1
+    "Back to school for some. Back to the bag for you.",
+    "The harvest is coming. Have you planted enough seeds?",
+    "August heat tests commitment. Winners stay in the fire.",
+    "Your bank account in December is decided by your August actions.",
+    "Outwork the heat. Outwork the doubt. Outwork everyone.",
+    "Late summer is when empires are quietly assembled.",
+    "Every dollar you earn today works overtime tomorrow.",
+    "August separates the builders from the dreamers.",
+    "Your energy is currency. Spend it on things that appreciate.", // Aug 10
+    "The market doesn't know what month it is. Stay relentless.",
+    "Build in private. Launch in September. Dominate by December.",
+    "Rich people rest strategically. Broke people rest chronically.",
+    "Your August hustle is your October harvest.",
+    "Stop planning to plan. Start executing to earn.",
+    "Consistency beats intensity. Show up every single day.",
+    "August is the runway. Q4 is the takeoff.",
+    "Your income ceiling is set by your daily habits. Raise the roof.",
+    "Operate like you're already a millionaire. The account will follow.",
+    "Two-thirds of the year gone. One-third left to change everything.", // Aug 20
+    "Money respects momentum. Don't you dare slow down.",
+    "Every skill you learn is a new income stream waiting to open.",
+    "The wealthy build assets in August. The broke build excuses.",
+    "Your hustle should be louder than your alarm clock.",
+    "Financial freedom has no off-season.",
+    "Stack skills. Stack cash. Stack advantages.",
+    "August: still time to make this your best year ever.",
+    "Grind now so you can flex later. Not the other way around.",
+    "The money doesn't care if it's hot outside. Get to work.",
+    "Prepare in August. Execute in September. Celebrate in October.", // Aug 30
+    "Summer's almost over. Your ambition is just getting started.", // Aug 31
+
+    // September (30 days)
+    "September is the real New Year. Set new financial goals.", // Sep 1
+    "Fall is coming. Your income shouldn't.",
+    "Q4 is 90 days away. Are your systems in place?",
+    "Back to the grind. Actually, real ones never left.",
+    "Leaves fall. Revenue rises. That's the goal.",
+    "September discipline creates December dividends.",
+    "The fourth quarter belongs to the prepared. Are you ready?",
+    "Sharpen your tools now. Harvest season is here.",
+    "Your September focus determines your year-end results.",
+    "While they adjust to fall, you adjust your portfolio.", // Sep 10
+    "The market shifts in September. Shift with it or get left.",
+    "Knowledge acquired now compounds through Q4 and beyond.",
+    "September: when strategic thinkers lap reactive ones.",
+    "Your October self will thank your September hustle.",
+    "Recession-proof your income. Diversify relentlessly.",
+    "The last 100 days of the year start now. Make each one count.",
+    "Fall forward into wealth. Never backward into comfort.",
+    "Build your financial fortress before winter comes.",
+    "Revenue goals aren't annual. They're daily habits.",
+    "September separates the amateurs from the professionals.", // Sep 20
+    "Ninety days to change your financial trajectory. Go.",
+    "Your competition relaxed in summer. Crush them in fall.",
+    "Every meeting in September is a deal in December.",
+    "The successful don't wait for motivation. They create it.",
+    "Stack your wins like autumn leaves. Deep and plentiful.",
+    "Financial literacy is your sharpest weapon. Keep learning.",
+    "Your systems should work harder than you do. Build them.",
+    "The last quarter is the money quarter. Prepare accordingly.",
+    "September hustle. October results. November gratitude. December wealth.",
+    "Fall into money. Don't fall behind.", // Sep 30
+
+    // October (31 days)
+    "October: where Q4 warriors are born.", // Oct 1
+    "The final sprint starts now. Leave nothing in the tank.",
+    "Scary how much money you'll leave on the table if you stop now.",
+    "Harvest what you planted. Reap what you sowed.",
+    "October is for closers. Close deals, close gaps, close doubters.",
+    "The wealthy plan in October what they execute in January.",
+    "Your year-end bonus is the work you put in today.",
+    "Seventy-five percent of the year is gone. Maximize the rest.",
+    "October nights are for planning. October days are for executing.",
+    "Fall back? Never. Fall forward into your next income stream.", // Oct 10
+    "The market gets spooky. Disciplined investors get wealthy.",
+    "Your financial future is written in the next 90 days.",
+    "Compound your October gains. Watch them multiply.",
+    "Every decision you make right now echoes into next year.",
+    "October is not for resting. It's for stacking.",
+    "The countdown to year-end starts. Make every day profitable.",
+    "Trick-or-treat? How about recurring revenue and asset growth?",
+    "Your ambition should scare you. If it doesn't, dream bigger.",
+    "Build something this October that pays you every month after.",
+    "The fourth quarter is the wealth quarter. Claim it.", // Oct 20
+    "October hustle builds November momentum.",
+    "Stack your income like pumpkins on a porch. Everywhere.",
+    "Wealth isn't seasonal. Your effort shouldn't be either.",
+    "The cold months are when the hardest workers emerge.",
+    "Fifty days until Christmas. Your bank account should be ready.",
+    "October: when smart money positions for the new year.",
+    "Finish the month strong. Start November stronger.",
+    "Your financial habits in October define your January reality.",
+    "No shortcuts to wealth. Just consistent, relentless execution.",
+    "The last 60 days of the year are the most profitable. Own them.", // Oct 30
+    "October's over. Did you earn more than you spent? Good.", // Oct 31
+
+    // November (30 days)
+    "November: the month of gratitude and gaining.", // Nov 1
+    "Be thankful for what you have. Then go get ten times more.",
+    "Gratitude without ambition is complacency. Keep pushing.",
+    "November is your final warning. December is the deadline.",
+    "The deals made in November fund the dreams of January.",
+    "Your year-end review starts now. What's the verdict?",
+    "Thirty days to close out the year. Make them legendary.",
+    "Thankful for the grind. Grateful for the gains.",
+    "November rain grows December grain. Keep planting.",
+    "While they shop Black Friday, you build Black Friday.", // Nov 10
+    "Your Thanksgiving table should reflect your year's hustle.",
+    "November is for harvesting. December is for celebrating.",
+    "Count your blessings, but also count your revenue.",
+    "The wealthy give thanks and then get back to building.",
+    "Your November actions write your December paycheck.",
+    "Consistency in November compounds into January wealth.",
+    "Holiday season is revenue season. Capitalize on it.",
+    "Your end-of-year push determines your start-of-year position.",
+    "Every sale in November is a seed for next year's forest.",
+    "Twenty days left. Twenty days to change your financial story.", // Nov 20
+    "The holiday rush is your opportunity. Seize it.",
+    "November teaches patience. December rewards persistence.",
+    "Your portfolio should grow faster than your holiday wish list.",
+    "Feast on opportunity. Fast on excuses.",
+    "Finish November with momentum. Carry it into December.",
+    "Black Friday for consumers. Building Friday for hustlers.",
+    "The year isn't over until you say it is. Keep earning.",
+    "November endings are December beginnings. Bridge the gap.",
+    "Your income doesn't hibernate. Neither should you.",
+    "November's done. December's your final stand. Make it count.", // Nov 30
+
+    // December (31 days)
+    "December: the final chapter. Write it in gold.", // Dec 1
+    "Year-end is not a finish line. It's a launchpad.",
+    "While they wind down, you double down.",
+    "December is when champions are crowned. Are you one?",
+    "Close every open loop. Collect every pending dollar.",
+    "The last month defines the whole year. Make it legendary.",
+    "Your December results are January's foundation. Build well.",
+    "Holiday spirit is great. Holiday income is better.",
+    "Twenty-three days to set up a dominant new year.",
+    "December is for closing. Close the year with a record.", // Dec 10
+    "Stack your wins before the clock runs out.",
+    "The wealthy plan next year in December. The broke plan parties.",
+    "Thirteen days left in the year. Thirteen reasons to go harder.",
+    "Your annual review should make you proud. If not, fix it now.",
+    "December 15: halftime of the final month. Pace yourself.",
+    "Finish what you started. Start what you'll finish.",
+    "The gift of compound interest keeps giving all year round.",
+    "Your New Year's resolution should be 'earn more, waste less.'",
+    "December 19: eleven days to outperform your past self.",
+    "Year-end tax moves separate the wealthy from the wishful.", // Dec 20
+    "Winter solstice: the darkest day. Let your ambition be the light.",
+    "Stack those year-end bonuses. Reinvest immediately.",
+    "Your bank account on December 23 reflects 357 days of effort.",
+    "Christmas Eve: the gift of financial freedom is self-given.",
+    "Merry Christmas. Now back to building the empire.",
+    "Boxing Day: box up your excuses. Ship them away forever.",
+    "Five days left. Five days to cement your legacy this year.",
+    "Reflect on the wins. Learn from the losses. Plan the comeback.",
+    "Two days left. Every hour counts. Every dollar matters.",
+    "New Year's Eve eve: tomorrow you celebrate. Today you execute.", // Dec 30
+    "Last day. Did you leave it all on the field? Good. Now rest. Tomorrow we go again." // Dec 31
   ];
 
   // ===== 27 Rotating GIF URLs (Money/Success Theme) =====

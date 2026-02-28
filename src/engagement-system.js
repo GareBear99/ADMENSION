@@ -558,7 +558,7 @@ class UserGuidance {
       create: 'Generate your unique ADM link. Wallet address is optional - you can add it later.',
       manage: 'View and update wallet addresses for your ADM codes. All changes save to browser.',
       docs: 'Learn how payouts work. Formula: pool × (your_units / total_units). Post-revenue only.',
-      admin: 'Advanced settings. Requires PIN 979899. Use carefully.'
+      admin: 'Advanced settings. Requires admin PIN authentication.'
     };
     
     return help[page] || 'Navigate using the menu above. All data is saved locally in your browser.';

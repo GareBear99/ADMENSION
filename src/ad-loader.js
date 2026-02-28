@@ -68,6 +68,12 @@
     'ad-admin-banner':     { type: 'BANNER',    page: 'admin',  format: 'horizontal', sizes: '728x90' },
     'ad-admin-rail':       { type: 'VERTICAL',  page: 'admin',  format: 'vertical',   sizes: '160x600', desktopOnly: true },
     'ad-admin-tall':       { type: 'RECTANGLE', page: 'admin',  format: 'rectangle',  sizes: '300x600' },
+
+    // Interstitial page (THE money page — users spend 16+ seconds here)
+    'ad-interstitial-sticky':  { type: 'BANNER',    page: 'interstitial', format: 'horizontal', sizes: '728x90' },
+    'ad-interstitial-left':    { type: 'VERTICAL',  page: 'interstitial', format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-interstitial-right':   { type: 'VERTICAL',  page: 'interstitial', format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-interstitial-bottom':  { type: 'BANNER',    page: 'interstitial', format: 'horizontal', sizes: '728x90' },
   };
 
   // ============================================================

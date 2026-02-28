@@ -41,25 +41,22 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     
-    # CORS for ads
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    
     # Cache control for HTML (don't cache - always fresh)
     Cache-Control = "public, max-age=0, must-revalidate"
 
-# JavaScript files (cache for 1 year with content hash)
+# JavaScript files - short cache since filenames have no content hashes
+# Users will get stale JS for up to 1 hour, then revalidate
 [[headers]]
   for = "/*.js"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=3600, must-revalidate"
     Content-Type = "application/javascript; charset=utf-8"
 
-# CSS files (cache for 1 year)
+# CSS files - short cache (no content hashes in filenames)
 [[headers]]
   for = "/*.css"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=3600, must-revalidate"
 
 # ads.txt must be served as plain text
 [[headers]]
@@ -68,7 +65,7 @@
     Content-Type = "text/plain; charset=utf-8"
     Cache-Control = "public, max-age=86400"
 
-# Images
+# Images (long cache OK - images rarely change)
 [[headers]]
   for = "/*.jpg"
   [headers.values]

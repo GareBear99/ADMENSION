@@ -1,6 +1,6 @@
 /**
  * ADMENSION Anti-Abuse & Fraud Prevention System
- * Version: 1.0
+ * Version: 1.1
  * Purpose: Prevent ad fraud, detect suspicious patterns, enforce policy-safe limits
  * 
  * Google Ad Manager Policy Compliance:
@@ -21,7 +21,10 @@
     MAX_REFRESHES_PER_HOUR: 15,
     MIN_TIME_BETWEEN_REFRESHES: 30000, // 30 seconds
     
-    // Page stagnation refresh (random 5-7 min)
+    // Page stagnation detection (logging only - NO automatic refresh)
+    // NOTE: Automatic page refresh is DISABLED to comply with Google AdSense
+    // policies which prohibit automatic ad refreshing without user interaction.
+    // The stagnation detector now only logs inactivity for analytics purposes.
     STAGNATION_MIN_MS: 5 * 60 * 1000, // 5 minutes
     STAGNATION_MAX_MS: 7 * 60 * 1000, // 7 minutes
     STAGNATION_ENABLED: true,
@@ -71,7 +74,7 @@
       // Initialize activity listeners
       this.setupActivityListeners();
       
-      // Start stagnation detector
+      // Start stagnation detector (logging only, no auto-refresh)
       if (CONFIG.STAGNATION_ENABLED) {
         this.startStagnationDetector();
       }
@@ -186,7 +189,10 @@
       return Date.now() - this.lastActivity;
     }
 
-    // ===== Stagnation Detector (Random 5-7 min refresh) =====
+    // ===== Stagnation Detector (Logging Only - NO Auto-Refresh) =====
+    // NOTE: Google AdSense policy prohibits automatic page/ad refreshing.
+    // This detector logs stagnation events for analytics but does NOT
+    // trigger page reloads. See: https://support.google.com/adsense/answer/48182
     startStagnationDetector() {
       if (this.stagnationTimer) {
         clearTimeout(this.stagnationTimer);
@@ -200,36 +206,28 @@
       this.stagnationTimer = setTimeout(() => {
         this.handleStagnation(randomInterval);
       }, randomInterval);
-
-      console.log(`[Anti-Abuse] Stagnation detector armed for ${(randomInterval / 60000).toFixed(1)} minutes`);
     }
 
     handleStagnation(interval) {
       const timeSinceActivity = this.getTimeSinceActivity();
       
-      // Only refresh if no recent activity (within last 30 seconds)
+      // If user has been active recently, reset the timer
       if (timeSinceActivity < 30000) {
-        console.log('[Anti-Abuse] Stagnation refresh cancelled: recent user activity detected');
         this.startStagnationDetector(); // Restart timer
         return;
       }
 
-      // Check if refresh is allowed
-      if (!this.canRefresh('stagnation')) {
-        console.warn('[Anti-Abuse] Stagnation refresh blocked: limits exceeded');
-        return;
-      }
-
-      console.log(`[Anti-Abuse] Page stagnant for ${(timeSinceActivity / 60000).toFixed(1)} min, refreshing...`);
+      // Log stagnation event for analytics (NO page reload)
+      console.log(`[Anti-Abuse] Page stagnant for ${(timeSinceActivity / 60000).toFixed(1)} min (logged, no refresh)`);
       
-      this.logRefresh('stagnation', {
+      this.logRefresh('stagnation_detected', {
         timeSinceActivity,
         interval,
-        reason: 'Page inactive, automatic refresh for ad optimization'
+        reason: 'Page inactive - logged for analytics (no auto-refresh per AdSense policy)'
       });
 
-      // Reload page
-      window.location.reload();
+      // Restart detector for next interval
+      this.startStagnationDetector();
     }
 
     // ===== Refresh Tracking & Limits =====
@@ -268,7 +266,7 @@
       
       const refreshEntry = {
         timestamp: now,
-        type, // 'manual', 'stagnation', 'navigation', 'ad_refresh'
+        type, // 'manual', 'stagnation_detected', 'navigation', 'ad_refresh'
         metadata,
         sessionId: sessionStorage.getItem('cfamm_s') || 'unknown',
         userAgent: navigator.userAgent,

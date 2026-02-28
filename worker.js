@@ -31,6 +31,12 @@ const RATE_LIMITS = {
     perHour: 50,        // 50 updates per hour
     perDay: 200,        // 200 updates per day
   },
+  // Event collection limits (POST /api/events)
+  events: {
+    perMinute: 30,      // 30 events per minute per IP
+    perHour: 500,       // 500 events per hour
+    perDay: 5000,       // 5,000 events per day
+  },
 };
 
 // Progressive timeout durations (in seconds)
@@ -106,6 +112,12 @@ export default {
       if (request.method === 'POST' && path.match(/\/api\/links\/[A-Z0-9]+\/pageview$/i)) {
         const code = path.split('/').slice(-2, -1)[0].toUpperCase();
         return await trackPageview(code, env);
+      }
+
+      // POST /api/events - Collect analytics events
+      if (request.method === 'POST' && path === '/api/events') {
+        const body = await request.json();
+        return await collectEvent(body, clientIP, env);
       }
 
       return jsonResponse({ error: 'Not found' }, 404);
@@ -294,6 +306,7 @@ async function checkRateLimit(request, clientIP, path, env) {
   // Determine action type
   let action = 'fetch';
   if (request.method === 'POST' && path === '/api/links') action = 'create';
+  else if (request.method === 'POST' && path === '/api/events') action = 'events';
   else if (request.method === 'PUT') action = 'update';
   
   const limits = RATE_LIMITS[action];
@@ -507,6 +520,45 @@ async function incrementGlobalStat(env, statName) {
   } catch (error) {
     console.error('Failed to increment global stat:', error);
   }
+}
+
+/**
+ * Collect an analytics event (pageview, ad_request, ad_viewable, wallet_submit)
+ */
+async function collectEvent(body, clientIP, env) {
+  const allowedTypes = ['pageview', 'ad_request', 'ad_viewable', 'wallet_submit', 'create_link', 'list_links'];
+  const type = body.type || '';
+
+  if (!type || !allowedTypes.includes(type)) {
+    return jsonResponse({ ok: false, error: 'invalid_type' }, 400);
+  }
+
+  const event = {
+    ts: Date.now(),
+    type,
+    ip_hash: await hashIP(clientIP),
+    payload: body.payload || {},
+  };
+
+  // Store in KV with a unique key; 30-day TTL
+  const key = `event:${type}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
+  await env.ADMENSION_LINKS.put(key, JSON.stringify(event), { expirationTtl: 2592000 });
+
+  // Increment daily event counter for simple analytics
+  const dayKey = `eventcount:${getCurrentDay()}`;
+  await incrementCounter(env, dayKey, 172800); // 2-day TTL
+
+  return jsonResponse({ ok: true });
+}
+
+/**
+ * Hash an IP address for privacy-safe storage
+ */
+async function hashIP(ip) {
+  const data = new TextEncoder().encode(ip + ':admension-salt');
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  const bytes = new Uint8Array(hash);
+  return Array.from(bytes.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**

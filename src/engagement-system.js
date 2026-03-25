@@ -662,4 +662,134 @@ if (typeof window !== 'undefined') {
   }
 }
 
+// ================================================================
+// SCAR — Canonical Continuity Entity
+// Canon: Scar records what was allowed to occur.
+// Hearts, fatigue, and loss are Scar's ledger.
+// Recovery is slower than failure: history matters.
+// ================================================================
+class Scar {
+  constructor(profile) {
+    this.profile = profile;
+    this.data = this.load();
+  }
+
+  load() {
+    try {
+      return JSON.parse(localStorage.getItem('scar.state') || 'null') || this.defaults();
+    } catch(e) { return this.defaults(); }
+  }
+
+  defaults() {
+    return {
+      // Layer 1: Personal multiplier (session count + link creation)
+      personalScore: 0,
+      personalMultiplier: 1.0,
+      // Layer 2: Global multiplier (vault progress)
+      globalMultiplier: 1.0,
+      vaultPct: 0,
+      // Layer 3: Sealed (monthly average — can decay)
+      monthlyAverages: [],
+      sealedMultiplier: 1.0,
+      // Continuity
+      lastVisitDay: null,
+      streak: 0,
+      longestStreak: 0,
+      totalDays: 0,
+      // Hearts (engagement budget)
+      hearts: 3,
+      maxHearts: 5,
+      fatigueLevel: 0,
+    };
+  }
+
+  save() {
+    try { localStorage.setItem('scar.state', JSON.stringify(this.data)); } catch(e) {}
+  }
+
+  // ---- Layer 1: Personal multiplier ----
+  updatePersonal() {
+    var s = this.profile.totalSessions || 0;
+    var l = this.profile.linkCreations || 0;
+    this.data.personalScore = Math.min(100, s * 2 + l * 5);
+    // 1.0x at 0 score, up to 1.6x at 100
+    this.data.personalMultiplier = 1.0 + (this.data.personalScore / 100) * 0.6;
+    this.save();
+  }
+
+  // ---- Layer 2: Global multiplier (vault) ----
+  setVaultProgress(pct) {
+    this.data.vaultPct = Math.max(0, Math.min(100, pct));
+    // 1.0x at 0%, up to 2.0x at 100%
+    this.data.globalMultiplier = 1.0 + (this.data.vaultPct / 100);
+    this.save();
+  }
+
+  // ---- Layer 3: Sealed monthly average ----
+  recordMonthlyAverage(month, avgSessions) {
+    this.data.monthlyAverages.push({ month, avg: avgSessions, t: Date.now() });
+    if (this.data.monthlyAverages.length > 12) this.data.monthlyAverages = this.data.monthlyAverages.slice(-12);
+    // Calculate sealed multiplier: average of recent months, decays if engagement drops
+    var total = this.data.monthlyAverages.reduce(function(s, m){ return s + m.avg; }, 0);
+    var avg = total / this.data.monthlyAverages.length;
+    this.data.sealedMultiplier = Math.max(0.8, Math.min(1.5, 0.8 + (avg / 30) * 0.7));
+    this.save();
+  }
+
+  // ---- Continuity: daily streak ----
+  recordVisit() {
+    var today = new Date().toISOString().slice(0, 10);
+    if (this.data.lastVisitDay === today) return; // already recorded today
+
+    var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if (this.data.lastVisitDay === yesterday) {
+      this.data.streak++;
+    } else if (this.data.lastVisitDay && this.data.lastVisitDay !== today) {
+      // Streak broken — fatigue increases, hearts lost
+      this.data.fatigueLevel = Math.min(10, this.data.fatigueLevel + 1);
+      this.data.hearts = Math.max(0, this.data.hearts - 1);
+      this.data.streak = 1;
+    } else {
+      this.data.streak = 1;
+    }
+
+    this.data.lastVisitDay = today;
+    this.data.totalDays++;
+    this.data.longestStreak = Math.max(this.data.longestStreak, this.data.streak);
+    // Recover hearts on streaks
+    if (this.data.streak >= 3 && this.data.hearts < this.data.maxHearts) {
+      this.data.hearts++;
+      this.data.fatigueLevel = Math.max(0, this.data.fatigueLevel - 1);
+    }
+    this.updatePersonal();
+    this.save();
+  }
+
+  // ---- Combined multiplier ----
+  getCombinedMultiplier() {
+    return this.data.personalMultiplier * this.data.globalMultiplier * this.data.sealedMultiplier;
+  }
+
+  getStatus() {
+    return {
+      personal: this.data.personalMultiplier.toFixed(2) + 'x',
+      global: this.data.globalMultiplier.toFixed(2) + 'x',
+      sealed: this.data.sealedMultiplier.toFixed(2) + 'x',
+      combined: this.getCombinedMultiplier().toFixed(2) + 'x',
+      streak: this.data.streak,
+      longestStreak: this.data.longestStreak,
+      hearts: this.data.hearts + '/' + this.data.maxHearts,
+      fatigue: this.data.fatigueLevel,
+      totalDays: this.data.totalDays,
+    };
+  }
+}
+
+// Initialize SCAR
+if (window.ADMENSION_ENGAGEMENT && window.ADMENSION_ENGAGEMENT.userProfile) {
+  window.SCAR = new Scar(window.ADMENSION_ENGAGEMENT.userProfile);
+  window.SCAR.recordVisit();
+  console.log('[SCAR] Entity initialized |', JSON.stringify(window.SCAR.getStatus()));
+}
+
 console.log('[ADMENSION] Engagement system loaded');

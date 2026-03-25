@@ -553,4 +553,109 @@
     return stats;
   };
 
+  // ================================================================
+  // SENTINEL — Canonical Safety Entity (wraps AbuseTracker)
+  // Canon: Sentinel is first. Every action passes through Sentinel.
+  // If Sentinel denies, nothing executes.
+  // ================================================================
+  const SENTINEL_AUDIT_KEY = 'sentinel.audit_log';
+  const SENTINEL_PAUSE_KEY = 'sentinel.emergency_pause';
+
+  class Sentinel {
+    constructor(tracker) {
+      this.tracker = tracker;
+      this.auditLog = this.loadAuditLog();
+      this.paused = this.checkPaused();
+      if (this.paused) {
+        console.warn('[SENTINEL] ⚠️ EMERGENCY PAUSE ACTIVE — ad serving disabled');
+      }
+    }
+
+    // ---- Gate: every action passes through here ----
+    allow(action, context) {
+      // Emergency pause overrides everything
+      if (this.paused) {
+        this.log('DENY', action, 'emergency_pause', context);
+        return false;
+      }
+      // High IVT score → deny ad-related actions
+      if (action.startsWith('ad_') && this.tracker.ivtScore.score >= CONFIG.IVT_SCORE_THRESHOLD) {
+        this.log('DENY', action, 'high_ivt', context);
+        return false;
+      }
+      // Rate limit: deny if refresh limits exceeded
+      if (action === 'ad_refresh' && !this.tracker.canRefresh('sentinel_check')) {
+        this.log('DENY', action, 'rate_limit', context);
+        return false;
+      }
+      // Excessive session views
+      if (this.tracker.data.sessionViews > CONFIG.SESSION_VIEW_LIMIT * 1.5) {
+        this.log('DENY', action, 'excessive_views', context);
+        return false;
+      }
+      this.log('ALLOW', action, 'passed', context);
+      return true;
+    }
+
+    // ---- Emergency pause (admin-triggered) ----
+    pause(reason) {
+      this.paused = true;
+      localStorage.setItem(SENTINEL_PAUSE_KEY, JSON.stringify({ active: true, reason, since: Date.now() }));
+      this.log('PAUSE', 'system', reason || 'admin_triggered');
+      console.warn('[SENTINEL] EMERGENCY PAUSE ACTIVATED:', reason);
+    }
+
+    resume() {
+      this.paused = false;
+      localStorage.removeItem(SENTINEL_PAUSE_KEY);
+      this.log('RESUME', 'system', 'admin_resumed');
+      console.log('[SENTINEL] ✅ System resumed');
+    }
+
+    checkPaused() {
+      try {
+        const p = JSON.parse(localStorage.getItem(SENTINEL_PAUSE_KEY) || 'null');
+        return !!(p && p.active);
+      } catch(e) { return false; }
+    }
+
+    // ---- Audit log ----
+    log(decision, action, reason, context) {
+      const entry = {
+        t: Date.now(),
+        d: decision,
+        a: action,
+        r: reason,
+        ctx: context || null,
+        ivt: this.tracker.ivtScore.score,
+        views: this.tracker.data.sessionViews,
+      };
+      this.auditLog.push(entry);
+      // Keep last 200 entries
+      if (this.auditLog.length > 200) this.auditLog = this.auditLog.slice(-200);
+      try { localStorage.setItem(SENTINEL_AUDIT_KEY, JSON.stringify(this.auditLog)); } catch(e) {}
+    }
+
+    loadAuditLog() {
+      try { return JSON.parse(localStorage.getItem(SENTINEL_AUDIT_KEY) || '[]'); } catch(e) { return []; }
+    }
+
+    getAuditLog() { return this.auditLog; }
+
+    getStatus() {
+      return {
+        paused: this.paused,
+        healthy: this.tracker.isHealthy(),
+        ivtScore: this.tracker.ivtScore.score,
+        ivtRisk: this.tracker.ivtScore.risk,
+        flags: this.tracker.data.flags.length,
+        auditEntries: this.auditLog.length,
+      };
+    }
+  }
+
+  // Initialize SENTINEL
+  window.SENTINEL = new Sentinel(window.ADMENSION_ANTI_ABUSE);
+  console.log('[SENTINEL] Entity initialized | Status:', window.SENTINEL.getStatus().healthy ? '✅ Healthy' : '⚠️ Issues');
+
 })();

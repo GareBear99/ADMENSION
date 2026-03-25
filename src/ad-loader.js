@@ -25,11 +25,16 @@
   const ADSENSE_CLIENT = 'ca-pub-5584590642779290';
 
   // Create these 3 ad units in your AdSense dashboard, then paste the slot IDs:
+  // If left empty, auto-format ads will be used (works without specific slot IDs)
   const SLOT_IDS = {
     BANNER:    '',  // Paste your "Display ads → Horizontal" slot ID here (e.g. '1234567890')
     RECTANGLE: '',  // Paste your "Display ads → Square" slot ID here
     VERTICAL:  '',  // Paste your "Display ads → Vertical" slot ID here
   };
+
+  // When true, use auto-format <ins> elements even without slot IDs.
+  // AdSense Auto Ads will fill these once the site is approved.
+  const USE_AUTO_FORMAT_FALLBACK = true;
 
   // ============================================================
   // AD CONTAINER MAP — Every placement on the site
@@ -68,6 +73,16 @@
     'ad-admin-banner':     { type: 'BANNER',    page: 'admin',  format: 'horizontal', sizes: '728x90' },
     'ad-admin-rail':       { type: 'VERTICAL',  page: 'admin',  format: 'vertical',   sizes: '160x600', desktopOnly: true },
     'ad-admin-tall':       { type: 'RECTANGLE', page: 'admin',  format: 'rectangle',  sizes: '300x600' },
+
+    // VALLIS page
+    'ad-vallis-banner':    { type: 'BANNER',    page: 'vallis', format: 'horizontal', sizes: '728x90' },
+    'ad-vallis-rail':      { type: 'VERTICAL',  page: 'vallis', format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-vallis-tall':      { type: 'RECTANGLE', page: 'vallis', format: 'rectangle',  sizes: '300x600' },
+
+    // Pools page
+    'ad-pools-banner':     { type: 'BANNER',    page: 'pools',  format: 'horizontal', sizes: '728x90' },
+    'ad-pools-rail':       { type: 'VERTICAL',  page: 'pools',  format: 'vertical',   sizes: '160x600', desktopOnly: true },
+    'ad-pools-tall':       { type: 'RECTANGLE', page: 'pools',  format: 'rectangle',  sizes: '300x600' },
 
     // Interstitial page (THE money page — users spend 16+ seconds here)
     'ad-interstitial-sticky':  { type: 'BANNER',    page: 'interstitial', format: 'horizontal', sizes: '728x90' },
@@ -193,8 +208,8 @@
 
       var slotId = SLOT_IDS[config.type];
 
-      if (!slotId) {
-        // No slot ID configured for this type
+      if (!slotId && !USE_AUTO_FORMAT_FALLBACK) {
+        // No slot ID and auto-format disabled
         if (CONFIG.showPlaceholders) {
           renderPlaceholder(container, containerId, config);
         }
@@ -231,7 +246,9 @@
     ins.className = 'adsbygoogle';
     ins.style.display = 'block';
     ins.setAttribute('data-ad-client', ADSENSE_CLIENT);
-    ins.setAttribute('data-ad-slot', slotId);
+    if (slotId) {
+      ins.setAttribute('data-ad-slot', slotId);
+    }
 
     // Set format based on ad type
     switch (config.format) {

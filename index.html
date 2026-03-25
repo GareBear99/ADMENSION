@@ -536,6 +536,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
     <script src="src/anti-abuse-system.js"></script>
     <script src="src/engagement-system.js"></script>
     <script src="src/page-validator.js"></script>
+    <script src="src/ad-fallback.js"></script>
 
 </head>
 <body>
@@ -564,6 +565,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
       <a href="?page=manage" data-page="manage">Manage</a>
       <a href="?page=docs" data-page="docs">Docs</a>
       <a href="?page=vallis" data-page="vallis">VALLIS</a>
+      <a href="?page=pools" data-page="pools">Pools</a>
       <a href="?page=admin" data-page="admin" id="adminNavLink">🔒 Admin</a>
       <a href="#" onclick="captureFullPageScreenshot(); return false;" style="background: rgba(34,211,238,.15); border-color: rgba(34,211,238,.4);">📸 Screenshot</a>
     </nav>
@@ -1254,6 +1256,146 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         </div>
 
         <div class="card col-12"><div id="ad-docs-tall" class="ad-container" data-placement="tall" data-page="docs" style="min-height: 600px; max-height: 600px;"></div></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ===== PAGE: POOLS ===== -->
+  <section class="page" id="page-pools">
+    <section class="card">
+      <h1>Liquidity Pools &amp; Vault</h1>
+      <p class="sub">5 pools + Anunnaki Treasury Vault. Rewards by pool share. SENTINEL-enforced. Disclosed odds.</p>
+
+      <div class="stack">
+        <div class="card col-12"><div id="ad-pools-banner" class="ad-container" style="min-height: 90px;"></div></div>
+
+        <div class="card col-8">
+          <!-- SCAR Status -->
+          <div class="notice goodNote" style="margin-bottom:12px">
+            <b>SCAR Continuity Status</b>
+            <div id="scarStatus" style="margin-top:8px;font-family:var(--mono);font-size:12px;">
+              Personal: 1.00x • Global: 1.00x • Sealed: 1.00x • Combined: 1.00x • Streak: 0 • Hearts: 3/5
+            </div>
+          </div>
+
+          <!-- Pool Cards -->
+          <h2>Active Pools</h2>
+          <div class="grid2" id="poolCards">
+            <div class="card" style="border-color:rgba(200,180,150,.3);background:linear-gradient(135deg,rgba(200,180,150,.08),rgba(0,0,0,.1));">
+              <h3 style="margin-top:0;color:#c8b496">⬢ Dust</h3>
+              <div class="mini">Entry-level pool. Lowest risk, lowest reward. Good for new participants.</div>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                <span class="pill">Min: $10</span><span class="pill">Max: $50</span><span class="pill">Est APR: 4-8%</span>
+              </div>
+              <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:35%;background:rgba(200,180,150,.6)"></div></div>
+              <div class="mini" style="margin-top:4px">TVL: $— • 35% capacity</div>
+            </div>
+
+            <div class="card" style="border-color:rgba(139,90,43,.3);background:linear-gradient(135deg,rgba(139,90,43,.08),rgba(0,0,0,.1));">
+              <h3 style="margin-top:0;color:#8b5a2b">⬢ Dung</h3>
+              <div class="mini">Balanced pool. Moderate risk/reward. Standard participation.</div>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                <span class="pill">Min: $10</span><span class="pill">Max: $75</span><span class="pill">Est APR: 8-14%</span>
+              </div>
+              <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:52%;background:rgba(139,90,43,.6)"></div></div>
+              <div class="mini" style="margin-top:4px">TVL: $— • 52% capacity</div>
+            </div>
+
+            <div class="card" style="border-color:rgba(220,80,80,.3);background:linear-gradient(135deg,rgba(220,80,80,.08),rgba(0,0,0,.1));">
+              <h3 style="margin-top:0;color:#dc5050">⬢ Flesh</h3>
+              <div class="mini">Higher-yield pool. Elevated risk. For experienced participants.</div>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                <span class="pill">Min: $15</span><span class="pill">Max: $100</span><span class="pill">Est APR: 14-22%</span>
+              </div>
+              <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:28%;background:rgba(220,80,80,.6)"></div></div>
+              <div class="mini" style="margin-top:4px">TVL: $— • 28% capacity</div>
+            </div>
+
+            <div class="card" style="border-color:rgba(180,20,20,.3);background:linear-gradient(135deg,rgba(180,20,20,.08),rgba(0,0,0,.1));">
+              <h3 style="margin-top:0;color:#b41414">⚫ BloodMoon</h3>
+              <div class="mini">High-risk event pool. Volatile. Only during active events.</div>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                <span class="pill">Min: $20</span><span class="pill">Max: $100</span><span class="pill">Est APR: 20-40%</span>
+              </div>
+              <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:15%;background:rgba(180,20,20,.6)"></div></div>
+              <div class="mini" style="margin-top:4px">TVL: $— • 15% capacity • Event: Inactive</div>
+            </div>
+
+            <div class="card" style="border-color:rgba(30,30,30,.5);background:linear-gradient(135deg,rgba(40,40,40,.15),rgba(0,0,0,.2));">
+              <h3 style="margin-top:0;color:#888">◆ Obsidian</h3>
+              <div class="mini">Maximum risk. Highest potential returns. SCAR continuity required (RETAINED+ tier).</div>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                <span class="pill">Min: $25</span><span class="pill">Max: $100</span><span class="pill">Est APR: 30-60%</span>
+                <span class="pill" style="background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.4)">Requires RETAINED+ tier</span>
+              </div>
+              <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:8%;background:rgba(100,100,100,.6)"></div></div>
+              <div class="mini" style="margin-top:4px">TVL: $— • 8% capacity • Gated</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Deposit Estimator -->
+          <h2>Deposit Estimator (Simulator)</h2>
+          <div class="notice warnNote" style="margin-bottom:10px">
+            <b>This is a simulator only.</b> No real deposits. Estimates based on disclosed pool parameters. Not a guarantee.
+          </div>
+          <div class="stack">
+            <div class="col-4">
+              <label class="mini">Pool</label>
+              <select id="estPool" style="width:100%">
+                <option value="dust">Dust (4-8% APR)</option>
+                <option value="dung">Dung (8-14% APR)</option>
+                <option value="flesh">Flesh (14-22% APR)</option>
+                <option value="bloodmoon">BloodMoon (20-40% APR)</option>
+                <option value="obsidian">Obsidian (30-60% APR)</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <label class="mini">Deposit ($)</label>
+              <input id="estAmount" type="number" min="10" max="100" value="25" />
+            </div>
+            <div class="col-4">
+              <label class="mini">Duration (days)</label>
+              <input id="estDays" type="number" min="1" max="365" value="30" />
+            </div>
+          </div>
+          <div class="notice goodNote" style="margin-top:10px" id="estResult">
+            Select a pool and amount to see estimated returns.
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Anunnaki Vault -->
+          <h2>Anunnaki Treasury Vault</h2>
+          <div class="notice">
+            Vault progression is funded by the platform treasury (not pool circulation). Crack stages raise ceilings and unlock permanent platform-wide rate tiers at Gate 2.0.
+          </div>
+          <div class="progressWrap" style="margin-top:10px">
+            <div class="progressTop">
+              <div><b>Vault Progress</b><div class="mini">Irreversible crack stages → permanent unlocks</div></div>
+              <div class="badge" id="vaultBadge" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-weight:700;">12%</div>
+            </div>
+            <div class="progressBar" style="height:20px;border-radius:10px;background:rgba(12,12,16,.8)">
+              <div class="progressFill" id="poolVaultFill" style="width:12%;background:linear-gradient(90deg,rgba(255,60,85,.92),rgba(255,120,80,.92));border-radius:10px;"></div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- SENTINEL Health -->
+          <h2>SENTINEL Status</h2>
+          <div id="sentinelStatus" class="notice goodNote">
+            Loading SENTINEL status...
+          </div>
+        </div>
+
+        <div class="card col-4" id="poolsRail">
+          <div id="ad-pools-rail" class="ad-container" data-placement="rail" data-page="pools" style="min-height: 600px; max-height: 600px;"></div>
+          <p class="mini">Desktop rail - hidden on mobile</p>
+        </div>
+
+        <div class="card col-12"><div id="ad-pools-tall" class="ad-container" data-placement="tall" data-page="pools" style="min-height: 600px; max-height: 600px;"></div></div>
       </div>
     </section>
   </section>
@@ -2396,7 +2538,7 @@ function setRail(id){
   if(!el) return;
   el.style.display = (device==="desktop" && CFG.enableDesktopRails) ? "block" : "none";
 }
-["homeRail","createRail","manageRail","docsRail","vallisRail","adminRail"].forEach(setRail);
+["homeRail","createRail","manageRail","docsRail","vallisRail","poolsRail","adminRail"].forEach(setRail);
 
 /* ===== Home step UI + actions ===== */
 const HEAD = ["No signup.", "Fast page.", "Done."];
@@ -5023,6 +5165,88 @@ function captureFullPageScreenshot() {
 window.captureFullPageScreenshot = captureFullPageScreenshot;
 </script>
 <!-- ===== /Screenshot Functionality ===== -->
+
+<!-- ===== Pools Page Logic ===== -->
+<script>
+(function(){
+  var POOLS = {
+    dust:      { minAPR: 4, maxAPR: 8 },
+    dung:      { minAPR: 8, maxAPR: 14 },
+    flesh:     { minAPR: 14, maxAPR: 22 },
+    bloodmoon: { minAPR: 20, maxAPR: 40 },
+    obsidian:  { minAPR: 30, maxAPR: 60 },
+  };
+
+  function updateEstimator(){
+    var pool = document.getElementById('estPool');
+    var amount = document.getElementById('estAmount');
+    var days = document.getElementById('estDays');
+    var result = document.getElementById('estResult');
+    if(!pool||!amount||!days||!result) return;
+    var p = POOLS[pool.value];
+    if(!p) return;
+    var a = parseFloat(amount.value) || 25;
+    var d = parseInt(days.value) || 30;
+    var minReturn = a * (p.minAPR / 100) * (d / 365);
+    var maxReturn = a * (p.maxAPR / 100) * (d / 365);
+    var scarMult = window.SCAR ? window.SCAR.getCombinedMultiplier() : 1.0;
+    result.innerHTML = '<b>Estimated return:</b> $' + (minReturn * scarMult).toFixed(2) + ' – $' + (maxReturn * scarMult).toFixed(2) +
+      ' on $' + a.toFixed(0) + ' over ' + d + ' days' +
+      '<br><span style="opacity:.7">SCAR multiplier: ' + scarMult.toFixed(2) + 'x • Pool: ' + pool.value +
+      ' (' + p.minAPR + '-' + p.maxAPR + '% APR)</span>';
+  }
+
+  function updateScarStatus(){
+    var el = document.getElementById('scarStatus');
+    if(!el || !window.SCAR) return;
+    var s = window.SCAR.getStatus();
+    el.innerHTML = 'Personal: <b>' + s.personal + '</b> • Global: <b>' + s.global + '</b> • Sealed: <b>' + s.sealed +
+      '</b> • Combined: <b>' + s.combined + '</b><br>Streak: <b>' + s.streak + '</b> (best: ' + s.longestStreak +
+      ') • Hearts: <b>' + s.hearts + '</b> • Fatigue: ' + s.fatigue + ' • Days: ' + s.totalDays;
+  }
+
+  function updateSentinelStatus(){
+    var el = document.getElementById('sentinelStatus');
+    if(!el || !window.SENTINEL) return;
+    var s = window.SENTINEL.getStatus();
+    if(s.paused){
+      el.className = 'notice warnNote';
+      el.innerHTML = '⚠️ <b>EMERGENCY PAUSE ACTIVE</b> — Ad serving disabled by admin.';
+    } else if(s.healthy){
+      el.className = 'notice goodNote';
+      el.innerHTML = '✅ <b>All Systems Healthy</b> • IVT: ' + s.ivtScore + ' (' + s.ivtRisk + ') • Flags: ' + s.flags + ' • Audit: ' + s.auditEntries + ' entries';
+    } else {
+      el.className = 'notice warnNote';
+      el.innerHTML = '⚠️ <b>Issues Detected</b> • IVT: ' + s.ivtScore + ' (' + s.ivtRisk + ') • Flags: ' + s.flags;
+    }
+  }
+
+  // Wire estimator inputs
+  ['estPool','estAmount','estDays'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('input', updateEstimator);
+  });
+
+  // Update on pools page show
+  var origShow = window.showPage;
+  if(origShow){
+    var _prev = origShow;
+    // Don't re-wrap if already wrapped for pools
+    if(!window.__poolsHooked){
+      window.__poolsHooked = true;
+      window.showPage = function(name){
+        var r = _prev(name);
+        if(name === 'pools'){
+          setTimeout(function(){ updateEstimator(); updateScarStatus(); updateSentinelStatus(); }, 50);
+        }
+        return r;
+      };
+    }
+  }
+  // Initial
+  setTimeout(function(){ updateEstimator(); updateScarStatus(); updateSentinelStatus(); }, 500);
+})();
+</script>
 
 </body>
 </html>

@@ -26,7 +26,7 @@ const AD_CONFIG = {
   adsense: {
     client: 'ca-pub-5584590642779290', // Your AdSense publisher ID
     enabled: true,
-    autoAds: true // Auto-format ads enabled (fills without specific slot IDs)
+    autoAds: false // Manual placement only — custom tracking system
   },
   
   prebid: {

@@ -173,6 +173,30 @@
     };
   }
 
+  // ---- Track ad impressions (mirrors ADMENSION markAd system) ----
+  function trackImpression(slot){
+    try{
+      var page = location.pathname.split('/').pop().replace('.html','') || 'index';
+      var sid = localStorage.getItem('cfamm.sid') || 'unknown';
+      var device = window.innerWidth < 980 ? 'mobile' : 'desktop';
+      // Use validator if available (shared with ADMENSION SPA)
+      if(window.ADMENSION_AD_VALIDATOR){
+        window.ADMENSION_AD_VALIDATOR.logAd(slot, page, sid, device, {}, document.referrer);
+      } else {
+        // Fallback: log to localStorage
+        var ads = JSON.parse(localStorage.getItem('cfamm.ads') || '[]');
+        ads.push({ t: Date.now(), slot: slot, page: page, device: device, step: 1 });
+        localStorage.setItem('cfamm.ads', JSON.stringify(ads));
+      }
+    }catch(e){}
+  }
+  // Track all placements we just created
+  trackImpression('vallis_anchor');
+  if(isDesktop){
+    trackImpression('vallis_side_left');
+    trackImpression('vallis_side_right');
+  }
+
   // ---- Load shared EVE chatbot on every VALLIS/wiki page ----
   try{
     if (!window.__ADMENSION_EVE_LOADED) {

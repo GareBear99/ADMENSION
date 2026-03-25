@@ -2493,11 +2493,25 @@ function showPage(name){
   
   document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("active", a.dataset.page===name));
   if(pillPage) pillPage.textContent = `page=${name}`;
-  // ad view marks for the route (user intent)
+  // ad view marks for the route (user intent) — every placement tracked
   markAd("anchor");
   markAd(`${name}_top_banner`);
   markAd(`${name}_incontent`);
+  markAd(`${name}_tall`);
+  markAd(`${name}_footer`);
+  if(device==="desktop" && CFG.enableDesktopRails){
+    markAd(`${name}_desktop_rail`);
+    markAd(`${name}_side_left`);
+    markAd(`${name}_side_right`);
+  }
   if(device==="desktop" && CFG.enableDesktopRails) markAd(`${name}_desktop_rail`);
+  // Side stickies (desktop only)
+  if(device==="desktop"){
+    markAd(`${name}_side_left`);
+    markAd(`${name}_side_right`);
+  }
+  // Tall in-content placements
+  markAd(`${name}_tall`);
   // route pageview event
   logEvent("route",{to:name});
   // engagement system tracking

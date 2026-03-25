@@ -33,8 +33,8 @@
   };
 
   // When true, use auto-format <ins> elements even without slot IDs.
-  // AdSense Auto Ads will fill these once the site is approved.
-  const USE_AUTO_FORMAT_FALLBACK = true;
+  // Set to false to use original placeholder + tracking system.
+  const USE_AUTO_FORMAT_FALLBACK = false;
 
   // ============================================================
   // AD CONTAINER MAP — Every placement on the site

@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en" class="theme-ritual">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OMEN — Neon Glyph Oracle</title>
+  <meta name="description" content="OMEN: neon glyph oracle mini-game with daily unique hash IDs, donate-for-spin perk, and pool-safe quotes. Theme-first docs shell." />
+  <link rel="stylesheet" href="omen.css" />
+</head>
+<body>
+  <!-- Effects layer: ALWAYS behind content, NEVER blocks clicks -->
+  <div id="fx-root" aria-hidden="true">
+    <canvas id="fx-grid"></canvas>
+    <canvas id="fx-runes"></canvas>
+    <div id="fx-orbs"></div>
+    <div id="fx-pulses"></div>
+    <div id="fx-spotlight"></div>
+    <div id="fx-glyphs"></div>
+    <div id="fx-grain"></div>
+    <div id="fx-vignette"></div>
+  </div>
+
+  <!-- Site content -->
+  <div id="site-root">
+    <header class="topbar">
+      <div class="brand">
+        <div class="sigil">𒀭</div>
+        <div class="brandText">
+          <div class="brandName">OMEN</div>
+          <div class="brandTag">glyph oracle • docs + theme shell</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="#how">How</a>
+        <a href="#glyphs">Glyphs</a>
+        <a href="#tester">Oracle</a>
+        <a href="#fair">Daily IDs</a>
+        <a href="#donate">Donate</a>
+      </nav>
+
+      <div class="topbarRight">
+        <div class="themePicker" title="Theme">
+          <span class="themeLabel">Theme</span>
+          <select id="themeSelect" aria-label="Theme selector">
+            <option value="ritual" selected>Ritual</option>
+            <option value="orbs">Orbs</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="orbFrame hero">
+        <div class="heroGlow" aria-hidden="true"></div>
+        <div class="heroGrid">
+          <div>
+            <h1>Spin a glyph. Receive an omen.</h1>
+            <p class="lead">
+              OMEN is our occult mini-game that feels like a neon ritual: a <b>glyph wheel</b> that outputs a deterministic result,
+              with <b>daily unique IDs</b> to prevent abuse, and donation perks that remain auditable.
+            </p>
+
+            <div class="ctaRow">
+              <a class="btn primary" href="#tester">Open Oracle</a>
+              <a class="btn" href="#fair">Daily ID rules</a>
+              <a class="btn ghost" href="#glyphs">View Glyphs</a>
+            </div>
+
+            <div class="heroBadges">
+              <span class="badge">Pool-safe quotes</span>
+              <span class="badge">Daily activation</span>
+              <span class="badge">Client ID + wallet link</span>
+              <span class="badge">Receipts-ready</span>
+            </div>
+          </div>
+
+          <div class="orbFrame heroCard windowDriftTarget">
+            <div class="heroCardTop">
+              <div class="heroMiniTitle">Quick omen preview</div>
+              <div class="heroMiniSub">what users see before spinning</div>
+            </div>
+            <div class="quotePreview">
+              <div class="qRow"><span>Glyph</span><b id="heroGlyph">WIND</b></div>
+              <div class="qRow"><span>Pool tier</span><b id="heroPool">BloodMoon</b></div>
+              <div class="qRow"><span>Daily status</span><b id="heroDaily">Ready</b></div>
+              <div class="qRow faint"><span>Receipt hash</span><b id="heroHash">…</b></div>
+            </div>
+            <div class="heroStamp">𒀭</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>𒀭</span></div>
+
+      <!-- HOW IT WORKS -->
+      <section id="how" class="section">
+        <h2>How it works</h2>
+        <p class="muted">
+          OMEN follows the same safety philosophy as CoinFlip: <b>quotes are explicit</b>, caps are strict,
+          and every action can produce a receipt hash. The “oracle” feeling comes from glyph art + theme effects —
+          the math stays transparent.
+        </p>
+
+        <div class="cardGrid">
+          <article class="orbFrame card windowDriftTarget">
+            <h3>Deterministic daily gate</h3>
+            <p>
+              Each wallet gets a <b>clientId</b> and a <b>daily activation</b>. The ID used for spins is a high-entropy hash
+              so collisions are practically impossible.
+            </p>
+            <pre class="code">dailyKey = SHA256(wallet + clientId + YYYYMMDD + salt)
+spinAllowed once/day per dailyKey</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Glyph wheel output</h3>
+            <p>
+              A spin reveals a glyph + omen text. (Later you can map glyphs to pool features, boosts, or “blessings”.)
+            </p>
+            <pre class="code">glyph ∈ {ASH, WIND, FLOOD, STONE, VOID}
+omen = deterministic pick from glyph’s message set</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Donation perk (auditable)</h3>
+            <p>
+              If someone donates, they can claim <b>1 free spin every 30 days</b> — tracked by wallet + clientId and logged.
+            </p>
+            <pre class="code">if donated: grant 1 spin / 30d
+grantKey = SHA256(wallet + clientId + monthWindow)</pre>
+          </article>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>𒀭</span></div>
+
+      <!-- GLYPHS -->
+      <section id="glyphs" class="section">
+        <h2>Glyph set</h2>
+        <p class="muted">Neon, backgroundless glyphs designed to match the CoinFlip ritual vibe.</p>
+
+        <div class="omenGrid">
+          <div class="omenGlyphCard orbFrame card windowDriftTarget">
+            <img src="assets/omen/glyphs/ash/256.png" alt="Ash glyph" />
+            <div class="omenGlyphMeta">
+              <b>ASH</b><span class="faint">— ignition / sacrifice</span>
+            </div>
+          </div>
+
+          <div class="omenGlyphCard orbFrame card windowDriftTarget">
+            <img src="assets/omen/glyphs/wind/256.png" alt="Wind glyph" />
+            <div class="omenGlyphMeta">
+              <b>WIND</b><span class="faint">— drift / unseen pressure</span>
+            </div>
+          </div>
+
+          <div class="omenGlyphCard orbFrame card windowDriftTarget">
+            <img src="assets/omen/glyphs/flood/256.png" alt="Flood glyph" />
+            <div class="omenGlyphMeta">
+              <b>FLOOD</b><span class="faint">— momentum / washout</span>
+            </div>
+          </div>
+
+          <div class="omenGlyphCard orbFrame card windowDriftTarget">
+            <img src="assets/omen/glyphs/stone/256.png" alt="Stone glyph" />
+            <div class="omenGlyphMeta">
+              <b>STONE</b><span class="faint">— defense / anchors</span>
+            </div>
+          </div>
+
+          <div class="omenGlyphCard orbFrame card windowDriftTarget">
+            <img src="assets/omen/glyphs/void/256.png" alt="Void glyph" />
+            <div class="omenGlyphMeta">
+              <b>VOID</b><span class="faint">— resets / silence</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>𒀭</span></div>
+
+      <!-- ORACLE TESTER -->
+      <section id="tester" class="section">
+        <h2>Oracle</h2>
+        <p class="muted">Theme-first tester: spins and ID gates run locally (calculation-only). Later you wire it to your receipts engine.</p>
+
+        <div class="testerShell">
+          <div class="testerLeft">
+            <div class="testerTitle">Spin</div>
+
+            <div class="orbFrame testerBlock windowDriftTarget" id="omenFlow">
+              <div class="flowHeader">
+                <div class="field">
+                  <label for="omenWallet">Linked wallet</label>
+                  <input id="omenWallet" placeholder="0x... (demo)" />
+                </div>
+                <div class="field">
+                  <label for="omenClientId">Client ID</label>
+                  <input id="omenClientId" placeholder="auto or paste" />
+                </div>
+              </div>
+
+              <div class="row">
+                <button class="btn primary" id="omenSpin">Spin glyph</button>
+                <button class="btn" id="omenCopyHash">Copy receipt hash</button>
+                <button class="btn ghost" id="omenReset">Reset</button>
+              </div>
+
+              <div class="note">
+                <div class="qRow"><span>Daily gate</span><b id="omenGate">Unknown</b></div>
+                <div class="qRow"><span>Glyph</span><b id="omenGlyph">—</b></div>
+                <div class="qRow"><span>Omen</span><b id="omenText">—</b></div>
+                <div class="qRow faint"><span>Receipt hash</span><b id="omenHash">—</b></div>
+              </div>
+
+              <div class="hint">
+                The daily gate is enforced per <b>wallet + clientId</b>. If you donate, you get <b>1 free spin per 30 days</b> (tracked the same way).
+              </div>
+            </div>
+          </div>
+
+          <div class="testerRight">
+            <div class="testerTitle">Rules</div>
+
+            <div class="orbFrame testerBlock parallaxTarget windowDriftTarget">
+              <div class="testerTitle2">Deterministic hash IDs</div>
+              <p class="muted small">
+                IDs are generated with SHA‑256 so duplicates are practically impossible. Same inputs → same output (auditable).
+              </p>
+              <pre class="code">dailyKey = SHA256(wallet + "|" + clientId + "|" + YYYYMMDD + "|" + salt)
+receipt = SHA256(dailyKey + "|" + glyph + "|" + nonce)</pre>
+            </div>
+
+            <div class="orbFrame testerBlock parallaxTarget windowDriftTarget" id="donate">
+              <div class="testerTitle2">Donate → 1 free spin / 30 days</div>
+              <p class="muted small">
+                Donation is optional and doesn’t hide the odds — it only grants a periodic free spin keyed to your identity.
+              </p>
+              <div class="row">
+                <button class="btn" id="omenDonate">Donate (demo)</button>
+                <button class="btn ghost" id="omenClaimFree">Claim free spin</button>
+              </div>
+              <div class="note">
+                <div class="qRow"><span>Donation status</span><b id="omenDonateStatus">Not donated</b></div>
+                <div class="qRow"><span>Next free spin</span><b id="omenNextFree">—</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>𒀭</span></div>
+
+      <!-- DAILY IDs -->
+      <section id="fair" class="section">
+        <h2>Daily unique IDs</h2>
+        <p class="muted">
+          The core anti-abuse mechanic: every spin is tied to a daily key derived from wallet + clientId.
+          The UI can show the receipt hash; your backend can store it immutably.
+        </p>
+        <div class="cardGrid">
+          <article class="card orbFrame windowDriftTarget">
+            <h3>What makes duplicates “practically impossible”</h3>
+            <p class="muted">
+              SHA-256 outputs 256-bit values. Two different inputs producing the same output (a collision) is so unlikely
+              it’s effectively zero for any real-world scale.
+            </p>
+          </article>
+          <article class="card orbFrame windowDriftTarget">
+            <h3>Client ID</h3>
+            <p class="muted">
+              Client ID is a stable identifier per wallet + device/session. It prevents edge cases where multiple browsers
+              would otherwise share the same daily key.
+            </p>
+          </article>
+          <article class="card orbFrame windowDriftTarget">
+            <h3>Receipt logging</h3>
+            <p class="muted">
+              Receipt hashes make “I got rugged” claims falsifiable: every spin can be reproduced from the inputs.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="runeDivider"><span>𒀭</span></div>
+        <p class="muted small">
+          OMEN is theme-first. Quotes, pool adapters, and receipts will plug in next. Effects are toggleable and performance-safe.
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Controls cluster (bottom-right) -->
+  <div class="controls" aria-hidden="false">
+    <button class="ctlBtn" id="ctlReduceMotion" title="Reduce motion">☾</button>
+    <button class="ctlBtn" id="ctlTheme" title="Toggle theme">⟡</button>
+    <button class="ctlBtn" id="ctlSettings" title="Settings">⚙</button>
+  </div>
+
+  <!-- Settings panel -->
+  <div class="ctlPanel" id="ctlPanel" aria-hidden="true">
+    <div class="ctlHeader">
+      <div>
+        <div class="ctlTitle">Effects</div>
+        <div class="ctlSub">Toggle visuals (safe defaults)</div>
+      </div>
+      <button class="ctlClose" id="ctlClose" title="Close">✕</button>
+    </div>
+
+    <div class="ctlRow">
+      <span>Dots</span>
+      <label class="switch"><input id="fxDots" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Runes</span>
+      <label class="switch"><input id="fxRunes" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Grain</span>
+      <label class="switch"><input id="fxGrain" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Vignette</span>
+      <label class="switch"><input id="fxVignette" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Reveal</span>
+      <label class="switch"><input id="fxReveal" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+
+    <div class="ctlRow">
+      <span>Orbs</span>
+      <label class="switch"><input id="fxOrbs" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Orb motion</span>
+      <label class="switch"><input id="fxOrbMotion" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Orb interaction</span>
+      <label class="switch"><input id="fxOrbInteract" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Card float</span>
+      <label class="switch"><input id="fxCardFloat" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Click pulse</span>
+      <label class="switch"><input id="fxClickPulse" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Spotlight</span>
+      <label class="switch"><input id="fxSpotlight" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Parallax</span>
+      <label class="switch"><input id="fxParallax" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+    <div class="ctlRow">
+      <span>Glyph drift</span>
+      <label class="switch"><input id="fxGlyphs" type="checkbox" checked><span class="slider"></span></label>
+    </div>
+
+    <div class="ctlRow">
+      <span>Density</span>
+      <select id="fxDensity">
+        <option value="low">Low</option>
+        <option value="med" selected>Med</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+
+    <div class="ctlRow">
+      <span>Debug</span>
+      <label class="switch"><input id="fxDebug" type="checkbox"><span class="slider"></span></label>
+    </div>
+
+    <div class="ctlRow">
+      <button class="btn" id="fxReset">Reset FX</button>
+    </div>
+
+    <pre id="fxDebugOut"></pre>
+  </div>
+
+  <script src="omen.js"></script>
+</body>
+</html>

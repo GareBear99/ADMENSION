@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en" class="theme-ritual">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CoinFlip — Cult UI Theme Shell</title>
+  <meta name="description" content="CoinFlip: a disclosed-odds coin flip that shows fees, caps, and receipts. Theme shell with effects + settings." />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <!-- Effects layer: ALWAYS behind content, NEVER blocks clicks -->
+  <div id="fx-root" aria-hidden="true">
+    <canvas id="fx-grid"></canvas>
+    <canvas id="fx-runes"></canvas>
+    <div id="fx-orbs"></div>
+    <div id="fx-pulses"></div>
+    <div id="fx-spotlight"></div>
+    <div id="fx-glyphs"></div>
+    <div id="fx-grain"></div>
+    <div id="fx-vignette"></div>
+  </div>
+
+  <!-- Site content -->
+  <div id="site-root">
+    <header class="topbar">
+      <div class="brand">
+        <div class="sigil">⛧</div>
+        <div class="brandText">
+          <div class="brandName">CoinFlip</div>
+          <div class="brandTag">docs + theme shell</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#how">How</a>
+        <a href="#tester">Tester</a>
+        <a href="#safety">Safety</a>
+        <a href="#fair">Provably Fair</a>
+        <a href="#cli">CLI</a>
+      </nav>
+
+<div class="topbarRight">
+  <a class="btn ghost" href="../../homepage.html" title="Back to VALLIS">VALLIS Home</a>
+  <div class="themePicker" title="Theme">
+    <span class="themeLabel">Theme</span>
+    <select id="themeSelect" aria-label="Theme selector">
+      <option value="ritual" selected>Ritual</option>
+      <option value="orbs">Orbs</option>
+    </select>
+  </div>
+</div>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="orbFrame hero">
+        <div class="heroGlow" aria-hidden="true"></div>
+        <div class="heroGrid">
+          <div>
+            <h1>A coin‑flip game that never lies about payouts.</h1>
+            <p class="lead">
+              This is a <b>theme-first</b> shippable docs shell inspired by that “cute‑but‑dark occult” vibe.
+              Effects are modular, toggleable, and performance-safe. Logic comes later.
+            </p>
+
+            <div class="ctaRow">
+              <a class="btn primary" href="#tester">Open Live Tester</a>
+              <a class="btn" href="#cli">View CLI Commands</a>
+              <a class="btn ghost" href="#fair">Provably Fair</a>
+            </div>
+
+            <div class="heroBadges">
+              <span class="badge">Disclosed odds</span>
+              <span class="badge">Fee transparency</span>
+              <span class="badge">Hard caps (α)</span>
+              <span class="badge">Receipts-ready</span>
+            </div>
+          </div>
+
+          <div class="orbFrame heroCard windowDriftTarget">
+            <div class="heroCardTop">
+              <div class="heroMiniTitle">Quick quote preview</div>
+              <div class="heroMiniSub">what users see before flipping</div>
+            </div>
+            <div class="quotePreview">
+              <div class="qRow"><span>Bet</span><b>$5.00</b></div>
+              <div class="qRow"><span>Fee (1.00%)</span><b>$0.05</b></div>
+              <div class="qRow"><span>Win return</span><b>$9.70</b></div>
+              <div class="qRow"><span>Player win chance</span><b>47.00%</b></div>
+              <div class="qRow faint"><span>Pool cap (α)</span><b>0.25%</b></div>
+            </div>
+            <div class="heroStamp">⛧</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>⛧</span></div>
+
+      <!-- HOW IT WORKS -->
+      <section id="how" class="section">
+        <h2>How it works</h2>
+        <p class="muted">
+          CoinFlip is designed around <b>explicit bias + explicit fees</b>, plus hard exposure caps so the pool can’t be drained in one streak.
+          This page is theme-first; the terminal bot + pool adapters plug in next.
+        </p>
+
+        <div class="cardGrid">
+          <article class="orbFrame card windowDriftTarget">
+            <h3>Pool‑adapter first</h3>
+            <p>
+              Your bot reads liquidity, fee rate, edge, and max payout fraction from a pool adapter.
+              Today it can be mock data; later you swap in on‑chain or backend adapters.
+            </p>
+            <pre class="code">getPoolInfo() → liquidity, fees, edge, caps
+safe max bet auto‑calculated from pool liquidity
+quotes always computed the same way</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>User‑facing transparency</h3>
+            <p>
+              Before any flip, users see: fee, bet-after-fee, win return, win profit, loss on lose, and safety locks.
+              The UI never hides the math.
+            </p>
+            <pre class="code">bet = user wager (1 / 5 / 10)
+fee = bet × feeRate
+betAfterFee = bet − fee
+winProfit = betAfterFee × m
+winReturn = betAfterFee + winProfit
+loseLoss = bet</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Pool safety caps</h3>
+            <p>
+              Let <b>L</b> be pool liquidity and <b>α</b> be max payout fraction. Then max payout is:
+            </p>
+            <pre class="code">maxPayout = L × α
+maxBet = maxPayout / ((1−feeRate) × (1+m))</pre>
+            <p class="muted small">The “safe ladder” can also require liquidity for N consecutive wins (optional strict mode).</p>
+          </article>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>⛧</span></div>
+
+      <!-- LIVE TESTER PLACEHOLDER (THEME ONLY) -->
+      <section id="tester" class="section">
+        <h2>Live tester</h2>
+        <p class="muted">
+          This live tester runs <b>locally</b> using preset pool profiles + disclosed odds. Later you’ll wire the same UI to your
+          pool adapter + receipts engine — but the quote math and safety gating remain identical.
+        </p>
+
+        <div class="testerShell">
+          <div class="testerLeft">
+            <div class="testerTitle">Simple flow</div>
+
+            <!-- ONE bubble owns the whole "flip" flow: pool select → bet/side → probability/return → flip -->
+            <div class="orbFrame testerBlock windowDriftTarget" id="flowCard">
+              <div class="flowHeader">
+                <div class="field">
+                  <label for="poolSelect">Pool / coin</label>
+                  <select id="poolSelect" aria-label="Select pool"></select>
+<div class="miniLine" id="detectedTokenLine">Detected: <span id="detectedToken">N/A</span> • Volatility: <span id="detectedVol">N/A</span> • TVL: <span id="detectedTVL">N/A</span></div>
+                </div>
+                <div class="miniStats">
+                  <div class="miniStat"><span>TVL</span> <strong id="poolTVL">N/A</strong></div>
+                  <div class="miniStat"><span>Safe max bet</span> <strong id="poolSafeMaxBet">N/A</strong></div>
+                </div>
+              </div>
+
+              <div class="flowGrid">
+                <div class="flowCol">
+                  <div class="label">Starting balance</div>
+                  <div class="row">
+                    <input id="startBalance" class="startInput" type="number" min="0" step="0.01" value="50" aria-label="Starting balance in USD" />
+                  </div>
+
+                  <div class="label">Choose bet</div>
+                  <div class="row">
+                    <button class="chip betBtn active" data-bet="1">$1</button>
+                    <button class="chip betBtn" data-bet="5">$5</button>
+                    <button class="chip betBtn" data-bet="10">$10</button>
+                  </div>
+
+                  <div class="label">Pick side</div>
+                  <div class="row">
+                    <button class="chip sideBtn active" data-side="heads">Heads</button>
+                    <button class="chip sideBtn" data-side="tails">Tails</button>
+                  </div>
+                </div>
+
+                <div class="flowCol">
+                  <div class="label">Win chance ↔ reward</div>
+                  <div class="twoWay">
+                    <div class="rangeRow">
+                      <span class="rangeLab">Win %</span>
+                      <input id="pSlider" type="range" min="0.35" max="0.47" step="0.001" value="0.47" />
+                      <input id="pInput" class="miniInput" type="number" min="35" max="47" step="0.1" value="47" />
+                    </div>
+                    <div class="rangeRow">
+                      <span class="rangeLab">Profit ×</span>
+                      <input id="mSlider" type="range" min="0.10" max="1.60" step="0.01" value="1.00" />
+                      <input id="mInput" class="miniInput" type="number" min="0.10" max="1.60" step="0.01" value="1.00" />
+                    </div>
+                    <div class="hint" id="twoWayHint">
+                      Higher win% lowers profit× (and vice‑versa) to keep the house edge stable.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row flipRow">
+                <button class="btn primary wide" id="btnFlip" type="button" disabled>Flip coin</button>
+                <button class="btn" id="btnQuote" type="button" disabled>Quote</button>
+                <button class="btn danger" id="btnReset" type="button">Reset</button>
+              </div>
+
+              <div class="hint" id="betGateHint">Select a pool to unlock flip presets.</div>
+
+              <div class="mini" id="runStats">
+                <div class="miniRow"><span>Player balance</span><b id="balanceNow">$0.00</b></div>
+                <div class="miniRow"><span>Total flips</span><b id="flipsCount">0</b></div>
+                <div class="miniRow"><span>Wins</span><b id="winsCount">0</b></div>
+                <div class="miniRow"><span>Losses</span><b id="lossesCount">0</b></div>
+              </div>
+            </div>
+
+            <div class="testerBlock orbFrame windowDriftTarget">
+              </div>
+          </div>
+
+          <div class="testerRight">
+            <div class="testerTitle">Balance graph</div>
+            <div class="orbFrame chartPh">
+              <canvas id="balanceChart" width="820" height="280" aria-label="Balance chart" role="img"></canvas>
+              <div class="chartCaption">Each flip appends a point. Wins are marked above the line, losses below.</div>
+            </div>
+
+            <div class="testerBlock orbFrame windowDriftTarget">
+              <div class="testerTitle2">Receipts</div>
+              <pre class="code small" id="receiptOut">Select a pool, then press Quote / Flip.</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>⛧</span></div>
+
+      <!-- SAFETY -->
+      <section id="safety" class="section">
+        <h2>Safety + solvency</h2>
+        <p class="muted">
+          The pool can’t be allowed to die. The bot uses hard caps + circuit breakers + conservative solvency checks.
+        </p>
+
+        <div class="cardGrid">
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Safe ladder</h3>
+            <p>
+              The UI offers $1/$5/$10, but the bot enforces what’s actually safe.
+              If liquidity drops, higher bets lock automatically.
+            </p>
+            <pre class="code">enabled(bet) if:
+  winProfit ≤ L×α
+  AND poolBalance ≥ winProfit×(1+buffer)</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Streak reserve (optional)</h3>
+            <p>
+              If you want extra safety, require enough liquidity to survive <b>N consecutive player wins</b> before enabling a bet.
+            </p>
+            <pre class="code">need = N × winProfit × (1+buffer)
+poolBalance must exceed need</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Circuit breakers</h3>
+            <p>
+              Pause flips if adapter fails, liquidity drops too fast, oracle is stale, or proof receipts fail verification.
+            </p>
+            <pre class="code">pause if:
+  adapter_error
+  pool_drop_rate > threshold
+  oracle_stale
+  receipts_invalid</pre>
+          </article>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>⛧</span></div>
+
+      <!-- PROVABLY FAIR -->
+      <section id="fair" class="section">
+        <h2>Provably fair (commit → reveal)</h2>
+        <p class="muted">
+          Proof prevents hidden manipulation of outcomes. Bias is intentional and disclosed; randomness is verifiable.
+        </p>
+
+        <div class="cardGrid">
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Commitment</h3>
+            <p>Server generates a secret seed, publishes its hash before flips start.</p>
+            <pre class="code">commit = SHA256(serverSeed)
+publish(commit)</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Reveal</h3>
+            <p>After an epoch closes, server reveals the seed. Anyone verifies the hash matches.</p>
+            <pre class="code">verify SHA256(serverSeed) == commit</pre>
+          </article>
+
+          <article class="card orbFrame parallaxTarget windowDriftTarget">
+            <h3>Outcome (demo rule)</h3>
+            <p>Use HMAC of serverSeed and clientSeed+nonce, parity determines Heads/Tails.</p>
+            <pre class="code">digest = HMAC_SHA256(serverSeed, `${clientSeed}:${nonce}`)
+firstByte = hexToByte(digest[0..1])
+outcome = (firstByte % 2 == 0) ? heads : tails</pre>
+          </article>
+        </div>
+      </section>
+
+      <div class="runeDivider"><span>⛧</span></div>
+
+      <!-- CLI -->
+      <section id="cli" class="section">
+        <h2>CLI usage (terminal bot)</h2>
+        <p class="muted">
+          Reference commands. Your shipped terminal bot should mirror these behaviors.
+        </p>
+
+        <div class="card orbFrame parallaxTarget windowDriftTarget">
+          <h3>Commands</h3>
+          <pre class="code">coinflip status
+coinflip quote --bet 1  --side heads
+coinflip quote --bet 5  --side tails
+coinflip flip  --bet 10 --side heads --client-seed "myseed"
+coinflip reveal</pre>
+
+          <div class="note">
+            <b>Quote output should always show:</b> bet, fee, bet-after-fee, win return/profit, lose loss,
+            pool liquidity, α cap, safe max bet, and disclosed win probability.
+          </div>
+        </div>
+      </section>
+
+      <footer class="orbFrame footer">
+        <div class="footerSigil">⛧</div>
+        <div class="footerText">
+          <div class="footerTitle">CoinFlip Documentation</div>
+          <div class="footerSub">Theme shell. Effects are toggleable. Logic + pool adapters connect next.</div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Controls cluster: ALWAYS visible -->
+  <div class="controls" role="dialog" aria-label="Effects controls">
+    <button class="ctlBtn" id="ctlSettings" title="Effects settings">⚙️</button>
+    <button class="ctlBtn" id="ctlReduceMotion" title="Reduce motion">🫧</button>
+    <button class="ctlBtn" id="ctlTheme" title="Toggle theme">🌓</button>
+  </div>
+
+  <!-- Dropdown panel -->
+  <div class="panel windowDriftTarget" id="ctlPanel" aria-hidden="true">
+  <div class="panelTitle">Effects</div>
+
+  <div class="toggleRow"><span>Particles (dot grid)</span><label class="switch"><input type="checkbox" id="fxDots" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Rune drift</span><label class="switch"><input type="checkbox" id="fxRunes" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Grain overlay</span><label class="switch"><input type="checkbox" id="fxGrain" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Vignette</span><label class="switch"><input type="checkbox" id="fxVignette" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Vignette strength</span><input id="fxVignetteStrength" type="range" min="0" max="100" value="58" /></div>
+
+  <div class="toggleRow"><span>Scroll reveals</span><label class="switch"><input type="checkbox" id="fxReveal" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Orbs background</span><label class="switch"><input type="checkbox" id="fxOrbs" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Orb motion</span><label class="switch"><input type="checkbox" id="fxOrbMotion" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Orb interaction</span><label class="switch"><input type="checkbox" id="fxOrbInteract" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Click pulses</span><label class="switch"><input type="checkbox" id="fxClickPulse" checked><span class="slider"></span></label></div>
+
+  <div class="toggleRow"><span>Card bubble float</span><label class="switch"><input type="checkbox" id="fxCardFloat" checked><span class="slider"></span></label></div>
+  <div class="toggleRow"><span>Window drift (hover)</span><label class="switch"><input type="checkbox" id="fxWindowDrift" checked><span class="slider"></span></label></div>
+
+  <div class="panelDivider"></div>
+  <div class="panelTitle small">Performance</div>
+
+  <div class="toggleRow"><span>Dot density</span>
+    <select id="fxDensity">
+      <option value="low">Low</option>
+      <option value="med" selected>Med</option>
+      <option value="high">High</option>
+    </select>
+  </div>
+
+  <div class="toggleRow"><span>Validator</span><label class="switch"><input type="checkbox" id="fxDebug"><span class="slider"></span></label></div>
+  <div class="debugBox" id="fxDebugOut">validator: off</div>
+
+  <div class="panelDivider"></div>
+  <button class="btn small" id="fxReset">Reset effects</button>
+</div>
+
+
+  <script src="assets/js/app.js"></script>
+<div id="toast" aria-live="polite"></div>
+</body>
+</html>

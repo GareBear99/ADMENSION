@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Theme Selector • Pool Games</title>
+  <link rel="stylesheet" href="theme-selector.css"/>
+</head>
+
+<body class="theme-none hover-glows ritual-v1">
+  <!-- FX ROOT (fixed, pointer-events none) -->
+  <div id="fx-root" aria-hidden="true">
+    <!-- Theme visuals -->
+    <canvas id="fx-grid"></canvas>
+    <canvas id="fx-runes"></canvas>
+    <div id="fx-orbs"></div>
+    <div id="fx-grain"></div>
+
+    <!-- Universal interactions -->
+    <div id="fx-pulses"></div>
+    <div id="fx-spotlight"></div>
+    <div id="fx-vignette"></div>
+  </div>
+
+  <!-- SITE ROOT -->
+  <div id="site-root">
+    <header class="topbar">
+      <div class="brand">
+        <div class="sigil">⟡</div>
+        <div>
+          <div class="brandTitle">Liquidity Pool Games</div>
+          <div class="brandSub">Universal Theme System</div>
+        </div>
+      </div>
+
+      <div class="topbarRight">
+        <div class="pill">
+          <span class="miniLabel">Active Theme</span>
+          <span id="activeThemeLabel" class="pillValue">No Theme</span>
+        </div>
+
+        <div class="actions">
+          <button class="btn ghost" id="resetDefaults">Reset</button>
+          <button class="btn ghost" id="exportTheme">Export JSON</button>
+          <button class="btn primary" id="applyThemeBtn">Apply</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="grid">
+        <!-- LEFT: Theme cards -->
+        <section class="card floatable driftable">
+          <div class="panelTitle">Choose Theme</div>
+          <div class="hint">No Theme = Universal Theme Settings (platform baseline) (visuals off). Ritual = CoinFlip ritual visuals. Universal interactions (pulse + spotlight/vignette + nested hover glows) apply in BOTH.</div>
+
+          <div class="themeCards">
+            <label class="themeCard" data-theme="none">
+              <input type="radio" name="theme" value="none" checked />
+              <div class="themeCardInner">
+                <div class="themeNameRow">
+                  <div class="themeName">No Theme</div>
+                  <div class="badge ok" data-active-badge>ACTIVE</div>
+                </div>
+                <div class="themeDesc">Universal theme settings only. (Temp: uses the same background layer as Orbs until a true blank skin is shipped.)</div>
+                <div class="themeMeta">
+                  <span class="chip">Baseline: Universal</span>
+                  <span class="chip">Visual: None</span>
+                </div>
+              
+              <div class="variantRow" aria-label="No Theme variants">
+                <div class="miniLabel" style="margin-bottom:6px;">No Theme variant</div>
+                <div class="seg">
+                  <label><input type="radio" name="noThemeVariant" value="v1" checked><span>No Theme v1</span></label>
+                  <label><input type="radio" name="noThemeVariant" value="v2"><span>No Theme v2 (Dark)</span></label>
+                </div>
+              </div>
+
+              </div>
+            </label>
+
+            <label class="themeCard" data-theme="ritual">
+              <input type="radio" name="theme" value="ritual" />
+              <div class="themeCardInner">
+                <div class="themeNameRow">
+                  <div class="themeName">Ritual</div>
+                  <div class="badge ok" data-active-badge></div>
+                </div>
+                <div class="themeDesc">Dot-grid + drifting runes. Orbs layer hidden.</div>
+                <div class="themeMeta">
+                  <span class="chip">Baseline: CoinFlip</span>
+                  <span class="chip">Visual: Ritual</span>
+                </div>
+              
+                <div class="variantRow" aria-label="Ritual variants">
+                  <div class="miniLabel" style="margin-bottom:6px;">Ritual variant</div>
+                  <div class="seg">
+                    <label><input type="radio" name="ritualVariant" value="v1" checked><span>Ritual v1</span></label>
+                    <label><input type="radio" name="ritualVariant" value="v2"><span>Ritual v2</span></label>
+                  </div>
+                </div>
+</div>
+            </label>
+
+            <label class="themeCard disabled" data-theme="third">
+              <input type="radio" name="theme" value="third" disabled />
+              <div class="themeCardInner">
+                <div class="themeNameRow">
+                  <div class="themeName">Theme 3</div>
+                  <div class="badge soon">RESERVED</div>
+                </div>
+                <div class="themeDesc">Hidden in production until shipped. Will inherit universal interactions.</div>
+                <div class="themeMeta">
+                  <span class="chip">Max: 3 themes</span>
+                  <span class="chip">Slot</span>
+                </div>
+              
+              <div class="variantRow" aria-label="Theme 3 variants">
+                <div class="miniLabel" style="margin-bottom:6px;">Theme 3 variant</div>
+                <div class="seg">
+                  <label><input type="radio" name="thirdVariant" value="v1" checked disabled><span>Theme 3 v1</span></label>
+                  <label><input type="radio" name="thirdVariant" value="v2" disabled><span>Theme 3 v2</span></label>
+                </div>
+              </div>
+
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- RIGHT: Live Preview -->
+        <section class="card floatable driftable">
+          <div class="panelTitle">Live Preview</div>
+          <div class="hint">Hover glows must apply to windows AND nested bubbles. Click anywhere for pulse (if enabled).</div>
+
+          <div class="preview">
+            <div class="previewRow">
+              <div class="previewCard">
+                <div class="miniLabel">Example Panel</div>
+                <div class="previewTitle">Pool Receipt Window</div>
+                <div class="previewText">Nested hover glows + theme visuals behind. Universals stay consistent across themes.</div>
+                <div class="bubbleRow">
+                  <div class="bubble">Inner Bubble</div>
+                  <div class="bubble">Nested Bubble</div>
+                  <div class="bubble">Another</div>
+                </div>
+                <div class="previewButtons">
+                  <button class="btn primary">Primary</button>
+                  <button class="btn ghost">Ghost</button>
+                  <button class="btn danger">Danger</button>
+                </div>
+              </div>
+
+              
+<div class="previewCard">
+  <div class="miniLabel">Theme Info</div>
+  <div class="hint">Visual themes only change the background layer. Universal settings apply to every theme.</div>
+  <div class="kv">
+    <div class="k">Active Theme</div>
+    <div class="v" id="previewActiveTheme">No Theme</div>
+  </div>
+  <div class="kv">
+    <div class="k">Ritual Variant</div>
+    <div class="v" id="previewRitualVariant">—</div>
+  </div>
+</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        
+
+<!-- FULL WIDTH: Theme Settings -->
+<section class="card span2 floatable driftable" id="themeSettingsCard">
+  <div class="panelTitle">Theme Settings</div>
+  <div class="hint">
+    These settings are the <b>platform-wide Theme Shell</b>. Themes only change visuals; universal interactions work in <b>No Theme</b> and <b>Ritual</b>.
+    Ritual also has its own <b>variant</b> selector below.
+  </div>
+
+  
+  <div class="settingsGroups">
+    <div class="groupHeader">
+      <div class="groupTitle">Universal Settings</div>
+      <div class="groupHint">Applies to <b>No Theme</b> and <b>Ritual</b> (and any future themes). Controls interactions, motion, and accessibility.</div>
+    </div>
+
+    <div class="settingsGrid">
+      <div class="settingsBlock">
+        <div class="miniLabel">Interactions</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optPulse" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Click Pulse</span>
+          </label>
+          <label class="toggle">
+            <input id="optSpotlight" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Spotlight</span>
+          </label>
+          <label class="toggle">
+            <input id="optVignette" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Vignette</span>
+          </label>
+          <label class="toggle">
+            <input id="optHover" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Hover Glows (Nested)</span>
+          </label>
+        </div>
+
+        <div class="miniLabel" style="margin-top:14px;">Vignette Strength</div>
+        <div class="rangeRow">
+          <input id="optVignetteStrength" type="range" min="0" max="100" value="60" />
+          <div class="rangeMeta"><span id="optVignetteStrengthVal">60%</span></div>
+        </div>
+
+        <div class="miniLabel" style="margin-top:14px;">Aesthetic</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optGrain" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Grain Overlay</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settingsBlock">
+        <div class="miniLabel">Motion</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optCardFloat" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Card Float</span>
+          </label>
+          <label class="toggle">
+            <input id="optWindowDrift" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Window Drift</span>
+          </label>
+        </div>
+
+        <div class="miniLabel" style="margin-top:14px;">Accessibility</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optReduceMotion" type="checkbox" />
+            <span class="track"></span>
+            <span class="toggleLabel">Reduce Motion</span>
+          </label>
+          <label class="toggle">
+            <input id="optReveal" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Reveal Animations</span>
+          </label>
+        </div>
+
+        <div class="miniLabel" style="margin-top:14px;">Debug</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optDebug" type="checkbox" />
+            <span class="track"></span>
+            <span class="toggleLabel">Show Debug Overlay</span>
+          </label>
+        </div>
+        <pre class="debugOut" id="debugOut" aria-live="polite"></pre>
+
+        <div class="btnRow" style="margin-top:12px;">
+          <button class="btn" id="btnResetFx" type="button">Reset Effects</button>
+        </div>
+      </div>
+    
+<div class="groupHeader noneOnly">
+  <div class="groupTitle">No Theme</div>
+  <div class="groupHint">Universal baseline mode. v1 = neutral baseline. v2 = darker DicerZ/DixTrix-style baseline (no orbs/runes; just deeper void + contrast).</div>
+</div>
+
+<div class="settingsGrid noneOnly">
+  <div class="settingsBlock">
+    <div class="miniLabel">No Theme Variant</div>
+    <div class="seg segWide" style="margin-top:10px;">
+      <label><input type="radio" name="noThemeVariant" value="v1" checked><span>No Theme v1</span></label>
+      <label><input type="radio" name="noThemeVariant" value="v2"><span>No Theme v2 (Dark)</span></label>
+    </div>
+    <div class="hint" style="margin-top:10px;">v2 is the “dark shell” used in DicerZ/DixTrix: higher contrast, deeper vignette, subtle grain bias — still theme-neutral.</div>
+  </div>
+
+  <div class="settingsBlock">
+    <div class="miniLabel">Notes</div>
+    <div class="hint">No Theme never enables Ritual runes or Orbs visuals. It only changes the baseline shell styling.</div>
+  </div>
+</div>
+
+</div>
+
+    <div class="groupHeader ritualOnly">
+      <div class="groupTitle">Ritual Settings</div>
+      <div class="groupHint"><b>Ritual-only</b> visuals (CoinFlip baseline). You can preselect even before switching to Ritual.</div>
+    </div>
+
+<div class="settingsGrid ritualOnly">
+      <div class="settingsBlock">
+        <div class="miniLabel">Ritual Visual Layers</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optDots" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Particles (Dot Grid)</span>
+          </label>
+          <label class="toggle">
+            <input id="optRunes" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Rune Drift</span>
+          </label>
+        </div>
+
+        <div class="miniLabel" style="margin-top:14px;">Density</div>
+        <div class="selectRow">
+          <select id="optDensity">
+            <option value="low">Low</option>
+            <option value="med" selected>Med</option>
+            <option value="high">High</option>
+          </select>
+          <div class="hint">Controls Ritual grid/runes intensity.</div>
+        </div>
+      </div>
+
+      <div class="settingsBlock">
+        <div class="miniLabel">Ritual Variant</div>
+        <div class="seg segWide" style="margin-top:10px;">
+          <label><input type="radio" name="ritualVariant" value="v1" checked><span>Ritual v1</span></label>
+          <label><input type="radio" name="ritualVariant" value="v2"><span>Ritual v2</span></label>
+        </div>
+
+        <div class="hint" style="margin-top:10px;">v2 is a hotter / more neon variant while keeping CoinFlip ritual identity.</div>
+      </div>
+    </div>
+
+    <div class="groupHeader orbsOnly">
+      <div class="groupTitle">Orb Settings</div>
+      <div class="groupHint">Applies to <b>No Theme</b> (temporary: uses Orbs background layer). Ritual hides the orb layer by default.</div>
+    </div>
+
+<div class="settingsGrid orbsOnly">
+      <div class="settingsBlock">
+        <div class="miniLabel">Orb Visual Layer</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optOrbs" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Orbs Layer</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settingsBlock">
+        <div class="miniLabel">Orb Motion & Interaction</div>
+        <div class="toggleRow">
+          <label class="toggle">
+            <input id="optOrbMotion" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Orb Motion</span>
+          </label>
+          <label class="toggle">
+            <input id="optOrbInteract" type="checkbox" checked />
+            <span class="track"></span>
+            <span class="toggleLabel">Orb Interact (Cursor)</span>
+          </label>
+        </div>
+        <div class="hint" style="margin-top:10px;">Density also maps to orb intensity.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- FULL WIDTH: Settings Matrix + Universal panel -->
+        <section class="card span2 floatable driftable">
+          <div class="panelTitle">Theme Settings Matrix (up to 3 themes)</div>
+          <div class="hint">No Theme + Ritual are the two active options. No Theme is the universal shell; Ritual is CoinFlip ritual. Theme 3 is a reserved slot.</div>
+
+          <div class="table matrix" id="themeMatrix">
+            <div class="trow head matrixHead">
+              <div>Setting</div>
+              <div><span class="dot orbs"></span> No Theme</div>
+              <div><span class="dot ritual"></span> Ritual</div>
+              <div><span class="dot third"></span> Theme 3</div>
+            </div>
+
+            <div class="trow matrixRow">
+              <div class="k">Visual Baseline</div>
+              <div>Universal shell (no theme visuals)</div>
+              <div>CoinFlip Ritual (grid + runes)</div>
+              <div>—</div>
+            </div>
+
+            <div class="trow matrixRow">
+              <div class="k">Status</div>
+              <div><span class="badge ok">Enabled</span></div>
+              <div><span class="badge ok">Enabled</span></div>
+              <div><span class="badge soon">Reserved</span></div>
+            </div>
+
+            <div class="trow matrixRow">
+              <div class="k">Universal Interactions</div>
+              <div>Pulse ✅ • Spotlight ✅ • Vignette ✅ • Hover ✅ (nested)</div>
+              <div>Pulse ✅ • Spotlight ✅ • Vignette ✅ • Hover ✅ (nested)</div>
+              <div>Pulse ✅ • Spotlight ✅ • Vignette ✅ • Hover ✅ (nested)</div>
+            </div>
+
+            <div class="trow matrixRow">
+              <div class="k">Notes</div>
+              <div>No Theme is universal-only (no theme visuals). (Temp: shares Orbs background layer.)</div>
+              <div>Ritual must remain CoinFlip-like (orbs hidden).</div>
+              <div>Hidden behind flag until shipped.</div>
+            </div>
+          </div>
+
+          
+
+          <!-- Universal Effects panel removed (duplicated; use Theme Settings > Universal Settings instead) -->
+
+        </section>
+      </section>
+
+      <footer class="footer">
+        <div class="hint">
+          Canon reminder: <b>themes differ visually</b>, but the interaction engine is <b>platform-wide</b>.
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="theme-selector.js"></script>
+</body>
+</html>

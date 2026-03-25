@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>VALLIS — Home</title>
+  <link rel="stylesheet" href="vallis-paper.css"/>
+  <style>
+    .hero { padding: 18px 18px 22px; }
+    .grid { display:grid; grid-template-columns: 1.2fr .8fr; gap: 14px; }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    .kpis { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    @media (max-width: 720px){ .kpis{grid-template-columns:1fr} }
+    .kpi{
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(215,160,255,.14);
+      background: rgba(0,0,0,.18);
+    }
+    .kpi .n{font-size:18px;font-weight:900;letter-spacing:.02em}
+    .kpi .l{font-size:12px;color:rgba(244,240,255,.62);margin-top:4px;line-height:1.35}
+    .cards { display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+    @media (max-width: 720px){ .cards{grid-template-columns:1fr} }
+    .card{
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(215,160,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.22));
+      box-shadow: 0 10px 40px rgba(0,0,0,.40);
+    }
+    .card h3{margin:0 0 6px}
+    .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(215,160,255,.16);
+      background: rgba(255,255,255,.03);
+      color: rgba(244,240,255,.86);
+    }
+    .mini { font-size: 13px; color: rgba(244,240,255,.72); line-height: 1.55; }
+    .list a{display:block;padding:8px 10px;border-radius:12px;border:1px solid transparent}
+    .list a:hover{background: rgba(215,160,255,.08);border-color: rgba(215,160,255,.16);}
+  
+    /* Anunnaki Treasury Vault Bar */
+    .vaultbarWrap{margin-top:14px;padding:14px 14px;border-radius:18px;border:1px solid rgba(215,160,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.26));
+      box-shadow: 0 10px 40px rgba(0,0,0,.40);}
+    .vaultbarHead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+    .vaultbarHead h2{margin:0;font-size:16px;letter-spacing:.02em}
+    .vaultbarMeta{font-size:12px;color:rgba(244,240,255,.62);line-height:1.35}
+    .vaultbarRow{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+    .vaultTrack{position:relative;flex:1;min-width:260px;height:22px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);background: rgba(0,0,0,.35);overflow:hidden}
+    .vaultFill{height:100%;width:var(--vault-pct, 12%);border-radius:999px;
+      background: linear-gradient(90deg, rgba(255,60,85,.92), rgba(255,120,80,.92));
+      box-shadow: 0 0 18px rgba(255,70,90,.35);}
+    .vaultTick{position:absolute;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.10)}
+    .vaultMilestones{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);pointer-events:none}
+    .vaultM{position:absolute;top:50%;transform:translate(-50%,-50%);height:44px;width:auto;filter:grayscale(1);opacity:.38}
+    .vaultMFinal{height:48px}
+    .vaultM.reached{filter:none;opacity:1;}
+    .vaultM.current{opacity:1;box-shadow:0 0 18px rgba(255,90,110,.35);border-radius:10px}
+    .vaultM[data-pos="0"]{left:0%}
+    .vaultM[data-pos="20"]{left:20%}
+    .vaultM[data-pos="40"]{left:40%}
+    .vaultM[data-pos="60"]{left:60%}
+    .vaultM[data-pos="80"]{left:80%}
+    .vaultM[data-pos="100"]{left:100%}
+
+    .vaultPctPill{display:flex;align-items:center;gap:8px}
+    .pctReadout{font-weight:900;font-size:14px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);color:rgba(244,240,255,.92)}
+    .pctHint{font-size:12px;color:rgba(244,240,255,.62)}
+    .vaultStages{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+    .stageImg{width:160px;max-width:42vw;border-radius:14px;border:1px solid rgba(215,160,255,.14);background:rgba(0,0,0,.25)}
+    .vaultStats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+    @media (max-width: 980px){.vaultStats{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width: 520px){.vaultStats{grid-template-columns:1fr}}
+    .vstat{padding:12px 14px;border-radius:16px;border:1px solid rgba(215,160,255,.14);background:rgba(0,0,0,.18)}
+    .vstat .k{font-size:12px;color:rgba(244,240,255,.62)}
+    .vstat .v{margin-top:4px;font-size:16px;font-weight:900;letter-spacing:.02em}
+    .vstat .s{margin-top:4px;font-size:12px;color:rgba(244,240,255,.70);line-height:1.35}
+
+  </style>
+</head>
+<body>
+  <div id="top"></div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="sigil">⟡</div>
+      <div>
+        <div class="brandTitle">VALLIS</div>
+        <div class="brandSub">Documentation Home • 2026-01-01 • Base Doc Theme</div>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn ghost" href="vallis-paper.html">Read Paper</a>
+      <a class="btn ghost" href="pdfs/VALLIS_Whitepaper_Full.pdf">Download PDF</a>
+      <a class="btn ghost" href="pdfs/VALLIS_Master_Spec_University_Edition.pdf">Master Spec</a>
+      <a class="btn ghost" href="pdfs/VALLIS_Investor_Deck.pdf">Investor Deck</a>
+      <a class="btn ghost" href="theme-selector.html">Theme Selector</a>
+      <a class="btn primary" href="#docs">Docs Map</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="toc panel">
+      <h3>Quick Select</h3>
+      <a href="#overview">Overview</a>
+      <a href="#anunnaki-vault">Anunnaki Vault Bar</a>
+      <a href="#games">Games</a>
+      <a href="#pools">Pools & Vaults</a>
+      <a href="#entities">Platform Entities</a>
+      <a href="#runes">Daily Runes</a>
+      <a href="#donations">Donation Perks</a>
+      <a href="#conclave">Conclave</a>
+      <a href="#roadmap">Next Steps</a>
+      <a href="#docs">Docs Map</a>
+      <div class="note">
+        <b>Theme status:</b> This homepage uses the base documentation palette until the Theme Selector rollout is complete.
+      </div>
+    </div>
+
+    <section class="content panel hero">
+      <h1 id="overview">VALLIS Platform</h1>
+      <div class="meta">
+        Governed liquidity + disclosed-odds minigames, ritual UX, and stability-first treasury progression.
+      </div>
+
+      <div class="vaultbarWrap" id="anunnaki-vault" style="--vault-pct: 12%;">
+        <div class="vaultbarHead">
+          <div>
+            <h2>Anunnaki Treasury Vault — Progress</h2>
+            <div class="vaultbarMeta">
+              Vault cracking is funded by the platform treasury (not pool circulation). Progress increases global ceilings and unlocks permanent
+              platform-wide rate tiers at Gate 2.0.
+            </div>
+          </div>
+          <div class="vaultPctPill">
+            <div class="pctReadout" id="vaultPctReadout">12%</div>
+            <div class="pctHint">demo slider (1–99)</div>
+          </div>
+        </div>
+
+        <div class="vaultbarRow">
+          <div class="vaultTrack" aria-label="Anunnaki Vault progress bar">
+            <div class="vaultFill" id="vaultFill"></div>
+            <div class="vaultMilestones" aria-hidden="true">
+              <img class="vaultM" data-pos="0"  src="assets/vault-gate-grey.png" alt="Stage 0"/>
+              <img class="vaultM" data-pos="20" src="assets/vault-stage-1.png" alt="Stage 1"/>
+              <img class="vaultM" data-pos="40" src="assets/vault-stage-2.png" alt="Stage 2"/>
+              <img class="vaultM" data-pos="60" src="assets/vault-stage-3.png" alt="Stage 3"/>
+              <img class="vaultM" data-pos="80" src="assets/vault-stage-4.png" alt="Stage 4"/>
+              <img class="vaultM vaultMFinal" data-pos="100" src="assets/vault-gate-final-combo.png" alt="Final stage"/>
+            </div>
+            <div class="vaultTick" style="left:20%"></div>
+            <div class="vaultTick" style="left:40%"></div>
+            <div class="vaultTick" style="left:60%"></div>
+            <div class="vaultTick" style="left:80%"></div>
+          </div>
+          <input id="vaultPct" type="range" min="1" max="99" value="12" style="width:240px;max-width:70vw" />
+        </div>
+<div class="vaultStats">
+          <div class="vstat">
+            <div class="k">Treasury Valuation (stable)</div>
+            <div class="v">$—</div>
+            <div class="s">Single-asset treasury view (aggregated by SENTINEL)</div>
+          </div>
+          <div class="vstat">
+            <div class="k">Crack Count (global)</div>
+            <div class="v">0</div>
+            <div class="s">Milestone stages completed platform-wide</div>
+          </div>
+          <div class="vstat">
+            <div class="k">Global Multiplier</div>
+            <div class="v">×1.00</div>
+            <div class="s">Unlocked by vault progression (never alters disclosed odds)</div>
+          </div>
+          <div class="vstat">
+            <div class="k">Your Multiplier</div>
+            <div class="v">×1.00</div>
+            <div class="s">Contribution-weighted (SCAR continuity eligible)</div>
+          </div>
+
+           style="margin-top:12px;">
+          <b>Red fill</b> represents vault pressure. At 100% the Gate opens (VALLIS 2.0) and platform-wide ceilings unlock permanently.
+          A sealed third layer may later enforce “monthly average stability” to prevent multiplier decay.
+        </div>
+      </div>
+
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="n">Games</div>
+          <div class="l">CoinFlip • OMEN • DicerZ/DixTrix • PALIMPSEST • MONOLITH • AD’AM</div>
+        </div>
+        <div class="kpi">
+          <div class="n">Stability</div>
+          <div class="l">SENTINEL (safety) + SCAR (continuity/stats) + Treasury Vault (milestones)</div>
+        </div>
+        <div class="kpi">
+          <div class="n">Value</div>
+          <div class="l">Liquidity rewards by pool share + daily Rune collectibles + receipts & disclosures</div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top:14px;">
+        <div class="card">
+          <h3 id="games">Games (Public Suite)</h3>
+          <p class="mini">Disclosed odds • deterministic receipts • themed presentation (themes finalized later).</p>
+
+          <div class="cards">
+            <a class="card" href="games/monolith/index.html">
+              <div class="cardTitle">Monolith</div>
+              <div class="cardMeta">Time-gated ultra-rare ritual (1m/10m/1h/1d/1w) + batch spins. Odds can only improve via Treasury + SCAR (bounded, disclosed).</div>
+              <div class="note" style="margin-top:10px;">Docs preview — no live funds.</div>
+            </a>
+
+            <a class="card" href="games/omen/index.html">
+              <div class="cardTitle">OMEN</div>
+              <div class="cardMeta">Ritual probability minigame shell with glyph identity + disclosed mechanics. Orbs/Ritual theme compatible; Anunnaki Vault excluded from public selectors.</div>
+              <div class="note" style="margin-top:10px;">Docs preview — no live funds.</div>
+            </a>
+
+            <a class="card" href="games/coinflip/index.html">
+              <div class="cardTitle">CoinFlip</div>
+              <div class="cardMeta">Disclosed-odds coin flip docs shell. Receipt-ready calculations and safety caps. Later plugs into pool adapter + receipts engine.</div>
+              <div class="note" style="margin-top:10px;">Docs preview — no live funds.</div>
+            </a>
+
+            <a class="card" href="games/dicerz/index.html">
+              <div class="cardTitle">DicerZ / DixTrix</div>
+              <div class="cardMeta">Dice + glyph modifiers (docs preview). Receipt-first outcomes with lore canon binding (cosmetic-only).</div>
+              <div class="note" style="margin-top:10px;">Docs preview — no live funds.</div>
+            </a>
+
+            <div class="card">
+              <h3>PALIMPSEST</h3>
+              <div class="mini">Layered reveal mechanic built for engagement without payout distortion. (Docs page to be added.)</div>
+              <div class="pillrow"><span class="pill">layers</span><span class="pill">slow-burn</span></div>
+            </div>
+
+            <div class="card">
+              <h3>AD’AM</h3>
+              <div class="mini">Ad-earning: users receive 1/3 of net ad revenue. Redeem at $20. Isolated from odds/liquidity.</div>
+              <div class="pillrow"><span class="pill">ads</span><span class="pill">$20 redeem</span><span class="pill">isolated</span></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card">
+          <h3 id="pools">Pools & Vaults</h3>
+          <p class="mini">
+            Pools are dynamic (any supported token/network). Users deposit $10–$100, see estimated return, and earn rewards by pool share.
+            Pools show composition charts; the treasury tracks stability separately.
+          </p>
+
+          <div class="pillrow">
+            <span class="pill">Dust</span><span class="pill">Dung</span><span class="pill">Flesh</span>
+            <span class="pill">BloodMoon</span><span class="pill">Obsidian</span>
+            <span class="pill">Anunnaki Treasury Vault (private)</span>
+          
+          </div>
+          <div class="vaultStats" style="margin-top:12px">
+            <div class="vstat">
+              <div class="k">Total Pool TVL</div>
+              <div class="v">$—</div>
+              <div class="s">Across Dust/Dung/Flesh/BloodMoon/Obsidian</div>
+            </div>
+            <div class="vstat">
+              <div class="k">Active Tokens</div>
+              <div class="v">—</div>
+              <div class="s">Dynamic: any supported coin/network</div>
+            </div>
+            <div class="vstat">
+              <div class="k">Avg Est. APR</div>
+              <div class="v">—</div>
+              <div class="s">Estimator only; receipts remain deterministic</div>
+            </div>
+            <div class="vstat">
+              <div class="k">Distribution Status</div>
+              <div class="v">OK</div>
+              <div class="s">SENTINEL enforced accounting</div>
+            </div>
+          </div>
+
+           style="margin-top:12px;">
+            <b>Treasury Vault progression:</b> crack stages raise ceilings and unlock platform-wide rates permanently at Gate 2.0.
+            A sealed third layer tracks monthly averages and can slowly decay multipliers if engagement drops.
+          </div>
+        </div>
+      </div>
+
+      <h2 id="entities">Platform Entities</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>SENTINEL</h3>
+          <div class="mini">Safety + correctness engine: throttles/pauses, distribution enforcement, exploit suppression, emergency controls.</div>
+        </div>
+        <div class="card">
+          <h3>SCAR</h3>
+          <div class="mini">Continuity + statistics engine: drives the 3-layer multiplier framework (user + global + sealed monthly-average layer).</div>
+        </div>
+      </div>
+
+      <h2 id="runes">Daily Runes (Collectibles)</h2>
+      <p class="mini">
+        One rune per 24h (Outcome + SCAR + Vault). Duplicate protection: 1 respin excluding duplicate; if still duplicate → Rune Dust
+        (cosmetic-only). Mythic/Hidden + Sentinel historic runes excluded by default.
+      </p>
+
+      <h2 id="donations">Donation Perks</h2>
+      <p class="mini">Cosmetic perks only (frames/effects/codex unlocks; optional non-stackable weekly cosmetic respin token). No odds/payout changes.</p>
+
+      <h2 id="conclave">CONCLAVE</h2>
+      <p class="mini">Non-binding voting hub for proposed features/games. Explicit disclaimer: votes inform direction but do not bind implementation.</p>
+
+      <h2 id="roadmap">Next Steps</h2>
+      <ul>
+        <li>Finalize Theme Selector rollout across all pages (Ritual/Orbs/No Theme v2)</li>
+        <li>Implement pool adapter (any token/network) + composition charts + per-deposit return estimator</li>
+        <li>Wire receipts engine (hashing + storage + audit tools)</li>
+        <li>Ship MONOLITH time-gate scheduler + batch packs</li>
+        <li>Ship AD’AM ad ledger + fraud controls + $20 redemption</li>
+        <li>Integrate Daily Runes + Codex UI + Rune Dust cosmetics</li>
+        <li>Integrate SENTINEL controls + SCAR continuity model</li>
+      </ul>
+
+      <h2 id="docs">Docs Map</h2>
+      <div class="cards">
+        <div class="card list">
+          <h3>Primary</h3>
+          <a href="homepage.html">Homepage (this page)</a>
+          <a href="vallis-paper.html">Academic Paper (HTML Quick Select)</a>
+          <a href="pdfs/VALLIS_Whitepaper_Full.pdf">Academic Paper (PDF)</a>
+          <a href="theme-selector.html">Theme Selector</a>
+          <a href="games/coinflip/index.html">CoinFlip (Live Theme Shell)</a>
+        </div>
+        <div class="card">
+          <h3>Build Agent Note</h3>
+          <div class="mini">
+            This homepage is the builder entrypoint: it enumerates every platform surface and how they connect.
+            Default styling remains base-dark until theme system is fully unified.
+          </div>
+        </div>
+
+           style="margin-top:16px;">
+        <b>Archive:</b> First running copy of VALLIS docs package with stable scroll + homepage entry.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const links = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+    const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    function onScroll(){
+      let best = null;
+      for(const s of sections){
+        const r = s.getBoundingClientRect();
+        if(r.top <= 120) best = s;
+      }
+      links.forEach(a => a.classList.remove('active'));
+      if(best){
+        const id = '#' + best.id;
+        const a = links.find(x => x.getAttribute('href') === id);
+        if(a) a.classList.add('active');
+      }
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if(t) t.scrollIntoView({behavior:'smooth', block:'start'});
+        history.replaceState(null,'',a.getAttribute('href'));
+      });
+    });
+  </script>
+
+  <script>
+    // Demo wiring for Anunnaki Treasury Vault progress (1%–99%)
+    (function(){
+      const wrap = document.getElementById('anunnaki-vault');
+      const slider = document.getElementById('vaultPct');
+      const fill = document.getElementById('vaultFill');
+      const readout = document.getElementById('vaultPctReadout');
+      if(!wrap || !slider || !fill || !readout) return;
+
+      function setPct(p){
+        const pct = Math.max(1, Math.min(99, Number(p)||1));
+        wrap.style.setProperty('--vault-pct', pct + '%');
+        fill.style.width = pct + '%';
+        readout.textContent = pct + '%';
+
+        // milestones: grey at start, cracks across, final combo at end
+        const effective = (pct >= 99) ? 100 : pct;
+        const ms = wrap.querySelectorAll('.vaultM');
+        ms.forEach(m => {
+          const pos = Number(m.dataset.pos || 0);
+          m.classList.toggle('reached', effective >= pos);
+          m.classList.remove('current');
+        });
+        // current milestone = last reached
+        let current = null;
+        ms.forEach(m => {
+          const pos = Number(m.dataset.pos || 0);
+          if(effective >= pos) current = m;
+        });
+        if(current) current.classList.add('current');
+      }
+      slider.addEventListener('input', () => setPct(slider.value), {passive:true});
+      setPct(slider.value);
+    })();
+  </script>
+
+</body>
+</html>

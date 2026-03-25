@@ -1,0 +1,28 @@
+{
+  "vault": {
+    "progressBarFrame": "assets/progressbar-frame.png",
+    "gates": [
+      "assets/vault-gate-grey.png",
+      "assets/vault-stage-1.png",
+      "assets/vault-stage-2.png",
+      "assets/vault-stage-3.png",
+      "assets/vault-stage-4.png",
+      "assets/vault-gate-final-combo.png"
+    ]
+  },
+  "games": {
+    "coinflip": {
+      "entry": "games/coinflip/index.html"
+    },
+    "omen": {
+      "entry": "games/omen/index.html"
+    },
+    "dicerz": {
+      "entry": "games/dicerz/index.html"
+    }
+  },
+  "notes": {
+    "mode": "documentation-first",
+    "last_packaged": "2026-01-01T13:18:25.035305Z"
+  }
+}

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>VALLIS — Academic Paper (Parts I–IV)</title>
+  <link rel="stylesheet" href="vallis-paper.css"/>
+</head>
+<body>
+  <div id="top"></div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="sigil">⟡</div>
+      <div>
+        <div class="brandTitle">VALLIS</div>
+        <div class="brandSub">Academic Paper • Parts I–IV • 2026-01-01</div>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn ghost" href="homepage.html">Home</a>
+      <a class="btn ghost" href="theme-selector.html">Theme Selector</a>
+      <a class="btn ghost" href="VALLIS_Academic_Paper_Parts_I-IV.pdf">Download PDF</a>
+      <a class="btn primary" href="#part1">Start</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    
+<div class="toc panel">
+  <h3>Quick Select</h3>
+  <a href="#top">Title Page</a>
+  <a href="#part1">Part I</a>
+  <a class="sub" href="#p1-abstract">Abstract</a>
+  <a class="sub" href="#p1-problem">Problem</a>
+  <a class="sub" href="#p1-goals">Design Goals</a>
+  <a class="sub" href="#p1-entities">Core Entities</a>
+  <a class="sub" href="#p1-invariants">Invariants</a>
+  <a href="#part2">Part II</a>
+  <a class="sub" href="#p2-liquidity">Dynamic Pools</a>
+  <a class="sub" href="#p2-receipts">Receipts</a>
+  <a class="sub" href="#p2-games">Game Suite</a>
+  <a class="sub" href="#p2-multipliers">Multipliers</a>
+  <a href="#part3">Part III</a>
+  <a class="sub" href="#p3-sentinel">SENTINEL</a>
+  <a class="sub" href="#p3-vault">Anunnaki Vault</a>
+  <a class="sub" href="#p3-adam">AD’AM</a>
+  <a class="sub" href="#p3-runes">Daily Runes</a>
+  <a href="#part4">Part IV</a>
+  <a class="sub" href="#p4-regulatory">Regulatory</a>
+  <a class="sub" href="#p4-limitations">Limitations</a>
+  <a class="sub" href="#p4-future">Future Work</a>
+  <a class="sub" href="#p4-conclusion">Conclusion</a>
+  <div class="note">
+    Use the <b>Theme Selector</b> page to switch between Ritual/Orbs/No-Theme layouts.
+  </div>
+</div>
+
+    <article class="content panel">
+      <h1>VALLIS</h1>
+      <div class="meta">
+        <b>A Governed Liquidity, Probability, and Identity Platform for Long-Term Systemic Stability</b><br/>
+        Compiled as a single quick-select HTML + PDF package (Parts I–IV).
+      </div>
+
+      <div class="note">
+        This HTML is optimized for fast navigation and build-agent ingestion. Use the PDF for investor/legal distribution.
+      </div>
+
+      
+<h2 id="part1">Part I — Foundations, Definitions, and System Goals</h2>
+
+<h3 id="p1-abstract">Abstract</h3>
+<p>
+VALLIS is a governed liquidity and probability platform designed to support occult-themed pool minigames
+while maintaining long-term systemic stability. The architecture is defined by strict separation of concerns:
+(1) liquidity participation and accounting, (2) disclosed-odds probability games, (3) identity-like collectibles
+(Runes) that avoid economic distortion, and (4) bounded authority layers (SENTINEL and the Anunnaki Treasury Vault).
+This paper formalizes the platform’s design objectives, defines its entities and invariants, and presents a system
+model that prioritizes survivability, auditability, and user trust over short-term growth exploitation.
+</p>
+
+<h3 id="p1-problem">1. The Problem: Systems That Optimize for Speed Fail</h3>
+<p>
+Many crypto-native platforms fail because they optimize for short-term metrics—rapid deposits, viral engagement,
+and reflexive incentives—without a credible stability doctrine. VALLIS is engineered in opposition to this pattern:
+it treats pauses, throttles, and explicit authority as legitimate tools of survival, and it treats every user-facing
+mechanic as a potential incentive hazard that must be contained.
+</p>
+
+<h3 id="p1-goals">2. Design Goals</h3>
+<ul>
+  <li><b>Probabilistic integrity:</b> disclosed odds, deterministic calculations, auditable receipts.</li>
+  <li><b>Liquidity clarity:</b> user rewards scale with share of pool, not with hidden leverage or narrative guarantees.</li>
+  <li><b>Authority clarity:</b> intervention is explicit and bounded (SENTINEL), not disguised as “community governance.”</li>
+  <li><b>Progression without corruption:</b> Vault milestones may raise ceilings, but never rewrite probability truth.</li>
+  <li><b>Engagement without compulsion:</b> Runes and Codex are cosmetic; AD’AM isolates attention monetization.</li>
+</ul>
+
+<h3 id="p1-entities">3. Core Entities (Definitions)</h3>
+<ul>
+  <li><b>Pools/Vaults:</b> named liquidity domains (e.g., Dust, Dung, Flesh, BloodMoon, Obsidian; Anunnaki Treasury Vault is private).</li>
+  <li><b>Games:</b> disclosed-odds minigames (CoinFlip, OMEN, DicerZ/DixTrix, PALIMPSEST, MONOLITH, AD’AM).</li>
+  <li><b>SENTINEL:</b> safety/enforcement authority that can throttle/pause systems based on explicit criteria.</li>
+  <li><b>SCAR:</b> continuity/statistics entity that encodes long-term engagement signals (non-game, non-payout).</li>
+  <li><b>Runes/Codex:</b> daily collectibles with duplicate-respin and Rune Dust sink; cosmetic-only.</li>
+</ul>
+
+<h3 id="p1-invariants">4. Non-Negotiable Invariants</h3>
+<ul>
+  <li>Odds disclosures are honest; probability math is not “bent” by vibes, streaks, or hidden rules.</li>
+  <li>Any multiplier system must be separated from probability distributions (ceilings may move, truth does not).</li>
+  <li>Authority is explicit; intervention is logged; recovery criteria are known.</li>
+  <li>Cosmetic systems do not become economic side-channels (no secondary market dependence for survival).</li>
+</ul>
+
+      
+<h2 id="part2">Part II — Architecture, Game Economics, and Flow Design</h2>
+
+<h3 id="p2-separation">5. Separation of Concerns as a Stability Strategy</h3>
+<p>
+VALLIS treats system design as containment: high-volatility mechanics are isolated behind interfaces that prevent
+cross-domain contamination. Liquidity participation cannot “infect” probability integrity; attention monetization
+cannot “infect” odds; collectibles cannot “infect” payouts.
+</p>
+
+<h3 id="p2-liquidity">6. Dynamic Liquidity Pools (Any Token / Any Network)</h3>
+<p>
+User deposits may be accepted in a wide range of supported assets. Pools track their composition transparently
+(charts of constituent tokens). Internally, the platform’s treasury accounting expresses platform stability in a
+stable-denominated valuation, while preserving per-pool composition views for transparency. User reward share is
+computed as a function of user proportional contribution relative to total pool amount, consistent with standard
+liquidity participation logic.
+</p>
+
+<h3 id="p2-receipts">7. Receipts, Disclosure, and Verifiability</h3>
+<p>
+Every game action produces a receipt: inputs (pool, amount, disclosed odds), deterministic computation results,
+and outcome. Receipts provide a primary defense against disputes and enable audits without exposing sensitive user
+data. This also supports investor-grade transparency for platform economics.
+</p>
+
+<h3 id="p2-games">8. Game Suite Overview (Occult Minigames)</h3>
+<ul>
+  <li><b>CoinFlip:</b> baseline disclosed-odds game with Ritual theme canonical styling.</li>
+  <li><b>OMEN:</b> ritual probability engine with glyph system and Orbs theme baseline; Anunnaki Vault excluded from public selectors.</li>
+  <li><b>DicerZ/DixTrix:</b> dice + modifier system with lore-bound quotes and collectible canon; outcomes wired to pools.</li>
+  <li><b>PALIMPSEST:</b> long-form, layered reveal mechanic designed for sustained attention without payout distortion.</li>
+  <li><b>MONOLITH:</b> time-gated, ultra-low probability mechanic with reset intervals (1m/10m/1h/1d/1w) and purchasable batch spins,
+        with odds improving as Vault progress and multipliers rise (without rewriting disclosed base truth).</li>
+  <li><b>AD’AM:</b> ad-watching system that returns 1/3 of net ad revenue to users, redeemable at $20, isolated from probability and liquidity.</li>
+  <li><b>CONCLAVE:</b> non-binding voting/expression system for proposed features and games.</li>
+</ul>
+
+<h3 id="p2-multipliers">9. Multipliers (Personal + Global) Without Probability Corruption</h3>
+<p>
+VALLIS distinguishes between <b>personal multipliers</b> (derived from an individual’s contribution and continuity signals)
+and <b>global multipliers</b> (derived from platform-wide Vault crack stages). Multipliers may change ceilings, access tiers,
+or unlocks, but probability distributions remain disclosed and auditable. Any change must be logged and attributable.
+</p>
+
+      
+<h2 id="part3">Part III — Safety, Authority, and Platform-Scale Equilibria</h2>
+
+<h3 id="p3-sentinel">10. SENTINEL — Safety, Enforcement, and the Necessity of Intervention</h3>
+<p>
+Autonomy alone does not guarantee fairness. Systems without an intervention authority either ossify into exploit-driven
+equilibria or collapse under adversarial pressure. VALLIS therefore implements SENTINEL: a bounded, transparent enforcement
+authority whose legitimacy derives from predictability and scope-limits.
+</p>
+<ul>
+  <li>Enforce rate limits across execution surfaces</li>
+  <li>Throttle or pause subsystems under stress</li>
+  <li>Detect and suppress abusive automation</li>
+  <li>Trigger emergency shutdowns and controlled resumptions</li>
+</ul>
+<p>
+SENTINEL does not modify probability distributions, directly alter liquidity balances, or act as governance. It is defensive.
+</p>
+
+<h3 id="p3-vault">11. The Anunnaki Treasury Vault — Authority Without Governance</h3>
+<p>
+The Anunnaki Treasury Vault provides a platform-scale regulator enforcing ceilings and irreversible unlocks. It is not a
+user wallet or governance council; it governs limits and progression. Vault progression is modeled as irreversible “crack”
+stages achieved through aggregate participation and stability. When a crack stage is reached, ceilings may rise, global
+multipliers may increase, and capabilities may unlock permanently.
+</p>
+<p>
+Beyond visible crack stages, a sealed layer tracks rolling monthly averages for sustainability. If activity drops below
+thresholds, gradual multiplier decay may occur, signaling the need for renewed engagement without inducing panic.
+</p>
+
+<h3 id="p3-adam">12. AD’AM — Attention Monetization as a Controlled Input</h3>
+<ul>
+  <li>33.33% of net advertising revenue credited to users</li>
+  <li>66.67% retained by the platform</li>
+  <li>Redeemable once credits reach $20</li>
+  <li>Credits are non-transferable and non-stakeable</li>
+</ul>
+
+<h3 id="p3-conclave">13. CONCLAVE — Exploration Without Obligation</h3>
+<p>
+CONCLAVE is a non-binding expression layer for voting on proposed games and features. It explicitly disclaims any promise
+of implementation, avoiding governance theater while preserving user signal value.
+</p>
+
+<h3 id="p3-runes">14. Daily Runes and the Codex — Ritual Without Reward</h3>
+<p>
+Daily Rune claims reinforce continuity without economic distortion. One rune per 24h with duplicate protection: one respin;
+if still duplicate, convert to Rune Dust (cosmetic-only sink). Mythic/Hidden and Sentinel-issued historic runes remain excluded.
+</p>
+
+<h3 id="p3-conclusion">15–16. Survivability and Part III Conclusion</h3>
+<p>
+VALLIS prioritizes survivability: intelligible operation under adversarial conditions, explicit authority, transparent rules,
+and bounded incentives. It rejects engagement exploitation as a default growth strategy.
+</p>
+
+      
+<h2 id="part4">Part IV — Comparative Analysis, Regulatory Positioning, and Final Synthesis</h2>
+
+<h3 id="p4-compare">17. Comparative Analysis: Platform Archetypes</h3>
+<p>
+VALLIS differs from DeFi and token-governed platforms by removing emissions and binding token governance; it differs from
+regulated gaming by incorporating auditability while rejecting near-miss framing and streak exploitation; and it differs
+from DAOs by refusing governance theater in favor of explicit, bounded authority.
+</p>
+
+<h3 id="p4-regulatory">18. Regulatory Positioning and Legal Interpretability</h3>
+<p>
+VALLIS uses compliance-by-architecture: modular interpretability by separating probability, liquidity, identity, and attention
+monetization. This reduces the risk of category-blending failures that trigger regulatory scrutiny.
+</p>
+
+<h3 id="p4-limitations">19. Limitations and Open Questions</h3>
+<ul>
+  <li>Reduced short-term growth potential (by design)</li>
+  <li>Dependence on operator integrity (mitigated by transparency)</li>
+  <li>Cultural adoption risk for long-horizon mechanics</li>
+</ul>
+
+<h3 id="p4-future">20. Future Research</h3>
+<ul>
+  <li>Empirical measurement of trust retention and stability under stress</li>
+  <li>Formal modeling of multiplier decay equilibria</li>
+  <li>Regulatory comparative outcomes vs token-governed systems</li>
+</ul>
+
+<h3 id="p4-conclusion">22. Conclusion</h3>
+<p>
+By foregrounding separation of concerns, explicit authority, and long-term equilibrium enforcement, VALLIS provides a blueprint
+for durable crypto-native platforms that can survive adversarial conditions and shifting regulatory environments.
+</p>
+
+
+      <div class="note" id="end">
+        End of Paper.
+      </div>
+    </article>
+  </main>
+
+  <script src="vallis-paper.js"></script>
+</body>
+</html>

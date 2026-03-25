@@ -26,7 +26,7 @@ const AD_CONFIG = {
   adsense: {
     client: 'ca-pub-5584590642779290', // Your AdSense publisher ID
     enabled: true,
-    autoAds: false // We use manual placement for better control
+    autoAds: true // Auto-format ads enabled (fills without specific slot IDs)
   },
   
   prebid: {
@@ -102,7 +102,9 @@ const PAGE_REFRESH_MAP = {
   create: ['top-banner', 'rail-left', 'in-content-tall', 'footer-banner'],
   manage: ['top-banner', 'rail-left', 'in-content-tall'],
   docs: ['top-banner', 'in-content-tall', 'rail-left'],
-  admin: ['top-banner', 'in-content-tall', 'rail-left']
+  admin: ['top-banner', 'in-content-tall', 'rail-left'],
+  vallis: ['top-banner', 'in-content-tall', 'rail-left'],
+  pools: ['top-banner', 'in-content-tall', 'rail-left']
 };
 
 // ===== AD UNIT DEFINITIONS =====

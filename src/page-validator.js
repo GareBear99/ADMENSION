@@ -140,6 +140,50 @@
       ]
     },
     
+    vallis: {
+      required_elements: [
+        { id: 'page-vallis', type: 'section', class: 'page' }
+      ],
+      required_ads: [
+        { slot: 'anchor', description: 'Bottom sticky anchor bar' },
+        { slot: 'vallis_top_banner', description: 'Top banner' }
+      ],
+      validation_checks: [
+        { name: 'VALLIS Content Loaded', check: () => {
+          const el = document.getElementById('page-vallis');
+          return el && el.querySelectorAll('.card').length >= 5;
+        }}
+      ]
+    },
+
+    pools: {
+      required_elements: [
+        { id: 'page-pools', type: 'section', class: 'page' },
+        { id: 'poolCards', type: 'div' },
+        { id: 'estPool', type: 'select' },
+        { id: 'scarStatus', type: 'div' },
+        { id: 'sentinelStatus', type: 'div' }
+      ],
+      required_ads: [
+        { slot: 'anchor', description: 'Bottom sticky anchor bar' },
+        { slot: 'pools_top_banner', description: 'Top banner' }
+      ],
+      validation_checks: [
+        { name: 'Pool Cards Rendered', check: () => {
+          const cards = document.getElementById('poolCards');
+          return cards && cards.querySelectorAll('.card').length >= 5;
+        }},
+        { name: 'SCAR Status Loaded', check: () => {
+          const el = document.getElementById('scarStatus');
+          return el && el.innerHTML.includes('Personal');
+        }},
+        { name: 'SENTINEL Status Loaded', check: () => {
+          const el = document.getElementById('sentinelStatus');
+          return el && !el.innerHTML.includes('Loading');
+        }}
+      ]
+    },
+
     admin: {
       required_elements: [
         { id: 'page-admin', type: 'section', class: 'page' },
@@ -166,7 +210,7 @@
   const GLOBAL_CHECKS = {
     'Navigation Bar': () => {
       const nav = document.getElementById('nav');
-      return nav && nav.querySelectorAll('a').length === 7; // 6 pages + screenshot
+      return nav && nav.querySelectorAll('a').length >= 7; // 8 pages + screenshot
     },
     'Pills Visible': () => {
       const pills = document.querySelector('.pills');

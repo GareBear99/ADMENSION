@@ -28,7 +28,9 @@ const ENGAGEMENT = {
     create: { value: 1.8, premium: true, description: 'Revenue generation intent' },
     manage: { value: 1.5, premium: true, description: 'Account management (high-value)' },
     docs: { value: 1.1, premium: false, description: 'Educational content' },
-    admin: { value: 2.0, premium: true, description: 'Administrative actions (highest value)' }
+    admin: { value: 2.0, premium: true, description: 'Administrative actions (highest value)' },
+    vallis: { value: 1.3, premium: true, description: 'VALLIS ecosystem content' },
+    pools: { value: 1.6, premium: true, description: 'Liquidity pools (high-intent)' }
   }
 };
 

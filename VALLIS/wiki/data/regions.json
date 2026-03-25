@@ -1,0 +1,30 @@
+{
+  "US": {
+    "rpm_range": [
+      8,
+      18
+    ],
+    "note": "Often strongest RPM when content + retention are solid."
+  },
+  "CA": {
+    "rpm_range": [
+      6,
+      14
+    ],
+    "note": "Strong, slightly lower than US on average."
+  },
+  "EU": {
+    "rpm_range": [
+      5,
+      12
+    ],
+    "note": "Varies by country and consent flows."
+  },
+  "GLOBAL": {
+    "rpm_range": [
+      3,
+      10
+    ],
+    "note": "Mixed traffic quality and geography."
+  }
+}

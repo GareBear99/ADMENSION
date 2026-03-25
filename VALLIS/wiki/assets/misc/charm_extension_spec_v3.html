@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Charm Extension v2 — Paper-to-Live Gated Trading Spec</title>
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --panel: #121225;
+      --text: #e9e9f2;
+      --muted: #b8b8d6;
+      --accent: #8b5cf6;
+      --accent2: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --border: rgba(255,255,255,0.10);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    body {
+      margin: 0; background: radial-gradient(1200px 600px at 30% 0%, rgba(139,92,246,0.18), transparent),
+                           radial-gradient(900px 500px at 80% 20%, rgba(34,197,94,0.10), transparent),
+                           var(--bg);
+      color: var(--text); font-family: var(--sans); line-height: 1.55;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 42px 18px 80px; }
+    .hero {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(18,18,37,0.9), rgba(18,18,37,0.7));
+      border-radius: 18px; padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+    h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: .2px; }
+    .sub { color: var(--muted); }
+    .pillrow { margin-top: 14px; display:flex; flex-wrap:wrap; gap:10px; }
+    .pill {
+      border: 1px solid var(--border);
+      padding: 6px 10px; border-radius: 999px; font-size: 12px; color: var(--muted);
+      background: rgba(255,255,255,0.03);
+    }
+    .grid { display:grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px; }
+    @media (min-width: 860px) { .grid { grid-template-columns: 1fr 1fr; } }
+    .card {
+      border: 1px solid var(--border);
+      background: rgba(18,18,37,0.65);
+      border-radius: 16px; padding: 18px;
+    }
+    h2 { margin: 0 0 10px; font-size: 18px; }
+    h3 { margin: 16px 0 8px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    ul { margin: 8px 0 0 20px; }
+    code, pre { font-family: var(--mono); }
+    .callout {
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px; border-radius: 12px;
+      background: rgba(139,92,246,0.10);
+      border: 1px solid rgba(139,92,246,0.25);
+      margin-top: 12px;
+    }
+    .good { border-left-color: var(--accent2); background: rgba(34,197,94,0.10); border-color: rgba(34,197,94,0.22); }
+    .warn { border-left-color: var(--warn); background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.22); }
+    .danger { border-left-color: var(--danger); background: rgba(239,68,68,0.10); border-color: rgba(239,68,68,0.22); }
+    .footer { color: var(--muted); margin-top: 22px; font-size: 12px; }
+    .kbd { font-family: var(--mono); padding: 2px 6px; border:1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.04); }
+  </style>
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Charm Extension v2 — Paper-to-Live Gated Trading Spec</h1>
+      <div class="sub">MetaMask-compatible ETH/USDC spot bot + 3-slot window detection + mandatory 24h paper qualification.</div>
+      <div class="pillrow">
+        <div class="pill">Network: Base (preferred)</div>
+        <div class="pill">Pair: ETH/USDC</div>
+        <div class="pill">Mode: Spot only</div>
+        <div class="pill">Safety: Paper gate</div>
+        <div class="pill">Date: 2025-12-29</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Mandatory Paper-to-Live Safety Gate</h2>
+        <div class="callout warn">
+          <strong>Live trading is locked</strong> until the bot proves itself in paper mode.
+        </div>
+        <ul>
+          <li><strong>Run paper mode for 24 hours</strong> (continuous runtime; brief restarts allowed).</li>
+          <li>Require <strong>≥ 1 closed paper trade</strong> with <strong>net positive PnL</strong> (fees + slippage estimated).</li>
+          <li>If paper has <strong>2 losses in a row</strong>, extend paper mode until it gets <strong>1 win</strong>.</li>
+          <li>After unlocking live, allow <strong>one live session</strong>. Re-qualify after drawdown stop, critical restart, or 24h elapsed.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>When a Trade Window is OPEN</h2>
+        <div class="callout good">
+          A window opens only when the market is <strong>boring</strong> and mean reversion is <strong>proven</strong>.
+        </div>
+        <h3>Regime Gate (must pass)</h3>
+        <ul>
+          <li>Range-bound (no strong EMA slope).</li>
+          <li>24h volatility below threshold (default ~4%).</li>
+          <li>No “volatility spike” candles recently.</li>
+          <li>Compression (ATR/volume contracting).</li>
+        </ul>
+        <h3>Setup Proof (buy/sell)</h3>
+        <ul>
+          <li><strong>Buy window:</strong> touch VWAP − 1.5σ → close back inside → ATR decreasing.</li>
+          <li><strong>Sell window:</strong> touch VWAP + 1.5σ → rejection → volume spike → ATR decreasing.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>When a Window CLOSES</h2>
+        <div class="callout danger">
+          If conditions change, the bot stops trying to be a hero and <strong>backs off</strong>.
+        </div>
+        <ul>
+          <li>Market stops being range-bound (trend starts).</li>
+          <li>ATR rises (volatility expanding).</li>
+          <li>Big “expansion candle” appears (breakout risk).</li>
+          <li>Signal goes stale (expires).</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>3-Slot Queue (Always Ready, Never Forced)</h2>
+        <p>The bot maintains up to <strong>3 slots</strong> that can be:</p>
+        <ul>
+          <li><span class="kbd">WATCHING</span> – waiting for a valid window</li>
+          <li><span class="kbd">ARMED</span> – window open; ready to execute if trigger hits</li>
+          <li><span class="kbd">OPEN</span> – position live</li>
+          <li><span class="kbd">COOLDOWN</span> – brief pause after closing</li>
+        </ul>
+        <div class="callout">
+          Slots are refilled immediately when one closes, but <strong>only</strong> if a real window exists.
+        </div>
+      </div>
+    </div>
+
+    
+      <div class="card">
+        <h2>3-Slot System (v3 Personalities)</h2>
+        <div class="callout good">
+          Same safety gates. Different roles: <strong>Scout</strong> (fast), <strong>Farmer</strong> (profit), <strong>Anchor</strong> (defensive).
+        </div>
+        <h3>Slot 1 — Scout</h3>
+        <ul>
+          <li>Enters quickly when a window opens (lighter confirmation).</li>
+          <li>Exits on <strong>any</strong> profit and re-arms fast.</li>
+          <li>Small size (10–20% of active).</li>
+        </ul>
+        <h3>Slot 2 — Farmer</h3>
+        <ul>
+          <li>Waits for clean VWAP confirmation.</li>
+          <li>Aims for meaningful profit per trade.</li>
+          <li>Medium size (30–40% of active).</li>
+        </ul>
+        <h3>Slot 3 — Anchor</h3>
+        <ul>
+          <li>Your original strict setup; trades only when conditions are ideal.</li>
+          <li>Protects the high profitable-session goal.</li>
+          <li>Largest size allowed (still capped by phase rules).</li>
+        </ul>
+        <div class="callout">
+          Coordination: no same-direction stacking, total exposure cap, pause all slots if regime fails.
+        </div>
+      </div>
+
+<div class="card" style="margin-top:14px;">
+      <h2>Notes</h2>
+      <ul>
+        <li>Nothing here guarantees profit. The edge comes from <strong>selectivity</strong>, <strong>small losses</strong>, and <strong>not trading</strong> when conditions are bad.</li>
+        <li>Use backtesting/tuning to set thresholds, then rely on paper mode to validate execution behavior.</li>
+      </ul>
+      <div class="footer">Generated for your dashboard + terminal bot build. Use at your own risk.</div>
+    </div>
+  </div>
+<script src="../../../admension-ads.js"></script>n</body>
+</html>

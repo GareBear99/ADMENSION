@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GBz_Bot — $500 Pro Quant System (Operator Documentation)</title>
+<style>
+:root{
+  --bg0:#05020b;
+  --bg1:#0b0620;
+  --bg2:#160a3a;
+  --ink:#f6f1ff;
+  --muted:#c7b6ff;
+  --muted2:#8b7dd6;
+  --accent:#b026ff;
+  --accent2:#6d28ff;
+  --accent3:#ff2bd6;
+  --good:#4ef0b4;
+  --warn:#ffd166;
+  --bad:#ff4d6d;
+  --glass: rgba(255,255,255,0.06);
+  --glass2: rgba(255,255,255,0.10);
+  --stroke: rgba(200,160,255,0.18);
+  --shadow: 0 18px 60px rgba(0,0,0,0.55);
+  --r: 22px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--ink);
+  background: radial-gradient(1200px 900px at 20% 10%, rgba(176,38,255,0.18), transparent 60%),
+              radial-gradient(900px 800px at 80% 30%, rgba(109,40,255,0.16), transparent 55%),
+              radial-gradient(1100px 900px at 50% 90%, rgba(255,43,214,0.10), transparent 60%),
+              linear-gradient(180deg, var(--bg0), var(--bg1) 35%, var(--bg2));
+  overflow-x:hidden;
+}
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  background:
+    radial-gradient(70% 60% at 50% 40%, rgba(0,0,0,0.00), rgba(0,0,0,0.55)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity:.35;
+  pointer-events:none;
+  z-index:-1;
+}
+#veil{position:fixed; inset:0; z-index:-2;}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 18px 90px}
+.topbar{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter: blur(14px);
+  background: linear-gradient(180deg, rgba(6,3,15,.85), rgba(6,3,15,.55));
+  border-bottom:1px solid rgba(200,160,255,.14);
+}
+.topbar .row{max-width:1180px;margin:0 auto;display:flex;gap:14px;align-items:center;justify-content:space-between;padding:12px 18px}
+.brand{display:flex;align-items:center;gap:12px}
+.sig{
+  width:42px;height:42px;border-radius:14px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,43,214,.90), rgba(176,38,255,.40) 45%, rgba(109,40,255,.20) 70%, rgba(0,0,0,.0));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: 0 0 26px rgba(176,38,255,.45), 0 0 60px rgba(255,43,214,.18);
+  position:relative;
+}
+.sig:after{
+  content:"";
+  position:absolute; inset:8px;
+  border-radius:12px;
+  border:1px dashed rgba(255,255,255,.25);
+  opacity:.6;
+}
+.brand h1{font-size:14px;letter-spacing:.12em;margin:0;text-transform:uppercase}
+.brand .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.actions{display:flex;gap:10px;align-items:center}
+.pill{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(200,160,255,.20);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  padding:9px 12px;border-radius:999px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  user-select:none;
+}
+.pill small{color:var(--muted);font-family:var(--mono)}
+.btn{
+  cursor:pointer;
+  border:1px solid rgba(200,160,255,.22);
+  background: radial-gradient(circle at 30% 20%, rgba(255,43,214,.26), rgba(176,38,255,.14) 55%, rgba(0,0,0,.0));
+  padding:10px 12px;border-radius:14px;
+  color:var(--ink);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  box-shadow: 0 14px 40px rgba(0,0,0,.35), 0 0 28px rgba(176,38,255,.25);
+}
+.btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.22);box-shadow:0 18px 60px rgba(0,0,0,.45),0 0 40px rgba(176,38,255,.35)}
+.hero{
+  margin-top:26px;
+  border:1px solid rgba(200,160,255,.16);
+  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+  border-radius:var(--r);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  position:relative;
+}
+.hero:before{
+  content:"";
+  position:absolute; inset:-1px;
+  background: radial-gradient(600px 300px at 10% 0%, rgba(255,43,214,.22), transparent 60%),
+              radial-gradient(600px 300px at 90% 40%, rgba(176,38,255,.18), transparent 60%);
+  opacity:.9;
+  pointer-events:none;
+}
+.hero .inner{position:relative;padding:26px 24px 22px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+@media (max-width:900px){.hero .inner{grid-template-columns:1fr}}
+.hbig{font-size:34px;line-height:1.05;margin:0 0 8px;letter-spacing:-.02em}
+.kicker{color:var(--muted);margin:0 0 16px;font-size:14px;max-width:70ch}
+.badgeRow{display:flex;flex-wrap:wrap;gap:10px}
+.badge{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:8px 10px;
+  border-radius:999px;
+  border:1px solid rgba(200,160,255,.20);
+  background: rgba(0,0,0,.20);
+}
+.badge b{color:#fff}
+.heroCard{
+  border:1px solid rgba(200,160,255,.16);
+  background: rgba(0,0,0,.22);
+  border-radius:18px;
+  padding:16px 16px 14px;
+}
+.heroCard h3{margin:0 0 8px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#fff}
+.heroCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.sep{height:1px;background:rgba(200,160,255,.16);margin:14px 0}
+.grid{display:grid;grid-template-columns: 320px 1fr; gap:18px; align-items:start; margin-top:18px}
+@media (max-width:980px){.grid{grid-template-columns:1fr}}
+.toc{
+  position:sticky; top:74px;
+  border:1px solid rgba(200,160,255,.16);
+  background: rgba(0,0,0,.18);
+  border-radius:var(--r);
+  padding:16px;
+  box-shadow: 0 18px 70px rgba(0,0,0,.35);
+}
+.toc h3{margin:0 0 10px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+.toc a{
+  display:block;
+  padding:10px 10px;
+  margin:6px 0;
+  border-radius:14px;
+  text-decoration:none;
+  border:1px solid rgba(200,160,255,.10);
+  background: rgba(255,255,255,.03);
+  color:var(--muted);
+  transition:transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.toc a:hover{transform:translateX(2px);background:rgba(176,38,255,.08);border-color:rgba(200,160,255,.22);color:#fff}
+.toc a.active{background:rgba(255,43,214,.12);border-color:rgba(255,255,255,.22);color:#fff}
+.section{
+  border:1px solid rgba(200,160,255,.14);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
+  border-radius:var(--r);
+  box-shadow: var(--shadow);
+  padding:22px 22px 18px;
+  margin-bottom:18px;
+  position:relative;
+  overflow:hidden;
+}
+.section:before{
+  content:"";
+  position:absolute; inset:-2px;
+  background: radial-gradient(520px 200px at 10% 0%, rgba(176,38,255,.18), transparent 62%),
+              radial-gradient(520px 200px at 90% 30%, rgba(255,43,214,.12), transparent 60%);
+  opacity:.9;
+  pointer-events:none;
+}
+.section > *{position:relative}
+.section h2{margin:0 0 10px;font-size:18px;letter-spacing:.10em;text-transform:uppercase}
+.section p{margin:10px 0;color:var(--muted);line-height:1.6}
+.section ul{margin:10px 0 0 18px;color:var(--muted);line-height:1.7}
+.callout{
+  border:1px solid rgba(200,160,255,.20);
+  background: rgba(0,0,0,.22);
+  border-radius:18px;
+  padding:14px 14px;
+  margin:12px 0;
+}
+.callout strong{color:#fff}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:740px){.kv{grid-template-columns:1fr}}
+.kv .box{
+  border:1px solid rgba(200,160,255,.16);
+  background: rgba(255,255,255,.03);
+  border-radius:18px;
+  padding:12px 12px;
+}
+.kv .box .k{font-size:12px;color:var(--muted2);font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.kv .box .v{font-size:16px;margin-top:6px;color:#fff}
+.accordion details{
+  border:1px solid rgba(200,160,255,.14);
+  background: rgba(0,0,0,.20);
+  border-radius:18px;
+  padding:12px 12px;
+  margin:10px 0;
+}
+.accordion summary{
+  cursor:pointer;
+  list-style:none;
+  font-weight:700;
+  color:#fff;
+}
+.accordion summary::-webkit-details-marker{display:none}
+.accordion .hint{font-family:var(--mono);font-size:12px;color:var(--muted2);margin-top:6px}
+.accordion .body{margin-top:10px;color:var(--muted);line-height:1.6}
+.calc{display:grid;grid-template-columns: 1fr 1fr;gap:12px;margin-top:12px}
+@media (max-width:860px){.calc{grid-template-columns:1fr}}
+.field{
+  border:1px solid rgba(200,160,255,.16);
+  background: rgba(255,255,255,.03);
+  border-radius:18px;
+  padding:12px;
+}
+.field label{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted2);font-family:var(--mono)}
+.field input[type="number"], .field input[type="text"]{
+  width:100%;
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid rgba(200,160,255,.18);
+  background: rgba(0,0,0,.30);
+  color:#fff;
+  outline:none;
+}
+.field input:focus{border-color:rgba(255,255,255,.25);box-shadow:0 0 0 4px rgba(176,38,255,.14)}
+.range{margin-top:10px}
+.field input[type="range"]{width:100%}
+.out{
+  border:1px solid rgba(200,160,255,.16);
+  background: rgba(0,0,0,.25);
+  border-radius:18px;
+  padding:14px;
+}
+.out .big{font-size:22px;color:#fff;font-weight:800}
+.out .small{color:var(--muted);font-family:var(--mono);font-size:12px;margin-top:8px;line-height:1.5}
+.tableWrap{overflow:auto;margin-top:10px;border-radius:16px;border:1px solid rgba(200,160,255,.14)}
+table{width:100%;border-collapse:collapse;background:rgba(0,0,0,.18)}
+th,td{padding:10px 10px;border-bottom:1px solid rgba(200,160,255,.10);text-align:left;font-size:13px;color:var(--muted)}
+th{color:#fff;font-size:12px;letter-spacing:.10em;text-transform:uppercase;background:rgba(255,255,255,.04);position:sticky;top:0}
+td b{color:#fff}
+.footer{margin-top:26px;color:var(--muted2);font-size:12px;text-align:center}
+kbd{font-family:var(--mono);font-size:12px;border:1px solid rgba(200,160,255,.20);background:rgba(0,0,0,.25);padding:2px 6px;border-radius:8px;color:#fff}
+hr{border:none;border-top:1px solid rgba(200,160,255,.16);margin:14px 0}
+</style>
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+<canvas id="veil"></canvas>
+
+<div class="topbar">
+  <div class="row">
+    <div class="brand">
+      <div class="sig" aria-hidden="true"></div>
+      <div>
+        <h1>GBz_Bot — Pro Quant System</h1>
+        <div class="sub">Paid product documentation • operator-grade • 2025-12-31</div>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="pill"><small>PRICE</small> <b>$500</b></div>
+      <button class="btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="inner">
+      <div>
+        <h2 class="hbig">A directional, execution‑grade bot that trades like a disciplined analyst — not a coin‑flip machine.</h2>
+        <p class="kicker">
+          GBz_Bot is designed for repeatable, rules‑based trading with confidence weighting, volatility filters,
+          ATR‑based risk control, and drawdown governors. It’s the “Pro module” in your ecosystem — replacing most of the
+          chaos exposure once it proves itself in paper mode.
+        </p>
+        <div class="badgeRow">
+          <div class="badge"><b>Mode:</b> Paper → Live (gated)</div>
+          <div class="badge"><b>Risk:</b> No martingale</div>
+          <div class="badge"><b>Core:</b> Multi‑factor confirmation</div>
+          <div class="badge"><b>Stops:</b> ATR TP/SL + session kill‑switch</div>
+          <div class="badge"><b>Target:</b> Consistency & controlled growth</div>
+        </div>
+      </div>
+      <div class="heroCard">
+        <h3>Instant operator map</h3>
+        <p><b>1)</b> Feed markets → <b>2)</b> Build features → <b>3)</b> Score + confirm → <b>4)</b> Size by confidence →
+        <b>5)</b> Execute via abstraction → <b>6)</b> Log + audit → <b>7)</b> Govern drawdown.</p>
+        <div class="sep"></div>
+        <p style="margin-top:10px"><b>Critical safety:</b> GBz_Bot is built to stop trading when conditions are not “clean.”
+        Winning comes from <b>trading less</b> — but only when the edge is present.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <nav class="toc" id="toc">
+      <h3>Table of Contents</h3>
+      <a href="#sec0">0. What you’re buying</a>
+      <a href="#sec1">1. System architecture</a>
+      <a href="#sec2">2. Strategy logic (how it decides)</a>
+      <a href="#sec3">3. Execution & risk governors</a>
+      <a href="#sec4">4. Profit model & projections</a>
+      <a href="#sec5">5. Minimum capital & scaling</a>
+      <a href="#sec6">6. Comparisons (why it matters)</a>
+      <a href="#sec7">7. Operator checklist</a>
+      <a href="#sec8">8. Disclaimers</a>
+    </nav>
+
+    <main>
+      <section class="section" id="sec0">
+        <h2>0. What you’re buying</h2>
+        <div class="kv">
+          <div class="box"><div class="k">Product type</div><div class="v">Execution‑grade quant bot</div></div>
+          <div class="box"><div class="k">Goal</div><div class="v">Controlled, repeatable edge</div></div>
+          <div class="box"><div class="k">Anti‑pattern</div><div class="v">No “chase losses” logic</div></div>
+          <div class="box"><div class="k">Value</div><div class="v">Auditability + governance</div></div>
+        </div>
+        <div class="callout">
+          <strong>How GBz_Bot fits your ecosystem:</strong> Harvest is your survivable grinder, Doman.ai is your
+          opportunity‑limited arb, Charm is your window‑based spot system, OneShot is your high‑variance edge capture,
+          BrokeBot is your funding/event engine. <b>GBz_Bot is the pro directional module</b> — it should earn the right
+          to replace riskier exposure once it proves stable.
+        </div>
+      </section>
+
+      <section class="section" id="sec1">
+        <h2>1. System architecture</h2>
+        <p>GBz_Bot is built like a real trading system: streaming ingestion, feature engineering, scoring, execution abstraction,
+        and an ops layer that keeps the bot honest.</p>
+
+        <div class="accordion">
+          <details open>
+            <summary>Ingestion layer (websocket + candles)</summary>
+            <div class="hint">Objective: get clean market data without gaps or drift.</div>
+            <div class="body">
+              Uses exchange websocket for tick/level updates + periodic candle snapshots. Runs a “heartbeat” and flags
+              stale data. If the feed is unhealthy, the bot <b>halts</b>.
+            </div>
+          </details>
+
+          <details>
+            <summary>Microstructure + feature engineering</summary>
+            <div class="hint">Objective: turn chaos into measurable signals.</div>
+            <div class="body">
+              Builds features like volatility regime, ATR, range compression/expansion, momentum bursts, and
+              confirmation metrics (multi‑factor). Features are logged so you can audit why a trade happened.
+            </div>
+          </details>
+
+          <details>
+            <summary>Strategy + scoring engine</summary>
+            <div class="hint">Objective: trade only when the edge stack is present.</div>
+            <div class="body">
+              Signals are not “one indicator.” They’re a <b>confirmation stack</b>.
+              The output is a probability/confidence score used for position sizing.
+            </div>
+          </details>
+
+          <details>
+            <summary>Execution abstraction</summary>
+            <div class="hint">Objective: swap execution targets without rewriting strategy.</div>
+            <div class="body">
+              Strategy emits intents (enter/exit/adjust). The execution layer handles order types, retries,
+              slippage checks, and post‑trade reconciliation.
+            </div>
+          </details>
+
+          <details>
+            <summary>Ops / observability</summary>
+            <div class="hint">Objective: logs, metrics, and drawdown governors.</div>
+            <div class="body">
+              Every decision point writes a structured log: reason codes, features, risk state,
+              and expected vs realized fill. This is what makes it a sellable “$500 product,” not a script.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="section" id="sec2">
+        <h2>2. Strategy logic (how it decides)</h2>
+        <p>Layman version: GBz_Bot waits for the market to become “tradable,” then it only trades when multiple independent
+        signals agree — and it sizes the trade based on how strong that agreement is.</p>
+
+        <div class="callout">
+          <strong>Edge principle:</strong> You don’t win by being right all the time — you win by making sure your
+          winners are larger than your losers while avoiding “bad market states.”
+        </div>
+
+        <div class="accordion">
+          <details open>
+            <summary>Step A — Market state filter (trade/no‑trade)</summary>
+            <div class="body">
+              The bot first asks: <b>is this a clean environment?</b>
+              If volatility is unstable, spreads widen, or the regime is chaotic → it stays out.
+            </div>
+          </details>
+
+          <details>
+            <summary>Step B — Multi‑factor confirmation stack</summary>
+            <div class="body">
+              A trade requires agreement across a stack (example): trend alignment, momentum confirmation,
+              volatility condition, and a “no trap” rule (avoid obvious fakeouts).
+            </div>
+          </details>
+
+          <details>
+            <summary>Step C — Confidence score & position sizing</summary>
+            <div class="body">
+              Each confirmed setup produces a confidence score (0–100). Higher confidence → larger size (within caps).
+              Low confidence → smaller size or no trade.
+            </div>
+          </details>
+
+          <details>
+            <summary>Step D — ATR-based TP/SL + trailing logic</summary>
+            <div class="body">
+              Take profit and stop loss are set from ATR so risk matches market movement.
+              Optional trailing locks profits when the move continues.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="section" id="sec3">
+        <h2>3. Execution & risk governors</h2>
+        <p>GBz_Bot is allowed to be “aggressive” only when it is also <b>governed</b>.</p>
+
+        <div class="kv">
+          <div class="box"><div class="k">Per-trade risk</div><div class="v">0.25%–1.0% typical</div></div>
+          <div class="box"><div class="k">Daily loss cap</div><div class="v">-2% to -4% (kill switch)</div></div>
+          <div class="box"><div class="k">Max concurrent</div><div class="v">1–3 (config)</div></div>
+          <div class="box"><div class="k">No-trade states</div><div class="v">Chaos / gaps / news spikes</div></div>
+        </div>
+
+        <div class="callout">
+          <strong>Paper gate:</strong> Must run paper mode and show stable expectancy before live.
+          (Keep this: it’s what separates “gambling scripts” from systems.)
+        </div>
+
+        <p><b>Why this wins long-term:</b> The bot’s primary job is to avoid the market when your edge collapses.</p>
+      </section>
+
+      <section class="section" id="sec4">
+        <h2>4. Profit model & projections (interactive)</h2>
+        <p>These are not guarantees — they are <b>math models</b> so you can sanity-check goals. Change inputs and see outcomes.</p>
+
+        <div class="calc">
+          <div class="field">
+            <label>Starting capital (USD) <span id="capV">500</span></label>
+            <input type="range" min="50" max="50000" step="50" value="500" id="cap" class="range"/>
+            <label style="margin-top:10px">Avg trades per day <span id="tV">6</span></label>
+            <input type="range" min="0" max="40" step="1" value="6" id="trades" class="range"/>
+            <label style="margin-top:10px">Win rate (%) <span id="wV">58</span></label>
+            <input type="range" min="35" max="80" step="1" value="58" id="win" class="range"/>
+            <label style="margin-top:10px">Avg win / loss (R multiple) <span id="rV">1.30</span></label>
+            <input type="range" min="0.7" max="2.5" step="0.05" value="1.30" id="r" class="range"/>
+            <label style="margin-top:10px">Risk per trade (%) <span id="riskV">0.50</span></label>
+            <input type="range" min="0.1" max="2.0" step="0.05" value="0.50" id="risk" class="range"/>
+            <label style="margin-top:10px">Trading days / month <span id="dV">22</span></label>
+            <input type="range" min="10" max="30" step="1" value="22" id="days" class="range"/>
+          </div>
+
+          <div class="out">
+            <div class="big" id="evMonth">$0 / month (model)</div>
+            <div class="small" id="evExplain">—</div>
+            <hr/>
+            <div class="tableWrap">
+              <table>
+                <thead><tr><th>Week</th><th>Expected P/L</th><th>End balance</th><th>Notes</th></tr></thead>
+                <tbody id="weeks"></tbody>
+              </table>
+            </div>
+            <div class="small" style="margin-top:10px">
+              Model: expectancy in <b>R</b> units.
+              E[R] = p·R − (1−p)·1. Profit per trade = capital·risk%·E[R].
+              This ignores fees/slippage, so real results are lower.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="sec5">
+        <h2>5. Minimum capital & scaling (6 months → 2 years)</h2>
+        <p><b>Lowest usable:</b> You can technically start as low as $50–$100 in paper/sim mode to prove logic, but
+        live execution realism suffers (fees, min order sizes, and noise). For an operator aiming to actually compound,
+        the practical floor is usually <b>$250–$500</b> for spot/low leverage systems.</p>
+
+        <div class="callout">
+          <strong>Recommended starting bands:</strong>
+          <ul>
+            <li><b>$250–$500:</b> baseline proving range (conservative sizing, focus on survival).</li>
+            <li><b>$1,000–$5,000:</b> realistic compounding range (more stable risk % with less fee drag).</li>
+            <li><b>$10k+:</b> scaling requires pair diversification + execution upgrades (opportunity caps appear).</li>
+          </ul>
+        </div>
+
+        <p>Over 6–24 months, the growth lever is not “more trades,” it’s:
+        <b>(a)</b> avoiding drawdowns, <b>(b)</b> increasing confidence calibration, and <b>(c)</b> diversifying pairs while keeping risk constant.</p>
+      </section>
+
+      <section class="section" id="sec6">
+        <h2>6. Comparisons (why it matters)</h2>
+        <p>In your ecosystem, each bot plays a role. GBz_Bot’s job is to be the “professional” directional engine.</p>
+
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr><th>Bot</th><th>Strength</th><th>Primary limiter</th><th>Where GBz_Bot wins</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>Harvest</b></td><td>Survivable grind, multi-timeframe</td><td>Edge fades in chop / regime shifts</td><td>Cleaner governance + audited decisions</td></tr>
+              <tr><td><b>Doman.ai</b></td><td>Arb opportunity engine</td><td>Opportunity/capital caps</td><td>Directional alpha when arb is quiet</td></tr>
+              <tr><td><b>Charm</b></td><td>Window-based spot discipline</td><td>Few trades (by design)</td><td>More opportunities with stricter confirmation</td></tr>
+              <tr><td><b>OneShot</b></td><td>High-frequency edge capture</td><td>Variance + payout model risk</td><td>Lower variance, better auditability</td></tr>
+              <tr><td><b>BrokeBot</b></td><td>Funding/event harvesting</td><td>Events per month, fragmentation</td><td>Directional fills in between events</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout">
+          <strong>Real talk:</strong> No architecture “surpasses all systems known” by default.
+          What makes GBz_Bot valuable is it’s engineered to be <b>provable</b> (logs) and <b>governed</b> (risk).
+          That’s what lets it scale without blowing up.
+        </div>
+      </section>
+
+      <section class="section" id="sec7">
+        <h2>7. Operator checklist</h2>
+        <ul>
+          <li>Run <b>paper</b> until expectancy is positive and stable across weeks.</li>
+          <li>Turn on <b>hard loss caps</b> (daily + weekly) before going live.</li>
+          <li>Start with 1–2 pairs; expand only after stable results.</li>
+          <li>Audit every losing streak: were you trading a “no‑trade state”?</li>
+          <li>Keep execution logs; fix slippage/fees before increasing size.</li>
+          <li>Upgrade slowly: <kbd>feature</kbd> → <kbd>paper</kbd> → <kbd>live small</kbd> → <kbd>scale</kbd>.</li>
+        </ul>
+      </section>
+
+      <section class="section" id="sec8">
+        <h2>8. Disclaimers</h2>
+        <p><b>Not financial advice.</b> Trading can lose money. Any calculator or projection in this doc is a planning tool,
+        not a promise of performance. Real results vary due to slippage, fees, latency, market regime change, exchange risk,
+        and human configuration error.</p>
+      </section>
+
+      <div class="footer">GBz_Bot documentation (premium themed build) • Generated 2025-12-31 • For licensed customers only.</div>
+    </main>
+  </div>
+</div>
+
+<script>
+/* Alive background particles */
+const c = document.getElementById('veil');
+const ctx = c.getContext('2d');
+let W=0,H=0,particles=[],t=0;
+
+function resize() {
+  W = c.width = window.innerWidth * devicePixelRatio;
+  H = c.height = window.innerHeight * devicePixelRatio;
+}
+window.addEventListener('resize', resize); resize();
+
+function spawn(n=90) {
+  particles = [];
+  for (let i=0;i<n;i++) {
+    particles.push({
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: (Math.random()*1.8+0.8)*devicePixelRatio,
+      vx: (Math.random()*0.22-0.11)*devicePixelRatio,
+      vy: (Math.random()*0.22-0.11)*devicePixelRatio,
+      a: Math.random()*0.55+0.15,
+      hue: Math.random()<0.6 ? 285 : 315
+    });
+  }
+}
+spawn();
+
+function loop() {
+  t += 0.01;
+  ctx.clearRect(0,0,W,H);
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x<-50) p.x=W+50; if (p.x>W+50) p.x=-50;
+    if (p.y<-50) p.y=H+50; if (p.y>H+50) p.y=-50;
+    const pulse = 0.5 + 0.5*Math.sin(t + p.x*0.0009);
+    ctx.beginPath();
+    ctx.fillStyle = `hsla(${p.hue}, 100%, 65%, ${p.a*0.18 + pulse*0.06})`;
+    ctx.arc(p.x, p.y, p.r*(1.0+pulse*0.4), 0, Math.PI*2);
+    ctx.fill();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* TOC scrollspy */
+const links = Array.from(document.querySelectorAll('#toc a'));
+const secs = links.map(a => document.querySelector(a.getAttribute('href')));
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.remove('active'));
+      const id = '#'+e.target.id;
+      const a = links.find(x=>x.getAttribute('href')===id);
+      if(a) a.classList.add('active');
+    }
+  });
+},{root:null, rootMargin:"-40% 0px -55% 0px", threshold:0});
+secs.forEach(s=>s && obs.observe(s));
+
+/* Projection Calculator */
+const cap = document.getElementById('cap');
+const trades = document.getElementById('trades');
+const win = document.getElementById('win');
+const r = document.getElementById('r');
+const risk = document.getElementById('risk');
+const days = document.getElementById('days');
+
+function fmt(n) { return n.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function recompute() {
+  document.getElementById('capV').textContent = cap.value;
+  document.getElementById('tV').textContent = trades.value;
+  document.getElementById('wV').textContent = win.value;
+  document.getElementById('rV').textContent = Number(r.value).toFixed(2);
+  document.getElementById('riskV').textContent = Number(risk.value).toFixed(2);
+  document.getElementById('dV').textContent = days.value;
+
+  const C = Number(cap.value);
+  const T = Number(trades.value);
+  const p = Number(win.value)/100.0;
+  const R = Number(r.value);
+  const rp = Number(risk.value)/100.0;
+  const D = Number(days.value);
+
+  const expR = p*R - (1-p)*1.0;
+  const perTrade = C*rp*expR;
+  const perDay = perTrade * T;
+  const perMonth = perDay * D;
+
+  const sign = perMonth >= 0 ? "+" : "";
+  document.getElementById('evMonth').textContent = `${sign}$${fmt(perMonth)} / month (model)`;
+
+  document.getElementById('evExplain').textContent =
+    `Expectancy E[R]=${expR.toFixed(3)}. Per-trade ≈ $${fmt(perTrade)} at risk=${(rp*100).toFixed(2)}% and capital=$${fmt(C)}.`;
+
+  let bal = C;
+  const tbody = document.getElementById('weeks');
+  tbody.innerHTML = "";
+  const daysPerWeek = Math.max(1, Math.round(D/4));
+  for (let w=1; w<=4; w++) {
+    const wPL = (bal*rp*expR)*T*daysPerWeek;
+    bal = bal + wPL;
+
+    const note =
+      expR<=0 ? "Negative expectancy (tune / do not go live)." :
+      (p<0.52 ? "Edge too thin; volatility/fees can kill this." :
+      (rp>0.012 ? "Risk high; watch drawdowns." : "Reasonable risk band."));
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>Week ${w}</td><td><b>${sign}$${fmt(wPL)}</b></td><td><b>$${fmt(bal)}</b></td><td>${note}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+[cap,trades,win,r,risk,days].forEach(el=>el.addEventListener('input',recompute));
+recompute();
+</script>
+<script src="../../../admension-ads.js"></script>n</body>
+</html>

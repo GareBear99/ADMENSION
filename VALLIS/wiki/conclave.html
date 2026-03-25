@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CONCLAVE — VALLIS</title>
+  <link rel="stylesheet" href="css/style.css"/>
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><a href="index.html">VALLIS Lore Wiki</a></div>
+    <nav class="nav">
+      <a href="index.html">Overview</a>
+      <a class="active" href="conclave.html">Conclave</a>
+      <a href="codex.html">Codex</a>
+      <a href="search.html">Search</a>
+    
+      <a class="navlink" href="minigames/index.html">Minigames</a>
+      <a class="navlink" href="settings/region.html">Region</a>
+</nav>
+  </header>
+
+  <main class="page">
+    <section class="card">
+      <div class="kicker">CONCLAVE</div>
+      <h1>Community Priority Vote</h1>
+      <p class="muted">
+        Conclave is a monthly prioritization ritual. Tokens influence which bundle is implemented first.
+        Voting is non-binding: the founder may still ship stability, security, or compliance updates at any time.
+      </p>
+      <p class="muted">
+        <b>Important:</b> Conclave tokens only affect priority. They do not unlock content, change odds, or guarantee delivery.
+      </p>
+
+      <div class="hr"></div>
+
+      <div class="grid2">
+        <div class="card subtle">
+          <div class="kicker">Deterministic Daily Trace</div>
+          <p class="muted" style="font-size:12px;">
+            Daily rune + conclave code are derived from: <br/>
+            <code>VALLIS|YYYY-MM-DD (UTC)|SEASON_SEED</code> → SHA-256
+          </p>
+          <div class="row">
+            <div>
+              <div class="muted">Rune of the Day</div>
+              <div style="font-size:20px;font-weight:800;" id="cxRune">—</div>
+            </div>
+            <div>
+              <div class="muted">Conclave Code</div>
+              <div style="font-size:20px;font-weight:800;" id="cxCode">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card subtle">
+          <div class="kicker">Your Status</div>
+          <div class="row">
+            <div>
+              <div class="muted">Tokens (this month)</div>
+              <div style="font-size:24px;font-weight:900;" id="cxTokens">0</div>
+            </div>
+            <div>
+              <button class="btn" id="cxClaim">Claim Token (local)</button>
+            </div>
+          </div>
+          <p class="muted" style="font-size:12px;margin-top:8px;">
+            Static build note: token claim is local-only. Production should verify donation receipts and cap to 1 token/month.
+          </p>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="kicker">This Month’s Two Selections</div>
+      <div class="grid2" style="grid-template-columns:1fr 1fr;">
+        <div class="card subtle" id="cxA"></div>
+        <div class="card subtle" id="cxB"></div>
+      </div>
+
+      <div style="height:12px"></div>
+      <div class="card subtle">
+        <div class="kicker">Your Vote Receipt</div>
+        <div class="muted" id="cxReceipt">No vote recorded.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="muted">© VALLIS Lore Wiki — Conclave</div>
+  </footer>
+
+  <script src="js/app.js"></script>
+<script src="../admension-ads.js"></script>n</body>
+</html>

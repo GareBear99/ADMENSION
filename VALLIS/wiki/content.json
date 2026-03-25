@@ -1,0 +1,458 @@
+{
+  "meta": {
+    "site_name": "VALLIS Lore Wiki",
+    "founder": "Gary Richard Doman",
+    "canon_entity_order": "Sentinel \u2192 Scar \u2192 Noot \u2192 EVE",
+    "theme": "yellow_black",
+    "built_utc": "2026-01-02T22:20:51Z"
+  },
+  "entities": [
+    {
+      "slug": "sentinel",
+      "name": "Sentinel",
+      "tagline": "Enforcement",
+      "order": 1,
+      "body": [
+        "Sentinel is first. Every action passes through Sentinel.",
+        "Sentinel enforces caps, gates, phase locks, and deny/allow decisions.",
+        "If Sentinel denies, nothing executes\u2014no Scar, no Noot, no EVE."
+      ]
+    },
+    {
+      "slug": "scar",
+      "name": "Scar",
+      "tagline": "Memory of Cost",
+      "order": 2,
+      "body": [
+        "Scar records what was allowed to occur.",
+        "Hearts, fatigue, and loss are Scar's ledger of cost.",
+        "Scar ensures recovery is slower than failure: history matters."
+      ]
+    },
+    {
+      "slug": "noot",
+      "name": "Noot",
+      "tagline": "The Secret Remainder",
+      "order": 3,
+      "hidden": true,
+      "body": [
+        "Noot is secret and non-addressable.",
+        "Noot never overrides Sentinel and never excuses risk.",
+        "Noot represents the irreducible remainder after enforcement and memory."
+      ]
+    },
+    {
+      "slug": "eve",
+      "name": "EVE",
+      "tagline": "Interpreter",
+      "order": 4,
+      "body": [
+        "EVE speaks last.",
+        "EVE explains Sentinel's decision and Scar's state, acknowledging Noot as remainder without turning it into control.",
+        "EVE is guidance and clarity\u2014never prediction."
+      ]
+    }
+  ],
+  "glyphs": [
+    {
+      "slug": "ash",
+      "name": "ASH",
+      "file": "assets/glyphs/core/ash.svg",
+      "meaning": "Loss / decay / exhaustion (Scar / Hearts)",
+      "used_in": [
+        "OneShot / MultiShot",
+        "Archive logs (exhaustion)"
+      ],
+      "variants": [
+        {
+          "label": "Canonical",
+          "file": "assets/glyphs/core/ash.svg",
+          "notes": "Current canonical asset"
+        },
+        {
+          "label": "Ritual",
+          "file": "assets/glyphs/core/variants/ritual/ash.svg",
+          "notes": "Drop ritual-variant SVG here (if different)."
+        },
+        {
+          "label": "Orbs",
+          "file": "assets/glyphs/core/variants/orbs/ash.svg",
+          "notes": "Drop orbs-variant SVG here (if different)."
+        }
+      ]
+    },
+    {
+      "slug": "flood",
+      "name": "FLOOD",
+      "file": "assets/glyphs/core/flood.svg",
+      "meaning": "Variance / volatility (OMEN / Trials)",
+      "used_in": [
+        "OMEN",
+        "Volatility pages"
+      ],
+      "variants": [
+        {
+          "label": "Canonical",
+          "file": "assets/glyphs/core/flood.svg",
+          "notes": "Current canonical asset"
+        },
+        {
+          "label": "Ritual",
+          "file": "assets/glyphs/core/variants/ritual/flood.svg",
+          "notes": "Drop ritual-variant SVG here (if different)."
+        },
+        {
+          "label": "Orbs",
+          "file": "assets/glyphs/core/variants/orbs/flood.svg",
+          "notes": "Drop orbs-variant SVG here (if different)."
+        }
+      ]
+    },
+    {
+      "slug": "stone",
+      "name": "STONE",
+      "file": "assets/glyphs/core/stone.svg",
+      "meaning": "Structure / stability (Foundation)",
+      "used_in": [
+        "Doman.ai",
+        "Phase I (Foundation)"
+      ],
+      "variants": [
+        {
+          "label": "Canonical",
+          "file": "assets/glyphs/core/stone.svg",
+          "notes": "Current canonical asset"
+        },
+        {
+          "label": "Ritual",
+          "file": "assets/glyphs/core/variants/ritual/stone.svg",
+          "notes": "Drop ritual-variant SVG here (if different)."
+        },
+        {
+          "label": "Orbs",
+          "file": "assets/glyphs/core/variants/orbs/stone.svg",
+          "notes": "Drop orbs-variant SVG here (if different)."
+        }
+      ]
+    },
+    {
+      "slug": "void",
+      "name": "VOID",
+      "file": "assets/glyphs/core/void.svg",
+      "meaning": "Pause / uncertainty (Noot / paused states)",
+      "used_in": [
+        "Pause states",
+        "OMEN null readings"
+      ],
+      "variants": [
+        {
+          "label": "Canonical",
+          "file": "assets/glyphs/core/void.svg",
+          "notes": "Current canonical asset"
+        },
+        {
+          "label": "Ritual",
+          "file": "assets/glyphs/core/variants/ritual/void.svg",
+          "notes": "Drop ritual-variant SVG here (if different)."
+        },
+        {
+          "label": "Orbs",
+          "file": "assets/glyphs/core/variants/orbs/void.svg",
+          "notes": "Drop orbs-variant SVG here (if different)."
+        }
+      ]
+    },
+    {
+      "slug": "wind",
+      "name": "WIND",
+      "file": "assets/glyphs/core/wind.svg",
+      "meaning": "Flow / throughput (Harvest / scaling)",
+      "used_in": [
+        "Harvest",
+        "Scaling diagrams"
+      ],
+      "variants": [
+        {
+          "label": "Canonical",
+          "file": "assets/glyphs/core/wind.svg",
+          "notes": "Current canonical asset"
+        },
+        {
+          "label": "Ritual",
+          "file": "assets/glyphs/core/variants/ritual/wind.svg",
+          "notes": "Drop ritual-variant SVG here (if different)."
+        },
+        {
+          "label": "Orbs",
+          "file": "assets/glyphs/core/variants/orbs/wind.svg",
+          "notes": "Drop orbs-variant SVG here (if different)."
+        }
+      ]
+    },
+    {
+      "slug": "d6",
+      "name": "D6",
+      "file": "assets/glyphs/dice/d6.svg",
+      "meaning": "Discrete chance (CoinFlip / Trials)",
+      "used_in": [
+        "CoinFlip",
+        "Probability demos"
+      ],
+      "variants": [
+        {
+          "label": "Canonical",
+          "file": "assets/glyphs/dice/d6.svg",
+          "notes": "Current canonical asset"
+        },
+        {
+          "label": "Ritual",
+          "file": "assets/glyphs/dice/variants/ritual/d6.svg",
+          "notes": "Drop ritual-variant SVG here (if different)."
+        },
+        {
+          "label": "Orbs",
+          "file": "assets/glyphs/dice/variants/orbs/d6.svg",
+          "notes": "Drop orbs-variant SVG here (if different)."
+        }
+      ]
+    },
+    {
+      "slug": "d20",
+      "name": "D20",
+      "file": "assets/glyphs/dice/d20.svg",
+      "meaning": "Discrete chance (CoinFlip / Trials)",
+      "used_in": [
+        "CoinFlip",
+        "Probability demos"
+      ],
+      "variants": [
+        {
+          "label": "Canonical",
+          "file": "assets/glyphs/dice/d20.svg",
+          "notes": "Current canonical asset"
+        },
+        {
+          "label": "Ritual",
+          "file": "assets/glyphs/dice/variants/ritual/d20.svg",
+          "notes": "Drop ritual-variant SVG here (if different)."
+        },
+        {
+          "label": "Orbs",
+          "file": "assets/glyphs/dice/variants/orbs/d20.svg",
+          "notes": "Drop orbs-variant SVG here (if different)."
+        }
+      ]
+    }
+  ],
+  "runes": [
+    {
+      "name": "Limit",
+      "meaning": "Caps reached; further execution denied (Sentinel)."
+    },
+    {
+      "name": "Pause",
+      "meaning": "Regime not net-positive; system idles (Sentinel)."
+    },
+    {
+      "name": "Gate",
+      "meaning": "Phase locked; access denied until criteria met (Sentinel)."
+    },
+    {
+      "name": "Observation",
+      "meaning": "Trial/demo state; record without escalation (EVE)."
+    },
+    {
+      "name": "Record",
+      "meaning": "Logs/receipts written; immutable entry (Scar)."
+    },
+    {
+      "name": "Repetition",
+      "meaning": "Sustained filtered execution; density over hero trades (Scar)."
+    },
+    {
+      "name": "Reset",
+      "meaning": "Cycle rollover; state cleared where allowed (Sentinel)."
+    }
+  ],
+  "games": [
+    {
+      "slug": "coinflip",
+      "name": "CoinFlip",
+      "positioning": "Disclosed-odds probability demonstration (Standalone Mode capable).",
+      "glyphs": [
+        "d6",
+        "d20",
+        "void"
+      ],
+      "runes": [
+        "Observation",
+        "Record"
+      ],
+      "assets": []
+    },
+    {
+      "slug": "omen",
+      "name": "OMEN",
+      "positioning": "Interpretive visualization layer (cosmetic lore; no prediction).",
+      "glyphs": [
+        "flood",
+        "void",
+        "wind"
+      ],
+      "runes": [
+        "Observation",
+        "Repetition",
+        "Record"
+      ],
+      "assets": []
+    }
+  ],
+  "omens": [
+    {
+      "file": "assets/omens/images/123554274_391136665348621_7758588489061028584_n.png",
+      "name": "123554274_391136665348621_7758588489061028584_n.png"
+    },
+    {
+      "file": "assets/omens/images/605564765_1422950232526589_2769055575471070886_n.jpg",
+      "name": "605564765_1422950232526589_2769055575471070886_n.jpg"
+    },
+    {
+      "file": "assets/omens/images/7514E814-E245-4AF4-902E-DA5A4F97F56C.jpeg",
+      "name": "7514E814-E245-4AF4-902E-DA5A4F97F56C.jpeg"
+    },
+    {
+      "file": "assets/omens/images/80844b2caad970e42109ac8f1435fda6.jpg",
+      "name": "80844b2caad970e42109ac8f1435fda6.jpg"
+    },
+    {
+      "file": "assets/omens/images/ChatGPT Image Dec 31, 2025, 09_37_32 PM.png",
+      "name": "ChatGPT Image Dec 31, 2025, 09_37_32 PM.png"
+    },
+    {
+      "file": "assets/omens/images/FEC2C429-39B4-4E94-9F91-A2C319374430_1_105_c.jpeg",
+      "name": "FEC2C429-39B4-4E94-9F91-A2C319374430_1_105_c.jpeg"
+    },
+    {
+      "file": "assets/omens/images/d1222c03-fb67-4955-b4f7-8b9762f1ca5c.png",
+      "name": "d1222c03-fb67-4955-b4f7-8b9762f1ca5c.png"
+    },
+    {
+      "file": "assets/omens/images/f0847a1c0076bfd61cec4a81c8127666.jpg",
+      "name": "f0847a1c0076bfd61cec4a81c8127666.jpg"
+    }
+  ],
+  "runes_assets": {
+    "variants": [
+      {
+        "label": "Ritual",
+        "dir": "assets/runes/variants/ritual/",
+        "notes": "Drop rune PNG/SVGs here"
+      },
+      {
+        "label": "Orbs",
+        "dir": "assets/runes/variants/orbs/",
+        "notes": "Drop rune PNG/SVGs here"
+      }
+    ]
+  },
+  "relics_assets": {
+    "variants": [
+      {
+        "label": "Ritual",
+        "dir": "assets/relics/variants/ritual/",
+        "notes": "Drop relic PNG/SVGs here"
+      },
+      {
+        "label": "Orbs",
+        "dir": "assets/relics/variants/orbs/",
+        "notes": "Drop relic PNG/SVGs here"
+      }
+    ]
+  },
+  "featured": [
+    {
+      "title": "Master Sheet (Reference)",
+      "type": "reference",
+      "thumb": "assets/ui/master.png",
+      "href": "omens/index.html",
+      "note": "Canonical reference sheet for layouts/assets."
+    },
+    {
+      "title": "OMEN Visual",
+      "type": "omen",
+      "thumb": "assets/omens/images/123554274_391136665348621_7758588489061028584_n.png",
+      "href": "omens/index.html",
+      "note": "Interpretive-only. Cosmetic layer."
+    },
+    {
+      "title": "OMEN Visual",
+      "type": "omen",
+      "thumb": "assets/omens/images/605564765_1422950232526589_2769055575471070886_n.jpg",
+      "href": "omens/index.html",
+      "note": "Interpretive-only. Cosmetic layer."
+    },
+    {
+      "title": "OMEN Visual",
+      "type": "omen",
+      "thumb": "assets/omens/images/7514E814-E245-4AF4-902E-DA5A4F97F56C.jpeg",
+      "href": "omens/index.html",
+      "note": "Interpretive-only. Cosmetic layer."
+    },
+    {
+      "title": "OMEN Visual",
+      "type": "omen",
+      "thumb": "assets/omens/images/80844b2caad970e42109ac8f1435fda6.jpg",
+      "href": "omens/index.html",
+      "note": "Interpretive-only. Cosmetic layer."
+    },
+    {
+      "title": "OMEN Visual",
+      "type": "omen",
+      "thumb": "assets/omens/images/ChatGPT Image Dec 31, 2025, 09_37_32 PM.png",
+      "href": "omens/index.html",
+      "note": "Interpretive-only. Cosmetic layer."
+    },
+    {
+      "title": "OMEN Visual",
+      "type": "omen",
+      "thumb": "assets/omens/images/FEC2C429-39B4-4E94-9F91-A2C319374430_1_105_c.jpeg",
+      "href": "omens/index.html",
+      "note": "Interpretive-only. Cosmetic layer."
+    },
+    {
+      "title": "Glyph: ASH",
+      "type": "glyph",
+      "thumb": "assets/glyphs/core/ash.svg",
+      "href": "glyphs/ash.html",
+      "note": "Loss / decay / exhaustion (Scar / Hearts)"
+    },
+    {
+      "title": "Glyph: FLOOD",
+      "type": "glyph",
+      "thumb": "assets/glyphs/core/flood.svg",
+      "href": "glyphs/flood.html",
+      "note": "Variance / volatility (OMEN / Trials)"
+    },
+    {
+      "title": "Glyph: STONE",
+      "type": "glyph",
+      "thumb": "assets/glyphs/core/stone.svg",
+      "href": "glyphs/stone.html",
+      "note": "Structure / stability (Foundation)"
+    },
+    {
+      "title": "Glyph: VOID",
+      "type": "glyph",
+      "thumb": "assets/glyphs/core/void.svg",
+      "href": "glyphs/void.html",
+      "note": "Pause / uncertainty (Noot / paused states)"
+    },
+    {
+      "title": "Glyph: WIND",
+      "type": "glyph",
+      "thumb": "assets/glyphs/core/wind.svg",
+      "href": "glyphs/wind.html",
+      "note": "Flow / throughput (Harvest / scaling)"
+    }
+  ]
+}

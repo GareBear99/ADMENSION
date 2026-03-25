@@ -1,0 +1,157 @@
+[
+  {
+    "url": "index.html",
+    "title": "Overview",
+    "text": "VALLIS Lore Wiki. Canon order Sentinel Scar Noot EVE. Oracle fortunes hourly. Glyphs, runes, relics, games, omens, quotes, archive logs.",
+    "tags": [
+      "overview",
+      "vallis",
+      "lore"
+    ]
+  },
+  {
+    "url": "entities/sentinel.html",
+    "title": "Entity: Sentinel",
+    "text": "Sentinel is first. Every action passes through Sentinel. Sentinel enforces caps, gates, phase locks, and deny/allow decisions. If Sentinel denies, nothing executes\u2014no Scar, no Noot, no EVE.",
+    "tags": [
+      "entity",
+      "sentinel"
+    ]
+  },
+  {
+    "url": "entities/scar.html",
+    "title": "Entity: Scar",
+    "text": "Scar records what was allowed to occur. Hearts, fatigue, and loss are Scar's ledger of cost. Scar ensures recovery is slower than failure: history matters.",
+    "tags": [
+      "entity",
+      "scar"
+    ]
+  },
+  {
+    "url": "entities/noot.html",
+    "title": "Entity: Noot",
+    "text": "Noot is secret and non-addressable. Noot never overrides Sentinel and never excuses risk. Noot represents the irreducible remainder after enforcement and memory.",
+    "tags": [
+      "entity",
+      "noot"
+    ]
+  },
+  {
+    "url": "entities/eve.html",
+    "title": "Entity: EVE",
+    "text": "EVE speaks last. EVE explains Sentinel's decision and Scar's state, acknowledging Noot as remainder without turning it into control. EVE is guidance and clarity\u2014never prediction.",
+    "tags": [
+      "entity",
+      "eve"
+    ]
+  },
+  {
+    "url": "glyphs/ash.html",
+    "title": "Glyph: ASH",
+    "text": "Loss / decay / exhaustion (Scar / Hearts) Used in: OneShot / MultiShot, Archive logs (exhaustion)",
+    "tags": [
+      "glyph",
+      "ash"
+    ]
+  },
+  {
+    "url": "glyphs/flood.html",
+    "title": "Glyph: FLOOD",
+    "text": "Variance / volatility (OMEN / Trials) Used in: OMEN, Volatility pages",
+    "tags": [
+      "glyph",
+      "flood"
+    ]
+  },
+  {
+    "url": "glyphs/stone.html",
+    "title": "Glyph: STONE",
+    "text": "Structure / stability (Foundation) Used in: Doman.ai, Phase I (Foundation)",
+    "tags": [
+      "glyph",
+      "stone"
+    ]
+  },
+  {
+    "url": "glyphs/void.html",
+    "title": "Glyph: VOID",
+    "text": "Pause / uncertainty (Noot / paused states) Used in: Pause states, OMEN null readings",
+    "tags": [
+      "glyph",
+      "void"
+    ]
+  },
+  {
+    "url": "glyphs/wind.html",
+    "title": "Glyph: WIND",
+    "text": "Flow / throughput (Harvest / scaling) Used in: Harvest, Scaling diagrams",
+    "tags": [
+      "glyph",
+      "wind"
+    ]
+  },
+  {
+    "url": "glyphs/d6.html",
+    "title": "Glyph: D6",
+    "text": "Discrete chance (CoinFlip / Trials) Used in: CoinFlip, Probability demos",
+    "tags": [
+      "glyph",
+      "d6"
+    ]
+  },
+  {
+    "url": "glyphs/d20.html",
+    "title": "Glyph: D20",
+    "text": "Discrete chance (CoinFlip / Trials) Used in: CoinFlip, Probability demos",
+    "tags": [
+      "glyph",
+      "d20"
+    ]
+  },
+  {
+    "url": "games/coinflip.html",
+    "title": "Game: CoinFlip",
+    "text": "Disclosed-odds probability demonstration (Standalone Mode capable).",
+    "tags": [
+      "game",
+      "coinflip"
+    ]
+  },
+  {
+    "url": "games/omen.html",
+    "title": "Game: OMEN",
+    "text": "Interpretive visualization layer (cosmetic lore; no prediction).",
+    "tags": [
+      "game",
+      "omen"
+    ]
+  },
+  {
+    "url": "runes/index.html",
+    "title": "Runes",
+    "text": "Daily runes: Limit, Pause, Gate, Observation, Record, Repetition, Reset.",
+    "tags": [
+      "runes"
+    ]
+  },
+  {
+    "url": "omens/index.html",
+    "title": "Omens",
+    "text": "Omen imagery gallery and explanations. Interpretive only.",
+    "tags": [
+      "omens",
+      "gallery"
+    ]
+  },
+  {
+    "url": "entities/oracle.html",
+    "title": "Entity: Oracle",
+    "text": "Oracle is wiki-bound. It provides Fortune of the Hour from a 256-quote daily pool keyed by date and hour. Cosmetic-only; no promises or predictions.",
+    "tags": [
+      "entity",
+      "oracle",
+      "fortune",
+      "quotes"
+    ]
+  }
+]

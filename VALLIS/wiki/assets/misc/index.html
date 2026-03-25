@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HARVEST Trading Bot - Complete Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #667eea;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #764ba2;
+            margin-top: 25px;
+        }
+        .credits {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .credits h2 {
+            color: white;
+            border: none;
+            margin-top: 0;
+            font-size: 2em;
+        }
+        .credits p {
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+        .credits a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .credits a:hover {
+            text-decoration: underline;
+        }
+        .version {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+        .overview {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .overview p {
+            line-height: 1.8;
+            color: #444;
+        }
+        .overview ul {
+            line-height: 1.8;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: white;
+            margin: 0 0 10px 0;
+            font-size: 1.8em;
+        }
+        .stat-card p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        .doc-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+        .doc-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .doc-card h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .doc-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .doc-links {
+            margin-top: 15px;
+        }
+        .doc-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 10px;
+            margin-top: 5px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+        .doc-links a:hover {
+            background: #5568d3;
+        }
+        .feature-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .feature-list li {
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+        .architecture {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(102, 126, 234, 0.95);
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .audio-controls button {
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .audio-controls button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+        .audio-controls span {
+            color: white;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+    </style>
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+    <!-- Audio Player -->
+    <audio id="bgMusic" loop>
+        <source src="/Users/TheRustySpoon/Desktop/Projects/samples/Packs&Samples/riffsMe/MunnySide.wav" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <!-- Audio Controls -->
+    <div class="audio-controls">
+        <span id="songTitle">🎵 Munny Mind - TizWildin</span>
+        <button id="muteBtn" onclick="toggleMute()" title="Mute/Unmute">🔊</button>
+    </div>
+
+    <div class="container">
+        <!-- Credits Section -->
+        <div class="credits">
+            <h2>🌟 HARVEST Trading Bot</h2>
+            <p><strong>Created by Gary Richard Doman</strong></p>
+            <p>Founder of <a href="https://Doman.ai" target="_blank">Doman.ai</a> & GareBearEnterprises</p>
+            <p>Music Producer: TizWildin</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">Advanced Multi-Timeframe Algorithmic Trading System</p>
+        </div>
+
+        <h1>📚 Complete System Documentation</h1>
+        <p class="version">Version 3.3 | December 18, 2024 | Dashboard Enhancements & Status Tracking</p>
+        
+        <!-- System Overview -->
+        <h2>🎯 System Overview</h2>
+        <div class="overview">
+            <p><strong>HARVEST is an advanced multi-timeframe algorithmic trading bot</strong> that simultaneously trades across 5 different timeframes (1m, 5m, 15m, 1h, 4h) to maximize trading opportunities while maintaining strict risk controls.</p>
+            
+            <p>The system uses a sophisticated <strong>deterministic seed system</strong> (similar to Minecraft world generation) where each unique combination of trading parameters generates a reproducible "seed" that produces identical trading behavior. This enables:</p>
+            
+            <ul>
+                <li>✅ <strong>Perfect reproducibility</strong> - Same seed always produces same trades</li>
+                <li>✅ <strong>37.6 billion tracked combinations</strong> - Comprehensive parameter space</li>
+                <li>✅ <strong>4-layer tracking system</strong> - Registry, Snapshots, Catalog, Performance</li>
+                <li>✅ <strong>Automatic optimization</strong> - Whitelist/blacklist based on performance</li>
+                <li>✅ <strong>Independent per-timeframe</strong> - Each timeframe optimized separately</li>
+            </ul>
+        </div>
+
+        <!-- Key Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>5</h3>
+                <p>Timeframes</p>
+                <p>1m to 4h</p>
+            </div>
+            <div class="stat-card">
+                <h3>20-40+</h3>
+                <p>Trades Per Day</p>
+                <p>High Frequency</p>
+            </div>
+            <div class="stat-card">
+                <h3>37.6B</h3>
+                <p>Seed Combinations</p>
+                <p>Tracked</p>
+            </div>
+            <div class="stat-card">
+                <h3>72%+</h3>
+                <p>Target Win Rate</p>
+                <p>Per Timeframe</p>
+            </div>
+            <div class="stat-card">
+                <h3>6-Layer</h3>
+                <p>Data Validation</p>
+                <p>Blockchain Audit</p>
+            </div>
+            <div class="stat-card">
+                <h3>$100 Max</h3>
+                <p>Position Size</p>
+                <p>Small Account</p>
+            </div>
+            <div class="stat-card">
+                <h3>7 Tiers</h3>
+                <p>Balance-Aware</p>
+                <p>$10 to $100+</p>
+            </div>
+            <div class="stat-card">
+                <h3>Auto BTC</h3>
+                <p>Wallet Creation</p>
+                <p>At $20+</p>
+            </div>
+        </div>
+
+        <!-- Core Features -->
+        <h2>🚀 Core Features</h2>
+        <div class="feature-list">
+            <h3>Multi-Timeframe Trading</h3>
+            <ul>
+                <li><strong>1m (Ultra-Fast Scalping)</strong> - 30 min max hold, 82% confidence, 10-20 trades/day</li>
+                <li><strong>5m (Fast Scalping)</strong> - 1 hour max hold, 80% confidence, 6-12 trades/day</li>
+                <li><strong>15m (Short-Term)</strong> - 3 hour max hold, 75% confidence, 3-5 trades/day</li>
+                <li><strong>1h (Medium-Term)</strong> - 12 hour max hold, 75% confidence, 1-2 trades/day</li>
+                <li><strong>4h (Long-Term)</strong> - 24 hour max hold, 63% confidence, 0-1 trades/day</li>
+            </ul>
+
+            <h3>Seed System & Optimization</h3>
+            <ul>
+                <li><strong>Deterministic Seed Generation</strong> - Each parameter combination produces unique reproducible seed</li>
+                <li><strong>4-Layer Tracking</strong> - Registry, Snapshots (SHA-256), Catalog, Performance Tracker</li>
+                <li><strong>Automatic Whitelist</strong> - Seeds with 70%+ WR, positive P&L, 15+ trades</li>
+                <li><strong>Automatic Blacklist</strong> - Seeds with <55% WR or negative P&L</li>
+                <li><strong>Seed Testing Commands</strong> - Test all whitelisted or top 10 seeds per timeframe</li>
+                <li><strong>BASE_STRATEGY Overwrite</strong> - Deploy proven seeds to production</li>
+            </ul>
+
+            <h3>Risk Management & Position Sizing</h3>
+            <ul>
+                <li><strong>Balance-Aware Tiers</strong> - Position sizes scale with account balance ($10→$100+)</li>
+                <li><strong>Timeframe Multipliers</strong> - Each timeframe has unique position sizing:
+                    <ul style="margin-top: 5px; margin-left: 20px;">
+                        <li>1m: 0.3x base (fast scalping, small positions)</li>
+                        <li>5m: 0.5x base (medium scalping)</li>
+                        <li>15m: 0.7x base (short-term)</li>
+                        <li>1h: 1.0x base (standard medium-term)</li>
+                        <li>4h: 1.5x base (larger long-term positions)</li>
+                    </ul>
+                </li>
+                <li><strong>Tier Caps</strong> - Max position per asset increases with balance: $10→$15→$16→$18→$20→$100</li>
+                <li><strong>Example:</strong> At $35 balance (Tier 3), 1h trade = $15 × 1.0 = $15, while 1m = $15 × 0.3 = $4.50</li>
+                <li><strong>Dynamic TP/SL</strong> - ATR-based with timeframe-specific multipliers</li>
+                <li><strong>Time Limits</strong> - Force close after max hold time per timeframe</li>
+                <li><strong>Max Concurrent</strong> - 2 simultaneous positions across all active timeframes</li>
+            </ul>
+
+            <h3>Advanced Analytics</h3>
+            <ul>
+                <li><strong>10-Criteria High Accuracy Filter</strong> - Multi-factor trade validation</li>
+                <li><strong>Reversal Detection</strong> - Avoid trades near trend reversals</li>
+                <li><strong>Prediction Tracking</strong> - Confidence calibration and validation</li>
+                <li><strong>Strategy Performance</strong> - Real-time win rate and P&L tracking</li>
+                <li><strong>Backtest History</strong> - Complete audit trail with timestamps</li>
+            </ul>
+
+            <h3>Dashboard & UI</h3>
+            <ul>
+                <li><strong>Terminal Dashboard</strong> - Real-time monitoring with 4 panels + status bar</li>
+                <li><strong>Seed Status Panel</strong> - Shows active seeds for all 5 timeframes, whitelist/blacklist stats</li>
+                <li><strong>Bot Status Panel</strong> - Balance, active positions with sizes, last trade, P&L tracking</li>
+                <li><strong>Performance Panel</strong> - Win rate, trade statistics, average position sizes per timeframe</li>
+                <li><strong>Wallet & Limits Panel</strong> - MetaMask connection, BTC wallet, profit tracking, position size limits</li>
+                <li><strong>Status Bar (NEW!)</strong> - Real-time command tracking, validation icons (✓/✗), command history, operation status (ℹ️ ⏳ ✅ ❌)</li>
+                <li><strong>Comprehensive Help Screen (NEW!)</strong> - Press H for extensive command reference, status bar guide, tips & tricks</li>
+                <li><strong>Interactive Controls</strong> - Keyboard commands with immediate feedback and validation</li>
+            </ul>
+            
+            <h3>Wallet Management</h3>
+            <ul>
+                <li><strong>MetaMask Integration</strong> - Browser-based wallet connection with balance display</li>
+                <li><strong>BTC Wallet Generation</strong> - Automatic creation with BIP39/BIP44 derivation</li>
+                <li><strong>Auto-Funding</strong> - Transfer profits to BTC wallet at $100 threshold</li>
+                <li><strong>Real-Time Balance</strong> - Live ETH balance with USD conversion via Binance API</li>
+                <li><strong>Client ID System</strong> - Persistent wallet association per user</li>
+                <li><strong>Minimum Balance</strong> - $10 required for live trading startup</li>
+            </ul>
+            
+            <h3>Position Size Limiting</h3>
+            <ul>
+                <li><strong>Small Account Protection</strong> - Max $100 per position for accounts < $5,000</li>
+                <li><strong>Large Account Scaling</strong> - Max 2% of capital per position for accounts ≥ $5,000</li>
+                <li><strong>Unified Enforcement</strong> - Same limits in backtest and live trading</li>
+                <li><strong>Real-Time Display</strong> - Dashboard shows current limits and capital status</li>
+                <li><strong>Statistics Tracking</strong> - Monitor limit application frequency and reductions</li>
+            </ul>
+            
+            <h3>Data Validation & Integrity</h3>
+            <ul>
+                <li><strong>6-Layer Validation</strong> - Download → Validate → Blockchain Audit → Fix Corruptions</li>
+                <li><strong>Timestamp Integrity</strong> - Chronological order, 1-minute intervals, DST detection</li>
+                <li><strong>Price Validation</strong> - OHLC relationships, range checks, negative value detection</li>
+                <li><strong>Gap Detection</strong> - Identifies missing candles in 24/7 crypto market</li>
+                <li><strong>Blockchain Audit</strong> - Cross-validates with actual blockchain timestamps</li>
+                <li><strong>Audit Logging</strong> - Complete trail of all validation checks with severity levels</li>
+                <li><strong>Corruption Repair</strong> - Automatic detection with transparent reporting</li>
+            </ul>
+            
+            <h3>Statistics Tracking</h3>
+            <ul>
+                <li><strong>Historical Performance</strong> - All-time trades, P&L, win rates across all timeframes</li>
+                <li><strong>Daily Metrics</strong> - Trades per day, daily P&L, session uptime tracking</li>
+                <li><strong>Timeframe Analytics</strong> - Performance and seed info for each timeframe (1m-4h)</li>
+                <li><strong>Session Monitoring</strong> - Multiple sessions per day, active trading time</li>
+                <li><strong>Best/Worst Days</strong> - Automatic tracking of peak and low performance</li>
+                <li><strong>Persistent Storage</strong> - All statistics saved to JSON with dashboard display</li>
+            </ul>
+            
+            <h3>Balance-Aware Trading System (NEW!)</h3>
+            <ul>
+                <li><strong>Stair-Climbing Allocation</strong> - Each $10 earned alternates ETH→BTC slot from $10 to $100</li>
+                <li><strong>$10: ETH Slot 1</strong> - 1m only, ultra-fast scalping</li>
+                <li><strong>$20: BTC Slot 2</strong> - 1m only, dual-asset begins + BTC wallet auto-created</li>
+                <li><strong>$30: ETH Slot 3</strong> - 1m+5m unlocked (slots 3-4)</li>
+                <li><strong>$40: BTC Slot 4</strong> - 1m+5m active on both assets</li>
+                <li><strong>$50: ETH Slot 5</strong> - 1m+5m+15m unlocked (slots 5-6)</li>
+                <li><strong>$60: BTC Slot 6</strong> - Short-term timeframes active</li>
+                <li><strong>$70: ETH Slot 7</strong> - 1m+5m+15m+1h unlocked (slots 7-8)</li>
+                <li><strong>$80: BTC Slot 8</strong> - Medium-term swings added</li>
+                <li><strong>$90: ETH Slot 9</strong> - All 5 timeframes unlocked (slots 9-10)</li>
+                <li><strong>$100: BTC Slot 10</strong> - FULL BASE SYSTEM (10 slots = 5 TFs × 2 assets)</li>
+                <li><strong>$110: Position Tier 2</strong> - $10 fee → blockchain confirm → 20 slots (2 per TF per asset)</li>
+                <li><strong>$210: Position Tier 3</strong> - $10 fee → blockchain confirm → 30 slots MAXED (3 per TF per asset)</li>
+                <li><strong>Backtest Integration</strong> - Test any balance: <code>--balance 35</code> (4 slots active)</li>
+                <li><strong>Note</strong> - Founder fees only in live trading; backtests track full profit</li>
+            </ul>
+        </div>
+
+        <!-- Architecture -->
+        <h2>🏗️ System Architecture</h2>
+        <div class="architecture">
+            <h3>Seed System (Deterministic)</h3>
+            <p><strong>Layer 1 - Seed Registry</strong> (<code>ml/seed_registry.json</code>)</p>
+            <ul>
+                <li>Complete parameter configurations</li>
+                <li>Aggregate statistics across all trades</li>
+                <li>Test history and validation records</li>
+            </ul>
+
+            <p><strong>Layer 2 - Seed Snapshots</strong> (<code>ml/seed_snapshots.json</code>)</p>
+            <ul>
+                <li>SHA-256 hash verification for immutability</li>
+                <li>Configuration snapshots with timestamps</li>
+                <li>Reproducibility validation</li>
+            </ul>
+
+            <p><strong>Layer 3 - Seed Catalog</strong> (<code>ml/seed_catalog.json</code>)</p>
+            <ul>
+                <li>Trade-by-trade detailed records</li>
+                <li>Daily performance breakdown</li>
+                <li>Searchable metadata (seed, timeframe, date, asset)</li>
+            </ul>
+
+            <p><strong>Layer 4 - Performance Tracker</strong> (<code>ml/seed_performance_tracker.json</code>)</p>
+            <ul>
+                <li>Automatic whitelist/blacklist management</li>
+                <li>Real-time performance monitoring</li>
+                <li>Separate whitelist and blacklist files</li>
+            </ul>
+
+            <h3>Trading Engine</h3>
+            <ul>
+                <li><strong>ProcessingManager</strong> - Coordinates all 5 timeframe strategies</li>
+                <li><strong>TimeframeStrategy</strong> - Independent strategy per timeframe with unique seed</li>
+                <li><strong>StrategyManager</strong> - Tracks performance and adapts thresholds</li>
+                <li><strong>BacktestEngine</strong> - Historical testing with minute-by-minute simulation</li>
+            </ul>
+
+            <h3>Key Commands</h3>
+            <p><strong>Testing & Validation:</strong></p>
+            <code>python ml/seed_tester.py test-all &lt;1m|5m|15m|1h|4h&gt;</code><br>
+            <code>python ml/seed_tester.py test-top10 &lt;timeframe&gt;</code><br>
+            <code>python backtest_90_complete.py --test-seeds-file ml/test_top10_15m.json</code>
+
+            <p style="margin-top: 15px;"><strong>Strategy Management:</strong></p>
+            <code>python ml/seed_tester.py overwrite &lt;timeframe&gt; --use-best</code><br>
+            <code>python ml/seed_tester.py reset [--timeframe &lt;tf&gt;]</code><br>
+            <code>python ml/seed_tester.py status</code>
+
+            <p style="margin-top: 15px;"><strong>Backtesting:</strong></p>
+            <code>python backtest_90_complete.py --seed &lt;number&gt;</code><br>
+            <code>python backtest_90_complete.py --balance &lt;amount&gt;</code> (Test specific tier)<br>
+            <code>python pre_trading_check.py</code>
+        </div>
+        
+        <!-- Balance-Aware Tier System -->
+        <h2>💰 Stair-Climbing Balance Allocation</h2>
+        <div class="architecture">
+            <p style="color: #444; font-size: 1.1em; margin-bottom: 20px;">Every $10 earned unlocks ONE slot, alternating ETH→BTC, with progressive timeframe unlocks. Each slot requires ~$10 capital to trade effectively.</p>
+            
+            <h3>Slot 1: $10 (ETH - Capital Building)</h3>
+            <ul>
+                <li><strong>Active:</strong> ETH, 1m timeframe only</li>
+                <li><strong>Allocation:</strong> Slot 1 of 10 (ETH)</li>
+                <li><strong>Position Sizing:</strong> 1m trades = $10 × 0.3 = <strong>$3 positions</strong></li>
+                <li><strong>Strategy:</strong> Ultra-fast scalping (10-20 trades/day)</li>
+                <li><strong>BTC Wallet:</strong> Not required</li>
+                <li><strong>Goal:</strong> Earn $10 to unlock BTC slot 2</li>
+            </ul>
+            
+            <h3>Slot 2: $20 (BTC - Dual Asset)</h3>
+            <ul>
+                <li><strong>Active:</strong> ETH (slot 1) + BTC (slot 2), 1m only</li>
+                <li><strong>Allocation:</strong> 2 slots of 10 (ETH, BTC)</li>
+                <li><strong>Position Sizing:</strong> 1m trades = $10 × 0.3 = <strong>$3 per asset</strong></li>
+                <li><strong>BTC Wallet:</strong> 🚨 Auto-created on dashboard startup</li>
+                <li><strong>Strategy:</strong> Diversified scalping across two assets</li>
+                <li><strong>Goal:</strong> Earn $10 to unlock ETH slot 3 with 5m timeframe</li>
+            </ul>
+            
+            <h3>Slots 3-4: $30-40 (5m Timeframe Unlocked)</h3>
+            <ul>
+                <li><strong>Active at $30:</strong> ETH slots 1 & 3, BTC slot 2 (3 slots total)</li>
+                <li><strong>Active at $40:</strong> All 4 slots (ETH: 1,3 | BTC: 2,4)</li>
+                <li><strong>Timeframes:</strong> 1m + 5m on active assets</li>
+                <li><strong>Position Sizing at $40:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>1m: $10 × 0.3 = <strong>$3.00</strong></li>
+                        <li>5m: $10 × 0.5 = <strong>$5.00</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Strategy:</strong> Fast + medium scalping (16-32 trades/day)</li>
+                <li><strong>Goal:</strong> Reach $50 to unlock 15m timeframe</li>
+            </ul>
+            
+            <h3>Slots 5-6: $50-60 (15m Timeframe Unlocked)</h3>
+            <ul>
+                <li><strong>Active at $50:</strong> 5 slots (ETH: 1,3,5 | BTC: 2,4)</li>
+                <li><strong>Active at $60:</strong> 6 slots (ETH: 1,3,5 | BTC: 2,4,6)</li>
+                <li><strong>Timeframes:</strong> 1m + 5m + 15m on active assets</li>
+                <li><strong>Position Sizing at $60:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>1m: $10 × 0.3 = <strong>$3.00</strong></li>
+                        <li>5m: $10 × 0.5 = <strong>$5.00</strong></li>
+                        <li>15m: $10 × 0.7 = <strong>$7.00</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Strategy:</strong> Short-term + scalping mix (19-37 trades/day)</li>
+                <li><strong>Goal:</strong> Reach $70 to unlock 1h timeframe</li>
+            </ul>
+            
+            <h3>Slots 7-8: $70-80 (1h Timeframe Unlocked)</h3>
+            <ul>
+                <li><strong>Active at $70:</strong> 7 slots (ETH: 1,3,5,7 | BTC: 2,4,6)</li>
+                <li><strong>Active at $80:</strong> 8 slots (ETH: 1,3,5,7 | BTC: 2,4,6,8)</li>
+                <li><strong>Timeframes:</strong> 1m + 5m + 15m + 1h on active assets</li>
+                <li><strong>Position Sizing at $80:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>1m: $10 × 0.3 = <strong>$3.00</strong></li>
+                        <li>5m: $10 × 0.5 = <strong>$5.00</strong></li>
+                        <li>15m: $10 × 0.7 = <strong>$7.00</strong></li>
+                        <li>1h: $10 × 1.0 = <strong>$10.00</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Strategy:</strong> Medium-term swings + scalping (21-41 trades/day)</li>
+                <li><strong>Goal:</strong> Reach $90 to unlock 4h timeframe</li>
+            </ul>
+            
+            <h3>Slots 9-10: $90-100 (All Timeframes - Full Base System)</h3>
+            <ul>
+                <li><strong>Active at $90:</strong> 9 slots (ETH: 1,3,5,7,9 | BTC: 2,4,6,8)</li>
+                <li><strong>Active at $100:</strong> 10 slots (ETH: 1,3,5,7,9 | BTC: 2,4,6,8,10) - <strong>FULL BASE</strong></li>
+                <li><strong>Timeframes:</strong> ALL (1m, 5m, 15m, 1h, 4h) on both assets</li>
+                <li><strong>Position Sizing at $100:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>1m: $10 × 0.3 = <strong>$3.00</strong></li>
+                        <li>5m: $10 × 0.5 = <strong>$5.00</strong></li>
+                        <li>15m: $10 × 0.7 = <strong>$7.00</strong></li>
+                        <li>1h: $10 × 1.0 = <strong>$10.00</strong></li>
+                        <li>4h: $10 × 1.5 = <strong>$15.00</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Strategy:</strong> Complete timeframe coverage (22-42 trades/day)</li>
+                <li><strong>Next Milestone:</strong> At $110, pay $10 founder fee to unlock position tier 2 (20 total slots)</li>
+            </ul>
+            
+            <h3>Position Tier 2: $110-209 (20 Slots)</h3>
+            <ul>
+                <li><strong>Activation:</strong> At $110, send $10 founder fee to blockchain, wait for confirmation</li>
+                <li><strong>Unlock:</strong> 2 positions per timeframe per asset (20 total: 5 TFs × 2 assets × 2)</li>
+                <li><strong>Timeframes:</strong> All 5 (1m, 5m, 15m, 1h, 4h) on both ETH and BTC</li>
+                <li><strong>Position Sizing:</strong> Same multipliers (0.3x to 1.5x) but now can run 2 concurrent positions per TF per asset</li>
+                <li><strong>Strategy:</strong> Increased opportunity capture with multiple positions per timeframe</li>
+                <li><strong>Next Milestone:</strong> At $210, pay $10 fee to unlock position tier 3 (30 slots - MAXED)</li>
+            </ul>
+            
+            <h3>Position Tier 3: $210+ (30 Slots - MAXED)</h3>
+            <ul>
+                <li><strong>Activation:</strong> At $210, send $10 founder fee to blockchain, wait for confirmation</li>
+                <li><strong>Unlock:</strong> 3 positions per timeframe per asset (30 total: 5 TFs × 2 assets × 3) - MAXED</li>
+                <li><strong>Timeframes:</strong> All 5 (1m, 5m, 15m, 1h, 4h) on both ETH and BTC</li>
+                <li><strong>Position Limit:</strong> MAXED - cannot add more position slots</li>
+                <li><strong>Scaling:</strong> Position sizes grow with balance (2% rule for large accounts)</li>
+                <li><strong>Future Fees:</strong> $10 at $310, $410, $510... (every $100 profit from baseline)</li>
+                <li><strong>Strategy:</strong> Maximum opportunity capture, professional-grade system</li>
+            </ul>
+            
+            <h3>Key Stair-Climbing Principles</h3>
+            <ul>
+                <li><strong>ETH→BTC Alternation:</strong> Every $10 earned alternates asset allocation (slot 1=ETH, 2=BTC, 3=ETH...)</li>
+                <li><strong>Progressive Timeframe Unlocks:</strong> TFs unlock as slots increase (1m at 1-2, +5m at 3-4, +15m at 5-6, +1h at 7-8, +4h at 9-10)</li>
+                <li><strong>Slot-Based Capital:</strong> Each slot needs ~$10 to trade effectively</li>
+                <li><strong>Balance Drops Deactivate Slots:</strong> If balance falls below slot threshold, that slot deactivates</li>
+                <li><strong>Position Tiers at $100+:</strong> After full base system ($100), position capacity scales via founder fee system</li>
+                <li><strong>Seed Optimization:</strong> Each timeframe uses independently tested seeds for best performance</li>
+            </ul>
+            
+            <h3>Testing Slot Allocation</h3>
+            <p style="margin-top: 15px;"><strong>Backtest specific balances to see slot allocation in action:</strong></p>
+            <code>python backtest_90_complete.py --balance 10</code> (1 slot: ETH, 1m only)<br>
+            <code>python backtest_90_complete.py --balance 25</code> (2 slots: ETH+BTC, 1m only)<br>
+            <code>python backtest_90_complete.py --balance 35</code> (4 slots: ETH 1,3 + BTC 2,4, 1m+5m)<br>
+            <code>python backtest_90_complete.py --balance 55</code> (6 slots: 1m+5m+15m active)<br>
+            <code>python backtest_90_complete.py --balance 75</code> (8 slots: 1m+5m+15m+1h)<br>
+            <code>python backtest_90_complete.py --balance 100</code> (10 slots: Full base system, all TFs)<br>
+            <code>python backtest_90_complete.py --balance 150</code> (Tier 2: 20 position slots)<br>
+            <code>python backtest_90_complete.py --balance 250</code> (Tier 3: 30 position slots MAXED)
+            
+            <p style="margin-top: 15px;"><strong>View slot allocation details:</strong></p>
+            <code>python core/balance_aware_strategy.py</code>
+        </div>
+        
+        <!-- Paper Trading Requirement -->
+        <h2>📄 48-Hour Paper Trading Requirement</h2>
+        <div class="architecture">
+            <p style="color: #d32f2f; font-size: 1.1em; margin-bottom: 20px;"><strong>⚠️ MANDATORY:</strong> Before live trading, you MUST complete 48 hours of verified paper trading with positive P&L.</p>
+            
+            <h3>Requirements</h3>
+            <ul>
+                <li><strong>Duration:</strong> Minimum 48 continuous hours (2 full days)</li>
+                <li><strong>Minimum Trades:</strong> At least 1 successful trade</li>
+                <li><strong>Profitability:</strong> Total P&L > $0.00 (must overcome setup fees)</li>
+                <li><strong>Data Integrity:</strong> Session survives restarts, only clears on manual reset</li>
+            </ul>
+            
+            <h3>Fee Structure (Based on Slot Allocation)</h3>
+            <p><strong>$100 Starting Balance (10 slots - Full Base System):</strong></p>
+            <ul>
+                <li><strong>Setup Fees:</strong> $2.00 total
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>ETH→BTC Conversion (1%): $0.50 (on $50 BTC funding)</li>
+                        <li>BTC Transfer Fee (2%): $1.00 (on $50 BTC funding)</li>
+                        <li>Gas Fee: $0.50</li>
+                    </ul>
+                </li>
+                <li><strong>Per Trade:</strong> $0.50 gas fee (every trade)</li>
+                <li><strong>Starting P&L:</strong> -$2.00 (must overcome to be profitable)</li>
+            </ul>
+            
+            <p><strong>$20 Starting Balance (2 slots):</strong></p>
+            <ul>
+                <li><strong>Setup Fees:</strong> $0.40 (fund $10 to BTC slot 2)</li>
+                <li><strong>Per Trade:</strong> $0.50 gas fee</li>
+            </ul>
+            
+            <p><strong>$10 Starting Balance (1 slot - ETH only):</strong></p>
+            <ul>
+                <li><strong>Setup Fees:</strong> $0.00 (no BTC funding needed)</li>
+                <li><strong>Per Trade:</strong> $0.50 gas fee</li>
+            </ul>
+            
+            <h3>Dashboard Integration</h3>
+            <p>Paper trading status shows in real-time on dashboard status bar:</p>
+            <ul>
+                <li><strong>Running:</strong> <code>📄 Paper: [███░░░░░░░] 25% 12.0/48h • 5T • +$1.25</code></li>
+                <li><strong>Requirements Met:</strong> <code>📄 Paper: READY [100%] • 10T • +$5.00</code></li>
+                <li><strong>Completed:</strong> <code>🟢 Live: APPROVED • 48h • 15T • +$8.50</code> (permanent)</li>
+            </ul>
+            
+            <h3>Commands</h3>
+            <p><strong>Start Paper Trading:</strong></p>
+            <code>python3 run_paper_trading.py</code> (interactive menu)<br>
+            <code>python3 run_paper_trading.py --monitor</code> (live monitoring)<br>
+            <code>python3 test_paper_trading_live.py</code> (automated test)
+            
+            <p style="margin-top: 15px;"><strong>Check Status:</strong></p>
+            <code>python3 run_paper_trading.py --stats</code><br>
+            <code>python3 pre_trading_check.py --live</code> (validate for live trading)
+            
+            <p style="margin-top: 15px;"><strong>Complete Session:</strong></p>
+            <code>python3 run_paper_trading.py --complete</code>
+            
+            <p style="margin-top: 15px;"><strong>Reset (Start Over):</strong></p>
+            <code>python3 run_paper_trading.py --reset</code> (type 'RESET' to confirm)
+            
+            <h3>Key Points</h3>
+            <ul>
+                <li>✅ Session persists across dashboard/terminal restarts</li>
+                <li>✅ Real-time updates every 10 seconds in dashboard</li>
+                <li>✅ All fee calculations transparent (gross → fees → net)</li>
+                <li>✅ Progress bar shows percentage to 48 hours</li>
+                <li>✅ Only manual reset clears the session</li>
+                <li>⚠️ Must complete before <code>pre_trading_check.py --live</code> approves</li>
+                <li>🔴 Live trading blocked until requirements met</li>
+            </ul>
+        </div>
+        
+        <!-- Documentation Links -->
+        <h2>📖 Documentation</h2>
+        
+        <div class="doc-card">
+            <h3>🌱 Seed System Deep Dive</h3>
+            <p><strong>NEW!</strong> Comprehensive guide to the deterministic seed system. Learn how 37.6B combinations are tracked, tested, and optimized across 4 layers with SHA-256 verification. Includes testing workflows and best practices.</p>
+            <div class="doc-links">
+                <a href="SEED_SYSTEM.html">View Documentation</a>
+            </div>
+        </div>
+        
+        <div class="doc-card">
+            <h3>📚 User Manual</h3>
+            <p>Complete system guide with usage instructions, troubleshooting, and command reference. Start here if you're new to the system.</p>
+            <div class="doc-links">
+                <a href="USER_MANUAL.html">View HTML</a>
+                <a href="USER_MANUAL.md">View Markdown</a>
+                <a href="USER_MANUAL.pdf">Download PDF</a>
+            </div>
+        </div>
+        
+        <div class="doc-card">
+            <h3>🔢 Mathematics Explained</h3>
+            <p>Mathematical explanations in simple terms with real examples. Learn how win rate, P&L, leverage, position sizing, and all calculations work.</p>
+            <div class="doc-links">
+                <a href="MATHEMATICS.html">View HTML</a>
+                <a href="MATHEMATICS.md">View Markdown</a>
+                <a href="MATHEMATICS.pdf">Download PDF</a>
+            </div>
+        </div>
+        
+        <div class="doc-card">
+            <h3>🚀 Tron Blockchain Integration</h3>
+            <p>Future enhancement plans for Tron blockchain integration. Includes technical architecture, timeline, and implementation roadmap.</p>
+            <div class="doc-links">
+                <a href="TRON_INTEGRATION.html">View HTML</a>
+                <a href="TRON_INTEGRATION.md">View Markdown</a>
+                <a href="TRON_INTEGRATION.pdf">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Additional Resources -->
+        <h2>📚 Additional Resources</h2>
+        
+        <div class="doc-card">
+            <h3>🌱 Seed Testing Guide</h3>
+            <p>Complete guide to testing seeds, overwriting BASE_STRATEGY, and optimizing performance per timeframe. Includes workflow examples and best practices.</p>
+            <div class="doc-links">
+                <a href="../SEED_TESTING_GUIDE.md">View Guide</a>
+                <a href="../SEED_COMMANDS_QUICK_REF.md">Quick Reference</a>
+            </div>
+        </div>
+
+        <div class="doc-card">
+            <h3>⏱️ Timeframe Expansion</h3>
+            <p>Details on the new 1m and 5m timeframes. Includes configurations, strategies, performance expectations, and integration guide.</p>
+            <div class="doc-links">
+                <a href="../TIMEFRAME_EXPANSION.md">View Guide</a>
+                <a href="../FINAL_VERIFICATION.md">System Verification</a>
+            </div>
+        </div>
+
+        <div class="doc-card">
+            <h3>✅ Implementation Summary</h3>
+            <p>Complete summary of all features, CLI reference, workflow examples, and verification results. Perfect for understanding what's available.</p>
+            <div class="doc-links">
+                <a href="../IMPLEMENTATION_SUMMARY.md">View Summary</a>
+            </div>
+        </div>
+
+        <!-- Quick Start -->
+        <h2>⚡ Quick Start</h2>
+        <div class="architecture">
+            <h3>1. Run Pre-Flight Check</h3>
+            <code>python pre_trading_check.py</code>
+            <p>Validates data freshness and system readiness</p>
+
+            <h3>2. Check System Status</h3>
+            <code>python ml/seed_tester.py status</code>
+            <p>View current BASE_STRATEGY configuration for all timeframes</p>
+
+            <h3>3. Run Backtest</h3>
+            <code>python backtest_90_complete.py</code>
+            <p>Test with all 5 timeframes on 90 days of historical data</p>
+            <p><strong>NEW:</strong> Test specific balance tier: <code>python backtest_90_complete.py --balance 25</code></p>
+            <p>Try different tiers ($10, $25, $35, $60, $100) to see position sizing in action</p>
+
+            <h3>4. Launch Dashboard</h3>
+            <code>./dashboard.sh</code>
+            <p><strong>NEW!</strong> One-command startup: Auto-creates BTC wallet, initializes system, launches dashboard</p>
+            <p>Alternative: <code>python dashboard/terminal_ui.py --test</code></p>
+            <p>Real-time monitoring with 4 panels showing statistics, seeds, and wallet status | Press 'W' to connect MetaMask</p>
+
+            <h3>5. Download & Validate Data</h3>
+            <code>python archive/utilities/download_90day_data.py</code>
+            <p>Downloads 90 days of data with 6-layer validation and blockchain audit</p>
+            
+            <h3>6. Connect Wallet</h3>
+            <p><strong>Recommended:</strong> Press 'W' in dashboard or run <code>./dashboard.sh</code></p>
+            <p>MetaMask opens in browser, BTC wallet auto-created on first run, linked to your unique client ID</p>
+            
+            <h3>7. Optimize Strategies</h3>
+            <code>python ml/seed_tester.py test-top10 15m</code><br>
+            <code>python backtest_90_complete.py --test-seeds-file ml/test_top10_15m.json</code><br>
+            <code>python ml/seed_tester.py overwrite 15m --use-best</code>
+            <p>Test and deploy optimized seeds per timeframe</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Created by Gary Richard Doman</strong></p>
+            <p>Founder of <a href="https://Doman.ai" target="_blank" style="color: #667eea;">Doman.ai</a> & GareBearEnterprises | Music Producer: TizWildin</p>
+            <p style="margin-top: 20px;">For support: Run <code>python pre_trading_check.py</code> from the main directory</p>
+            <p>Version 3.3 | Last updated: December 18, 2024</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">System Status: <span style="color: #28a745; font-weight: bold;">✅ 5 Timeframes Active</span> | <span style="color: #667eea; font-weight: bold;">37.6B Seeds Tracked</span> | <span style="color: #ffc107; font-weight: bold;">💰 Slot Allocation</span> | <span style="color: #17a2b8; font-weight: bold;">✅ Status Tracking</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Audio control functionality
+        const audio = document.getElementById('bgMusic');
+        const muteBtn = document.getElementById('muteBtn');
+        let isMuted = false;
+        
+        // Auto-play on page load (with user interaction fallback)
+        window.addEventListener('load', function() {
+            audio.volume = 0.5; // Set to 50% volume
+            
+            // Try to autoplay
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // Autoplay was prevented, show a message
+                    console.log('Autoplay prevented. Click the page to start music.');
+                    
+                    // Play on first user interaction
+                    document.addEventListener('click', function playOnClick() {
+                        audio.play();
+                        document.removeEventListener('click', playOnClick);
+                    }, { once: true });
+                });
+            }
+        });
+        
+        // Toggle mute function
+        function toggleMute() {
+            if (isMuted) {
+                audio.muted = false;
+                muteBtn.textContent = '🔊';
+                isMuted = false;
+            } else {
+                audio.muted = true;
+                muteBtn.textContent = '🔇';
+                isMuted = true;
+            }
+        }
+        
+        // Keyboard shortcut: M to mute/unmute
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'm' || e.key === 'M') {
+                toggleMute();
+            }
+        });
+    </script>
+<script src="../../../admension-ads.js"></script>n</body>
+</html>

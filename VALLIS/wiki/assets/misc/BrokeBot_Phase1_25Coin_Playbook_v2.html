@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Broke Bot — Phase‑1 (TRON Rail) 25+ Coin Playbook (w/ Projections)</title>
+<style>
+  :root {
+    --bg:#070712; --txt:#e9e7ff; --muted:#b5b0e6; --accent:#b54bff; --accent2:#48f0c6; --warn:#ff5c7a;
+    --line:rgba(181,75,255,.25);
+  }
+  html,body{background:radial-gradient(1200px 800px at 30% 0%, rgba(181,75,255,.18), transparent 55%),
+                        radial-gradient(900px 700px at 80% 20%, rgba(72,240,198,.12), transparent 60%),
+                        var(--bg);
+            color:var(--txt); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;}
+  .wrap{max-width:1020px;margin:28px auto;padding:0 18px 60px;}
+  .hero{border:1px solid var(--line); background:linear-gradient(180deg, rgba(181,75,255,.12), rgba(14,14,34,.85));
+        border-radius:20px;padding:22px 22px 18px; box-shadow: 0 14px 40px rgba(0,0,0,.35);}
+  .kicker{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px;}
+  h1{margin:8px 0 6px;font-size:34px;line-height:1.15;}
+  .sub{color:var(--muted);margin:0 0 12px;}
+  .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .pill{border:1px solid var(--line);background:rgba(10,10,25,.6);padding:6px 10px;border-radius:999px;
+        color:var(--muted);font-size:12px}
+  .grid{display:grid;grid-template-columns: 1.15fr .85fr; gap:14px;margin-top:14px}
+  .card{border:1px solid var(--line);background:linear-gradient(180deg, rgba(10,10,25,.85), rgba(14,14,34,.65));
+        border-radius:18px;padding:16px;}
+  h2{margin:18px 0 10px;font-size:22px}
+  h3{margin:14px 0 8px;font-size:16px;color:var(--accent2)}
+  p,li{color:var(--muted);line-height:1.55}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+  .callout{border-left:4px solid var(--accent); padding:12px 12px 12px 14px; background:rgba(181,75,255,.08);
+           border-radius:14px; margin:12px 0;}
+  .warn{border-left-color:var(--warn); background:rgba(255,92,122,.08)}
+  table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:14px;border:1px solid var(--line);}
+  th,td{padding:10px 10px;border-bottom:1px solid rgba(181,75,255,.14);}
+  th{text-align:left;color:var(--txt);background:rgba(181,75,255,.10)}
+  tr:last-child td{border-bottom:none}
+  .footer{margin-top:26px;color:rgba(233,231,255,.65);font-size:12px}
+  .hr{height:1px;background:rgba(181,75,255,.18);margin:18px 0}
+  .tag{color:var(--txt)}
+</style>
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">Broke Bot • Phase‑1 Copy (Doman.ai Logic) • TRON (USDT‑TRC20 Rail)</div>
+    <h1>25+ Coin Funding‑Event Engine — With Profit Projection Math</h1>
+    <p class="sub">
+      TRON‑native: <b>TronLink signing</b>, TRON RPC, and USDT‑TRC20 capital routing.
+      Below includes scenario math for estimating monthly output after the edge is proven.
+    </p>
+    <div class="pillrow">
+      <span class="pill">Min bucket: <span class="tag">$5+</span></span>
+      <span class="pill">Leverage: <span class="tag">2×–5× isolated</span></span>
+      <span class="pill">Scaling: <span class="tag">coins × platforms × events</span></span>
+      <span class="pill">Wallet: <span class="tag">TronLink / TRON signing</span></span>
+      <span class="pill">Date: <span class="tag">2025-12-30</span></span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Phase‑1 rules (plain English)</h2>
+      <ul>
+        <li><b>Execute only when net-positive</b> after fees + spread + slippage + safety buffer.</li>
+        <li><b>Win by repetition, not prediction.</b> Lots of tiny wins across many coins.</li>
+        <li><b>Survivability first:</b> isolated margin, micro-buckets, daily stop rules.</li>
+      </ul>
+      <div class="callout warn">
+        <b>Not a promise:</b> “double → triple monthly” is an <b>aspirational goal</b>.
+        Real results depend on (1) event frequency, (2) net captured funding after costs,
+        and (3) avoiding liquidation / forced exits.
+      </div>
+    </div>
+    <div class="card">
+      <h2>TRON-native execution (no MetaMask)</h2>
+      <ul>
+        <li><b>Signing:</b> TronLink (browser), Ledger TRON, and other TRON-compatible signers.</li>
+        <li><b>Network:</b> TRON RPC + caching + fallback providers.</li>
+        <li><b>Rail:</b> USDT‑TRC20 transfers to move capital cheaply.</li>
+      </ul>
+      <div class="hr"></div>
+      <p class="mono">Net per event ≈ (Margin × Leverage) × NetCapturedRate</p>
+      <p>Where <b>NetCapturedRate</b> is funding captured after all costs (as % of notional).</p>
+    </div>
+  </div>
+
+  <h2>The projection model (math)</h2>
+  <div class="card">
+    <p class="mono">Events/month ≈ Coins × Platforms × QualifyingWindowsPerCoinPerMonth</p>
+    <p class="mono">Notional = Margin × Leverage</p>
+    <p class="mono">NetPerEvent ≈ Notional × NetCapturedRate</p>
+    <p class="mono">MonthlyNet ≈ Events/month × NetPerEvent</p>
+    <div class="callout">
+      <b>NetCapturedRate</b> = funding captured <i>minus</i> entry/exit fees, spread, slippage, and safety buffer.
+    </div>
+  </div>
+
+  <h2>Scenario table (editable placeholders)</h2>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th><th>Coins</th><th>Platforms</th><th>Windows/coin/mo</th><th>Events/mo</th>
+          <th>Avg margin</th><th>Lev</th><th>NetCapturedRate</th><th>Net/event</th><th>Net/month</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Conservative</td><td>25</td><td>2</td><td>2</td><td>100</td><td>$5</td><td>3×</td><td>0.12%</td><td>$0.02</td><td>$1.80</td></tr><tr><td>Base</td><td>25</td><td>3</td><td>3</td><td>225</td><td>$7.5</td><td>3×</td><td>0.18%</td><td>$0.04</td><td>$9.11</td></tr><tr><td>Aggressive</td><td>25</td><td>4</td><td>4</td><td>400</td><td>$10</td><td>3×</td><td>0.25%</td><td>$0.07</td><td>$30.00</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn">
+      To reach “double→triple monthly”, you typically need: higher event counts, higher average margin per event,
+      and/or higher net captured rate — while keeping liquidation risk low.
+    </div>
+  </div>
+
+  <h2>How we push toward double→triple (systematically)</h2>
+  <div class="card">
+    <h3>Lever 1 — More qualified events</h3>
+    <ul>
+      <li>Expand platforms (1 → 3–5) and keep 25–40 coins that pass filters.</li>
+      <li>Cache read endpoints to avoid stale decisions and rate-limit failures.</li>
+    </ul>
+    <h3>Lever 2 — Better capture quality</h3>
+    <ul>
+      <li>Arm only in the funding window; cancel on volatility expansion.</li>
+      <li>Require stable funding + tight spreads + adequate depth before entry.</li>
+      <li>Log skip reasons; tune filters from real misses/false events.</li>
+    </ul>
+    <h3>Lever 3 — More buckets (parallelism)</h3>
+    <ul>
+      <li>Increase number of micro-buckets once proof stats are strong.</li>
+      <li>Promotion rule: 30+ positive events with zero forced exits before increasing size.</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <div class="hr"></div>
+    <b>Disclaimer:</b> Educational/software design only. Trading is risky; funding can flip; outages and liquidations can happen.
+    Not financial advice; no profit guaranteed.
+  </div>
+</div>
+<script src="../../../admension-ads.js"></script>n</body>
+</html>

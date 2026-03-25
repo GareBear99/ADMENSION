@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sponsored Showcase — VALLIS Lore Wiki</title>
+  <link rel="stylesheet" href="css/style.css"/>
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <div class="nav">
+        <div class="brand">
+          <div class="brand-badge"></div>
+          <a href="index.html"><b>VALLIS Lore Wiki</b></a>
+          <span class="muted">• Founder: Gary Richard Doman</span>
+        </div>
+        <a href="entities/index.html">Entities</a>
+        <a href="glyphs/index.html">Glyphs</a>
+        <a href="runes/index.html">Runes</a>
+        <a href="games/index.html">Games</a>
+        <a href="omens/index.html">Omens</a>
+      <a href="minigames/index.html">Minigames</a>
+      <a href="settings/region.html">Region</a>
+
+        <a href="search.html">Search</a>
+      </div>
+      <div class="right">
+        <a class="btn" href="index.html">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="card">
+      <div class="kicker">Sponsored Showcase</div>
+      <h1>Book a 72‑Hour Sponsor Slot</h1>
+      <p class="muted">
+        This booking system is designed to be clean and policy-safe: no incentivized viewing, no “watch-to-earn” mechanics.
+        Sponsored placements display only in the <b>bottom showcase bar</b> when visitors reach the page footer.
+      </p>
+
+      <div class="hr"></div>
+
+      <div class="grid2">
+        <div class="card subtle">
+          <div class="kicker">Rules</div>
+          <ul class="muted">
+            <li><b>72 hour</b> windows, aligned to a fixed schedule.</li>
+            <li><b>Max 9</b> active sponsors per 72h window (rotating pills).</li>
+            <li>Schedule up to <b>3 months ahead</b> (≈92 days).</li>
+            <li>System supports up to <b>256</b> bookings in the 3‑month horizon (queue depth cap).</li>
+            <li>Optional “Sponsored since” backdate: up to <b>30 days</b>.</li>
+            <li>Client-only demo scheduler: stores bookings in your browser. Production uses server-side assignment + payments.</li>
+          </ul>
+        </div>
+
+        <div class="card subtle">
+          <div class="kicker">Availability</div>
+          <div id="sponsorPreview" class="muted">Loading…</div>
+          <div class="hr"></div>
+          <div class="muted">Horizon capacity: <b id="sponsorCap">0/256</b></div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <form id="sponsorBookingForm" class="form">
+        <div class="grid2">
+          <label>
+            <span>Nickname (required)</span>
+            <input name="nickname" type="text" maxlength="32" placeholder="Your name / brand"/>
+          </label>
+          <label>
+            <span>Title (optional)</span>
+            <input name="title" type="text" maxlength="48" placeholder="Short tagline"/>
+          </label>
+        </div>
+
+        <div class="grid2">
+          <label>
+            <span>Destination URL (required)</span>
+            <input name="url" type="url" placeholder="https://example.com"/>
+          </label>
+          <label>
+            <span>Requested show date (UTC)</span>
+            <input id="sponsorStart" name="start" type="datetime-local"/>
+          </label>
+        </div>
+
+        <div class="grid2">
+          <label>
+            <span>Sponsored since (optional, backdate ≤30d)</span>
+            <input id="sponsorSince" name="since" type="datetime-local"/>
+          </label>
+          <div class="notice">
+            <b>Compliance:</b> no misleading claims, no adult content, no prohibited offers. Keep it clean.
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <button class="btn primary" type="submit">Schedule 72h Slot (demo)</button>
+        <div id="sponsorResult" class="muted" style="margin-top:10px"></div>
+      </form>
+    </section>
+  </main>
+
+  <div class="wrap footer">
+    <div class="hr"></div>
+    <div>Created and maintained by <b>Gary Richard Doman</b>. Canon: <b>Sentinel → Scar → Noot → EVE</b>.</div>
+    <div class="muted">Ads and sponsors are displayed only in dedicated windows. No incentivized viewing. Navigation-driven refresh only.</div>
+  </div>
+
+  <script src="js/app.js"></script>
+<script src="../admension-ads.js"></script>n<script src="../../admension-ads.js"></script>n<script src="../../../admension-ads.js"></script>n</body>
+</html>

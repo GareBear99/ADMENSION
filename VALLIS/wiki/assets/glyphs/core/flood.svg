@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs>
+  <filter id="g"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="256" height="256" fill="none"/>
+<circle cx="128" cy="128" r="84" fill="none" stroke="#b57cff" stroke-width="10" filter="url(#g)"/>
+<path d="M64 128h128" stroke="#b57cff" stroke-width="10" stroke-linecap="round" filter="url(#g)"/>
+<text x="128" y="150" text-anchor="middle" font-family="system-ui" font-size="28" fill="#b57cff" filter="url(#g)">FLOOD</text>
+</svg>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>VALLIS Codex Vol. I</title>
+  <link rel="stylesheet" href="css/style.css"/>
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><a href="index.html">VALLIS Lore Wiki</a></div>
+    <nav class="nav">
+      <a href="entities.html">Entities</a>
+      <a href="glyphs.html">Glyphs</a>
+      <a href="runes.html">Runes</a>
+      <a href="games.html">Games</a>
+      <a class="active" href="codex.html">Codex</a>
+      <a href="search.html">Search</a>
+    
+      <a class="navlink" href="minigames/index.html">Minigames</a>
+      <a class="navlink" href="settings/region.html">Region</a>
+</nav>
+  </header>
+
+  <main class="page">
+    <section class="card">
+      <div class="kicker">VALLIS CODEX VOL. I</div>
+      <h1>Pay-What-You-Want Lore Codex</h1>
+      <p class="muted">
+        This is a compiled, print-friendly lore codex (PDF). Support is optional. You will be charged in <b>USD</b>.
+        Currency conversions are shown for reference only. No updates or additional content are promised.
+      </p>
+
+      <div class="hr"></div>
+
+      <div class="grid2">
+        <div class="card subtle">
+          <div class="kicker">Support Amount</div>
+          <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;">
+            <div style="font-size:28px;font-weight:800;" id="codexUsd">$7.00</div>
+            <div>
+              <label class="muted" for="codexCurrency">Display currency</label><br/>
+              <select id="codexCurrency" class="input">
+                <option value="USD" selected>USD</option>
+                <option value="CAD">CAD</option>
+              </select>
+            </div>
+          </div>
+
+          <input id="codexSlider" type="range" min="1" max="100" value="7" style="width:100%;margin-top:12px;"/>
+          <div class="muted" id="codexCad" style="margin-top:6px;">Charged in USD.</div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+            <button class="btn" id="codexCheckout">Checkout (USD)</button>
+            <button class="btn ghost" id="codexFree">Download Free Edition</button>
+          </div>
+
+          <p class="muted" style="margin-top:10px;font-size:12px;">
+            *Checkout is wired as a placeholder in this static build. Replace the handler with your Stripe / Gumroad link.
+          </p>
+        </div>
+
+        <div class="card subtle">
+          <div class="kicker">What You Get</div>
+          <ul class="list">
+            <li>Compiled Lore Overview + Entities</li>
+            <li>Glyphs with variant references</li>
+            <li>Runes, Omens, and system notes</li>
+            <li>Print-ready formatting</li>
+          </ul>
+          <div class="hr"></div>
+          <div class="kicker">Founder</div>
+          <p><b>Gary Richard Doman</b> — Sole Creator</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="muted">© VALLIS Lore Wiki — Codex Vol. I</div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    (function(){
+      const FX_USD_TO_CAD = 1.35; // display-only (manual update)
+      const slider = document.getElementById('codexSlider');
+      const usdEl = document.getElementById('codexUsd');
+      const cadEl = document.getElementById('codexCad');
+      const cur = document.getElementById('codexCurrency');
+
+      function render(){
+        const usd = Number(slider.value);
+        usdEl.textContent = `$${usd.toFixed(2)}`;
+        if(cur.value === 'CAD'){
+          const cad = usd * FX_USD_TO_CAD;
+          cadEl.textContent = `≈ $${cad.toFixed(2)} CAD (informational only). Charged in USD.`;
+        }else{
+          cadEl.textContent = `Charged in USD.`;
+        }
+        localStorage.setItem('vallis_codex_usd', String(usd));
+        localStorage.setItem('vallis_codex_cur', cur.value);
+      }
+
+      const savedUsd = localStorage.getItem('vallis_codex_usd');
+      const savedCur = localStorage.getItem('vallis_codex_cur');
+      if(savedUsd){ slider.value = savedUsd; }
+      if(savedCur){ cur.value = savedCur; }
+      render();
+
+      slider.addEventListener('input', render);
+      cur.addEventListener('change', render);
+
+      document.getElementById('codexCheckout').addEventListener('click', ()=>{
+        alert('Checkout placeholder. Wire your USD checkout link here.');
+      });
+
+      document.getElementById('codexFree').addEventListener('click', ()=>{
+        alert('Free edition placeholder. Wire your PDF download here.');
+      });
+    })();
+  </script>
+<script src="../admension-ads.js"></script>n</body>
+</html>

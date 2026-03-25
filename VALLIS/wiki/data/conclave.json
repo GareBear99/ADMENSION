@@ -1,0 +1,24 @@
+{
+  "month": "AUTO",
+  "season_seed": "VALLIS_LORE_WIKI_V1",
+  "bundles": [
+    {
+      "id": "A",
+      "title": "Archive Expansion",
+      "items": [
+        "Rune pages + variant UI",
+        "Relic galleries + indexing",
+        "Search filters + tags"
+      ]
+    },
+    {
+      "id": "B",
+      "title": "OMEN & Ritual Polish",
+      "items": [
+        "OMEN gallery layout v2",
+        "6 new omen drops",
+        "Conclave UX polish + receipts view"
+      ]
+    }
+  ]
+}

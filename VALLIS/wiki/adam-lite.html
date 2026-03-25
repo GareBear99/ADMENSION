@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>VALLIS Lore Wiki — AD’AM Lite</title>
+<meta name="description" content="AD’AM Lite: voluntary support via a clean ad container with Oracle receipts. No rewards, no gating.">
+<link rel="stylesheet" href="css/style.css"/>
+<meta property="og:title" content="VALLIS Lore Wiki — AD’AM Lite">
+<meta property="og:description" content="AD’AM Lite: voluntary support via a clean ad container with Oracle receipts. No rewards, no gating.">
+<meta property="og:type" content="website">
+<!-- Google AdSense -->n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5584590642779290" crossorigin="anonymous"></script>n</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-badge"></div>
+        <a href="index.html"><b>VALLIS Lore Wiki</b></a>
+        <span class="muted">• Founder: Gary Richard Doman</span>
+      </div>
+      <a href="entities/index.html">Entities</a>
+      <a href="glyphs/index.html">Glyphs</a>
+      <a href="runes/index.html">Runes</a>
+      <a href="games/index.html">Games</a>
+      <a href="omens/index.html">Omens</a>
+      <a href="minigames/index.html">Minigames</a>
+      <a href="settings/region.html">Region</a>
+
+      <a href="search.html">Search</a>
+    </div>
+  </div>
+</div>
+
+
+<div class="wrap">
+  <div class="grid">
+    <div>
+      <div class="card">
+      <div class="card" id="oracleWidget">
+        <div class="kicker">ORACLE</div>
+        <div class="hd">
+          <h2 style="margin:0">Fortune of the Hour</h2>
+          <div class="muted" style="font-size:12px">Oracle is the Wiki’s primary observer — a Scar/Sentinel hybrid for records, gates, and hourly fortune.</div>
+        </div>
+        <div class="bd">
+          <div class="quote" id="oracleFortune">Loading oracle fortune…</div>
+          <div class="row" style="margin-top:10px;flex-wrap:wrap;">
+            <div class="pill"><b>Hour</b> <span class="muted" id="oracleHour">—</span></div>
+            <div class="pill"><b>Trace</b> <span class="muted" id="oracleTrace">—</span></div>
+            <div class="pill"><b>Lucky</b> <span class="muted" id="oracleLucky">—</span></div>
+            <a class="pill" href="entities/oracle.html"><b>Open Oracle</b><span class="muted">— full ledger</span></a>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row" style="flex-wrap:wrap;">
+            <div>
+              <div style="font-size:22px;font-weight:900" id="oracleStatViews">0</div>
+              <div class="muted">Total Page Views</div>
+            </div>
+            <div>
+              <div style="font-size:22px;font-weight:900" id="oracleStatDonations">$0</div>
+              <div class="muted">Total Donations</div>
+            </div>
+            <div>
+              <div style="font-size:22px;font-weight:900" id="oracleStatEvents">0</div>
+              <div class="muted">Tracked Events</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="muted" style="font-size:12px">Oracle tracking is local-only in this static build (browser storage). Production uses server receipts + public ledger.</div>
+        </div>
+      </div>
+
+      <div class="card" id="donationGoal">
+        <div class="kicker">DONATION GOAL</div>
+        <div class="hd">
+          <h2 style="margin:0">$10,000 Goal</h2>
+          <div class="muted" style="font-size:12px">Tracks total donations recorded on the Wiki.</div>
+        </div>
+        <div class="bd">
+          <div class="row" style="align-items:center;flex-wrap:wrap;">
+            <div style="min-width:220px;">
+              <div style="font-size:18px;font-weight:900" id="goalText">$0 / $10,000</div>
+              <div class="muted" style="font-size:12px" id="goalPct">0%</div>
+            </div>
+            <div style="flex:1;min-width:240px;">
+              <div class="progress"><div class="progressBar" id="goalBar" style="width:0%"></div></div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="grid2">
+            <div class="card subtle">
+              <div class="kicker">Donate</div>
+              <div class="row" style="flex-wrap:wrap;gap:10px;">
+                <input class="input" id="donNick" placeholder="Nickname" maxlength="24"/>
+                <input class="input" id="donAmt" type="number" min="1" max="10000" step="1" value="5" style="width:130px"/>
+                <button class="btn" id="donSubmit">Record Donation</button>
+              </div>
+              <p class="muted" style="margin-top:8px;font-size:12px">Static build: this “records” locally. Replace with Stripe/Gumroad receipt flow in production.</p>
+            </div>
+            <div class="card subtle">
+              <div class="kicker">Recent Support</div>
+              <div class="muted" id="donRecent" style="font-size:13px">No donations recorded yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div class="hd">
+          <div class="kicker">Canon</div>
+          <h1 class="h1">The Record of VALLIS</h1>
+          <div class="notice">Entity order is enforced: <b>Sentinel → Scar → Noot → EVE</b>. Explanation is last.</div>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="pill"><b>Glyphs</b><span class="muted">Domains (conceptual)</span></div>
+            <div class="pill"><b>Runes</b><span class="muted">Daily states (descriptive)</span></div>
+            <div class="pill"><b>Relics</b><span class="muted">Interfaces & counters</span></div>
+            <div class="pill"><b>Omens</b><span class="muted">Interpretive visuals (cosmetic)</span></div>
+          </div>
+          <div class="hr"></div>
+          <p class="muted">This wiki is built for long-session clarity: clean navigation, deep cross-linking, and dedicated ad windows that never clutter the content.</p>
+          <div class="hr"></div>
+          <div class="list">
+            <a class="pill" href="entities/index.html"><b>Entities</b><span class="muted">Sentinel, Scar, Noot (secret), EVE</span></a>
+            <a class="pill" href="glyphs/index.html"><b>Glyphs</b><span class="muted">Ash, Flood, Stone, Void, Wind + Dice</span></a>
+            <a class="pill" href="runes/index.html"><b>Runes</b><span class="muted">Daily system states</span></a>
+            <a class="pill" href="games/index.html"><b>Games</b><span class="muted">CoinFlip, OMEN</span></a>
+            <a class="pill" href="omens/index.html"><b>Omens</b><span class="muted">Image gallery + interpretation rules</span></a>
+          
+          <div class="hr"></div>
+          <div class="kicker">Featured Assets</div>
+          <div class="muted">Shows what’s wired in now, plus placeholders for missing variant files.</div>
+          <div class="hr"></div>
+          <div id="featuredGrid" class="imggrid"></div>
+          <div class="hr"></div>
+          <div class="notice" id="missingAssetsNote">Checking asset variants…</div>
+
+</div>
+        </div>
+      </div>
+    </div>
+    
+<div class="adcol">
+  <div class="card">
+    <div class="hd">
+      <div class="kicker">Advertisement</div>
+      <div class="muted">Dedicated window • clean layout</div>
+    </div>
+    <div class="bd">
+      <div class="adwindow">
+        <div class="label">Right Column</div>
+        <div class="adslot tall">
+          Paste your ad network code here<br/>
+          <span class="muted">(no refresh timers; refresh on navigation only)</span>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <div class="adwindow">
+        <div class="label">Footer Window</div>
+        <div class="adslot">
+          Optional footer unit (long pages)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+
+
+<div class="wrap footer">
+  <div class="hr"></div>
+  <div>Created and maintained by <b>Gary Richard Doman</b>. Canon: <b>Sentinel → Scar → Noot → EVE</b>.</div>
+  <div class="muted">Ads are displayed only in dedicated windows. No incentivized viewing. Navigation-driven refresh only.</div>
+</div>
+<script src="js/app.js"></script>
+
+<script src="../admension-ads.js"></script>n</body>
+</html>

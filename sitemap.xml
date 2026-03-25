@@ -3,7 +3,7 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -11,7 +11,7 @@
 
   <!-- Stats Page -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/stats.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/stats.html</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -19,7 +19,7 @@
 
   <!-- Create Page -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/create.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/create.html</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -27,7 +27,7 @@
 
   <!-- Manage Page -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/manage.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/manage.html</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -35,7 +35,7 @@
 
   <!-- Docs Page -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/docs.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/docs.html</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -43,7 +43,7 @@
 
   <!-- Privacy Policy -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/privacy-policy.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/privacy-policy.html</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -51,7 +51,7 @@
 
   <!-- Interstitial (link redirect page) -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/interstitial.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/interstitial.html</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
@@ -59,49 +59,49 @@
 
   <!-- VALLIS Ecosystem Pages -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/?page=vallis</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/?page=vallis</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/homepage.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/homepage.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/vallis-paper.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/vallis-paper.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/theme-selector.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/theme-selector.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/games/coinflip/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/games/coinflip/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/games/omen/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/games/omen/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/games/dicerz/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/games/dicerz/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/games/monolith/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/games/monolith/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -109,55 +109,55 @@
 
   <!-- VALLIS Lore Wiki -->
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/entities/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/entities/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/glyphs/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/glyphs/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/games/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/games/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/omens/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/omens/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/runes/index.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/runes/index.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/codex.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/codex.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/conclave.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/conclave.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://garebear99.github.io/ADMENSION/VALLIS/wiki/search.html</loc>
+    <loc>https://garebear99.github.io/VALLIS_Liquidity/VALLIS/wiki/search.html</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

@@ -15,11 +15,11 @@
   css.textContent = [
     'body{ padding-bottom: 80px !important; }',
 
-    /* Bottom anchor */
+    /* Bottom anchor — matches ADMENSION main site .anchor styles */
     '.adm-anchor{',
     '  position:fixed;left:0;right:0;bottom:0;z-index:9999;',
     '  padding:10px 10px 12px;',
-    '  background:linear-gradient(to top,rgba(11,10,16,.94),rgba(11,10,16,.55));',
+    '  background:linear-gradient(to top,rgba(11,10,16,.92),rgba(11,10,16,.55));',
     '  backdrop-filter:blur(10px);',
     '  border-top:1px solid rgba(255,255,255,.10);',
     '}',
@@ -32,10 +32,11 @@
     '.adm-anchor-ad{flex:2;min-height:60px;border:1px dashed rgba(255,255,255,.20);border-radius:16px;',
     '  display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.45);',
     '  background:rgba(255,255,255,.03);overflow:hidden;}',
+    '.adm-anchor-ad ins{width:100%;}',
 
-    /* Side stickies */
+    /* Side stickies — matches ADMENSION .sideSticky / .sideSponsorWrap */
     '.adm-side{',
-    '  position:fixed;top:120px;z-index:9998;width:200px;',
+    '  position:fixed;top:104px;z-index:9998;width:200px;',
     '  border:1px solid rgba(255,255,255,.10);',
     '  background:rgba(12,12,16,.86);',
     '  backdrop-filter:blur(10px);',
@@ -51,8 +52,8 @@
     '}',
     '.adm-side-title{font-size:12px;color:rgba(255,255,255,.9);}',
     '.adm-side-hide{',
-    '  border:none;background:rgba(255,255,255,.07);color:#fff;',
-    '  width:26px;height:26px;border-radius:10px;cursor:pointer;font-size:12px;',
+    '  border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.35);color:rgba(255,255,255,.85);',
+    '  width:auto;padding:4px 8px;border-radius:10px;cursor:pointer;font-size:11px;',
     '}',
     '.adm-side-body{',
     '  padding:10px;min-height:160px;display:flex;align-items:center;justify-content:center;',
@@ -60,13 +61,13 @@
     '  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;',
     '}',
     '.adm-side-tab{',
-    '  position:fixed;top:160px;z-index:9998;',
+    '  position:fixed;top:140px;z-index:9998;',
     '}',
     '.adm-side-tab-left{left:10px;}',
     '.adm-side-tab-right{right:10px;}',
     '.adm-side-tab button{',
-    '  border:1px solid rgba(255,255,255,.12);background:rgba(12,12,16,.78);',
-    '  color:#fff;padding:10px 12px;border-radius:14px;cursor:pointer;',
+    '  border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.35);',
+    '  color:rgba(255,255,255,.85);padding:10px 12px;border-radius:999px;cursor:pointer;',
     '  box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:12px;',
     '}',
     '@media(max-width:1100px){',

@@ -5,6 +5,8 @@
  */
 (function(){
   'use strict';
+  if (window.__ADMENSION_UNIVERSAL_ADS_LOADED) return;
+  window.__ADMENSION_UNIVERSAL_ADS_LOADED = true;
   var CLIENT = 'ca-pub-5584590642779290';
   var isDesktop = window.innerWidth >= 1100;
 
@@ -169,4 +171,17 @@
       sideR.style.display='block'; tabR.style.display='none';
     };
   }
+
+  // ---- Load shared EVE chatbot on every VALLIS/wiki page ----
+  try{
+    if (!window.__ADMENSION_EVE_LOADED) {
+      var current = document.currentScript && document.currentScript.src ? document.currentScript.src : '';
+      if (current) {
+        var base = current.replace(/admension-ads\.js(?:\?.*)?$/, '');
+        var eve = document.createElement('script');
+        eve.src = base + 'eve-chatbot.js';
+        document.body.appendChild(eve);
+      }
+    }
+  }catch(e){}
 })();

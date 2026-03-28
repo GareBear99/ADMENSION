@@ -1,0 +1,35 @@
+<svg width="1200" height="300" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#05060a"/>
+      <stop offset="100%" stop-color="#0b0f1a"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#7a5cff"/>
+      <stop offset="100%" stop-color="#ff00c8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="300" fill="url(#bg)" />
+
+  <circle cx="600" cy="150" r="60" stroke="url(#neon)" stroke-width="2" fill="none" filter="url(#glow)" />
+  <circle cx="600" cy="150" r="90" stroke="url(#neon)" stroke-width="1" fill="none" opacity="0.4"/>
+
+  <path d="M100 150 Q300 50 600 150 T1100 150" stroke="url(#neon)" stroke-width="2" fill="none" opacity="0.6" filter="url(#glow)"/>
+
+  <text x="600" y="140" text-anchor="middle" fill="#ffffff" font-size="48" font-family="Arial" font-weight="bold">
+    ADMENSION
+  </text>
+
+  <text x="600" y="180" text-anchor="middle" fill="#aab3ff" font-size="16" font-family="Arial">
+    Ad Intelligence • Signal Routing • Revenue Engine
+  </text>
+</svg>

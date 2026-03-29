@@ -1,7 +1,4 @@
 
-<p align="center">
-  <img src="assets/readme/admension-banner.svg" alt="ADMENSION Banner"/>
-</p>
 
 # ADMENSION
 

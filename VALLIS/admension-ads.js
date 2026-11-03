@@ -44,7 +44,7 @@
   var anchorSlotId = shared.BANNER || SLOT_IDS.ANCHOR || '';
   var sideSlotId = shared.VERTICAL || SLOT_IDS.SIDE || '';
   if (!anchorSlotId || !sideSlotId) {
-    console.warn('[ADMENSION VALLIS Ads] ⚠️ No slot IDs configured — VALLIS <ins> tags are created without data-ad-slot and will not fill. Paste real slot IDs into src/ad-loader.js SLOT_IDS (single source of truth).');
+    console.warn('[ADMENSION VALLIS Ads] ⚠️ No slot IDs configured — VALLIS manual <ins> tags are created without data-ad-slot and will not fill as manual units. Auto ads (pub ID only) still serves on this page. Create the ad units in AdSense and paste the IDs into src/ad-loader.js SLOT_IDS (single source of truth).');
   }
 
   // ---- Site base: everything before "/VALLIS/" in the page URL.
@@ -55,8 +55,27 @@
     return i >= 0 ? p.slice(0, i) : '';
   }
 
+  // ---- Ensure the AdSense Auto ads script is present ----
+  // Most VALLIS pages already carry the <script async src="...adsbygoogle.js">
+  // tag, but the injector must not depend on that: any page that loads this
+  // file gets the Auto ads code (pub ID only — no slot IDs needed, because
+  // Auto ads is ON for the site and zero ad units exist in the account).
+  // Idempotent: skips when the script tag (or the queue) already exists.
+  function ensureAdSenseScript(){
+    try {
+      if (document.querySelector('script[src*="adsbygoogle.js"]')) return;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + CLIENT;
+      s.crossOrigin = 'anonymous';
+      document.head.appendChild(s);
+    } catch (e) {}
+  }
+
   function run() {
     var isDesktop = window.innerWidth >= 1100;
+
+    ensureAdSenseScript();
 
     // ---- Normalise privacy links on this page ----
     try {

@@ -34,6 +34,11 @@
  * 3. Paste each slot ID into SLOT_IDS below. Until then they stay empty
  *    on purpose: the loader shows labelled placeholders and reports
  *    NO SLOT ID instead of rendering anything fake. Never invent a slot ID.
+ *    NOTE (2026-11-03, verified in the AdSense account): ZERO ad units
+ *    exist, so no slot IDs exist anywhere yet — that is a LATER step, not
+ *    a blocker. Auto ads is ON for the site, so ads serve from the pub-ID
+ *    script alone; these manual placements activate when Gary creates the
+ *    three ad units and pastes the IDs here.
  * 4. Deploy. Ads will render in every discovered container of that type.
  *
  * VALIDATION: After page load, open DevTools console and run:
@@ -51,7 +56,9 @@
   // Create these 3 ad units in your AdSense dashboard, then paste the slot IDs.
   // DO NOT INVENT slot IDs: a wrong ID renders nothing and can flag the
   // account. Leave them empty until the real values are pasted in.
-  // (A separate task is fetching the real IDs from the AdSense account.)
+  // (2026-11-03: the AdSense account was checked — zero ad units exist, so
+  // there are no IDs to fetch yet. Creating the units is a later step for
+  // Gary; Auto ads serves from the pub-ID script in the meantime.)
   const SLOT_IDS = {
     BANNER:    '',  // Paste your "Display ads → Horizontal" slot ID here (e.g. '1234567890')
     RECTANGLE: '',  // Paste your "Display ads → Square" slot ID here

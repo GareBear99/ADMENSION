@@ -12,9 +12,20 @@ approve the site.
 **Current state after the cleanup:**
 - Ads are technically wired and verifiable: `src/ad-loader.js` v3.0
   discovers containers dynamically; `VALLIS/admension-ads.js` v2.0
-  carries slot plumbing. Both still render placeholders because
-  **SLOT_IDS are empty by design** — real slot IDs from the AdSense
-  account are still to be pasted in (never invent them).
+  carries slot plumbing and guarantees the AdSense Auto ads script is
+  present on every VALLIS page. The manual placements still render
+  placeholders because **SLOT_IDS are empty by design** — verified
+  2026-11-03, **zero ad units exist in the AdSense account**, so there
+  are no slot IDs anywhere yet. Creating the units is a later step for
+  Gary; Auto ads (pub ID only, ON for the site) serves in the meantime.
+- **Continuity restored (the point of this pass):** VALLIS stays
+  integrated in the portal — portal → VALLIS home → wiki/games →
+  ads — verified end to end 2026-11-03 (42/42 checks: every hop 200,
+  Auto ads code on every path page, loader discovers containers with
+  none unmapped, injector places units with exactly one AdSense
+  script, no broken internal links on the path). The wiki was
+  unreachable from the VALLIS home (no link either way) and the paper
+  page linked a PDF at the wrong path; both are fixed.
 - Copy is consistent at **13%** pool share everywhere (standardised
   2026-11-03 per CHANGELOG Issue #15, which already decided 13% is
   correct over 33% / 1/3). The VALLIS paper PDFs still say 1/3 and
@@ -117,10 +128,22 @@ before applying.
 - **13% vs 1/3 vs 33%:** standardised to 13% per CHANGELOG Issue
   #15. If Gary says the real number is 1/3, flip it the other way —
   one `sed` across the repo; the fix log lists every file touched.
-- **Slot IDs:** pending real values from the AdSense account. One
-  edit fills both systems: `src/ad-loader.js` SLOT_IDS (single
-  source of truth; `VALLIS/admension-ads.js` reads
-  `window.ADMENSION_SLOT_IDS`).
+- **Slot IDs:** verified 2026-11-03 — the AdSense account has ZERO ad
+  units, so no slot IDs exist anywhere to fetch. Creating the three
+  units (Banner / Rectangle / Vertical) is a later step for Gary, after
+  approval; one edit then fills both systems: `src/ad-loader.js`
+  SLOT_IDS (single source of truth; `VALLIS/admension-ads.js` reads
+  `window.ADMENSION_SLOT_IDS`). Auto ads serves from the pub-ID code
+  until then — slot IDs are NOT a blocker for the review.
+- **Finish line — resubmission:** the site (`garebear99.github.io`,
+  "Requires review") was first declined for not enough content;
+  adding VALLIS into the portal got it accepted, but the integration
+  broke placements and structure. This cleanup restores that
+  continuity. After the fixes are pushed AND the root site
+  (`garebear99.github.io` repo: `ads.txt` + landing page with the
+  Auto ads code) is live AND Gary has decided Decisions 1–2 below,
+  the site is resubmitted for review. Gary approves the push and the
+  resubmission separately — nothing is submitted from here.
 - **No traffic:** the site shows $0.00 RPM / $0.00 daily revenue.
   AdSense has no traffic minimum, but a zero-traffic application is
   weak. Consider applying after some real traffic exists.

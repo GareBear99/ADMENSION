@@ -1,6 +1,6 @@
 # ADMENSION - Google AdSense Integration — IN PROGRESS ⚠️
 
-**Status:** NOT READY — slot IDs pending; no ad has ever rendered (corrected 2026-11-03; see ADSENSE_COMPLIANCE.md)  
+**Status:** NOT READY — root site not connected yet (no `garebear99.github.io` repo, so no ads.txt and no AdSense code at the domain root); business-model decisions outstanding (see ADSENSE_COMPLIANCE.md). Slot IDs are NOT the blocker: Auto ads is ON and zero ad units exist in the account, so there are no slot IDs to paste yet — that is a later step. (Corrected 2026-11-03; account verified live.)
 **Publisher ID:** ca-pub-5584590642779290  
 **Date:** January 7, 2026
 
@@ -107,33 +107,51 @@ All navigation triggers page reloads for optimal revenue tracking.
 
 ---
 
-## 🚀 Next Steps for AdSense Verification
+## 🚀 Next Steps for AdSense Verification (corrected 2026-11-03)
 
-### 1. Deploy Site to Production
-Upload all files to your live domain (e.g., garebear99.github.io)
+### 1. Connect the site — the root domain is the missing piece
+The AdSense account's only site is `garebear99.github.io`, status
+"Requires review", ads.txt "Not found" (verified live 2026-11-03).
+The ADMENSION site itself is already on GitHub Pages and already
+carries the AdSense code — but AdSense checks the **domain root**,
+and the root currently 404s (no `garebear99.github.io` repo exists).
+A ready-to-push root-site package is prepared in the work folder
+(`root-site/`: `ads.txt` + landing page with the Auto ads code).
+Publish it (create the `garebear99.github.io` repo, push, Pages
+serves it automatically), then confirm `garebear99.github.io/ads.txt`
+returns `google.com, pub-5584590642779290, DIRECT, f08c47fec0942fa0`.
 
-### 2. Request AdSense Review
-1. Go to Google AdSense dashboard
-2. Click "Sites" → "Add Site"
-3. Enter your domain
-4. AdSense will verify the code snippet (already deployed)
-5. Click "Request Review"
+### 2. Decide the two business-model items first
+Do NOT request review until Gary has decided Decision 1 (AD'AM
+revenue share) and Decision 2 (timed interstitial) in
+ADSENSE_COMPLIANCE.md — submitting with incentivized viewing live
+risks a policy rejection, not just a delay.
 
-### 3. Verification Process
+### 3. Request AdSense Review
+1. Go to Google AdSense dashboard → Sites
+2. `garebear99.github.io` is already listed — AdSense will verify the
+   code snippet (now on the root page) and ads.txt
+3. Click "Request Review" (Gary's approval; do not submit from here)
+
+### 4. Verification Process
 **Google will check:**
-- ✅ AdSense code present on all pages
-- ✅ Sufficient content (you have comprehensive docs)
-- ✅ Privacy policy (privacy-policy.html exists)
+- ✅ AdSense code present on the site (Auto ads code, pub ID only — no
+  slot IDs needed; Auto ads is ON)
+- ✅ ads.txt at the domain root
+- ✅ Sufficient content (VALLIS integrated in the portal is what got
+  the site accepted before — it stays; continuity verified end to end)
+- ✅ Privacy policy (privacy-policy.html exists, linked from every page)
 - ✅ Navigation works properly
 - ✅ No policy violations
 
 **Timeline:** Usually 1-3 business days for initial review
 
-### 4. After Approval
-- Replace placeholder ad containers with live AdSense ad units
-- Use Auto Ads or manually place ad units in designated containers
-- Monitor performance via AdSense dashboard
-- Revenue starts accumulating immediately
+### 5. After Approval
+- Auto ads serve immediately from the pub-ID code.
+- LATER step (not required for approval): create the three ad units in
+  AdSense and paste the slot IDs into `src/ad-loader.js` SLOT_IDS —
+  the manual placements then activate in every discovered container.
+- Monitor performance via AdSense dashboard.
 
 ---
 
@@ -198,7 +216,7 @@ Before submitting to AdSense, verify:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| AdSense Code | ⚠️ SCRIPT PRESENT, NO SLOT IDS | Script tag on all pages; SLOT_IDS empty so only placeholders render |
+| AdSense Code | ✅ SCRIPT PRESENT, AUTO ADS ON | Script tag on all pages + VALLIS injector guarantees it; SLOT_IDS empty by design (zero ad units exist) so manual units show placeholders while Auto ads serves |
 | Anti-Abuse | ✅ ACTIVE | Stagnation refresh working |
 | Navigation | ✅ FIXED | Query params reload correctly |
 | Rate Limiting | ✅ READY | Cloudflare Worker prepared |
@@ -244,6 +262,6 @@ Before submitting to AdSense, verify:
 
 ---
 
-**NOT READY TO SUBMIT** — slot IDs pending + business-model decisions outstanding (see ADSENSE_COMPLIANCE.md)
+**NOT READY TO SUBMIT** — root site not connected yet (no `garebear99.github.io` repo → no ads.txt / no code at the domain root) + business-model decisions outstanding (see ADSENSE_COMPLIANCE.md). Slot IDs are a later step, not the blocker.
 
 Deploy to production → Request review → Start earning!

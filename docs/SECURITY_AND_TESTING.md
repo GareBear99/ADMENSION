@@ -204,8 +204,8 @@
 ### Asset Sizes
 - `index.html`: ~165KB (includes embedded JS/CSS)
 - `interstitial.html`: ~10KB
-- `universal-ads/admension-ads.js`: ~15KB
-- `universal-ads/admension-ads.css`: ~12KB
+- `universal-ads/admension-ads.js`: RETIRED 2026-11-03 (deleted)
+- `universal-ads/admension-ads.css`: RETIRED 2026-11-03 (deleted)
 - **Total critical path:** ~202KB uncompressed
 
 ### Optimization Opportunities
@@ -365,7 +365,7 @@
 ### ✅ Files Deployed
 - `index.html` - Main site
 - `interstitial.html` - Timed redirect page
-- `universal-ads/` - Ad system
+- `universal-ads/` - RETIRED 2026-11-03 (deleted; live systems are src/ad-loader.js and VALLIS/admension-ads.js)
 - `src/` - Supporting scripts
 - `docs/` - Documentation
 

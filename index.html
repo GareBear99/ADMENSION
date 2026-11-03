@@ -676,7 +676,7 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
         <!-- Bootstrap Phase Notice (auto-hides after Month 3) -->
         <div class="notice warnNote" id="bootstrapNotice" style="margin-top:12px; display:none;">
           <b>⚠️ Bootstrap Phase (Months 1-3):</b><br>
-          • <b>No payouts until Month 3</b> - First payout will occur on April 1, 2026<br>
+          • <b>No payouts until Month 3</b> - No payouts have been made yet; the first payout happens in Month 3 after live revenue starts<br>
           • <b>Pool capped at 50% (6.5% of revenue)</b> during bootstrap phase<br>
           • After Month 3, pool increases to full 13% and payouts begin monthly<br>
           • This ensures system stability and sustainable long-term payouts
@@ -792,7 +792,7 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
   
       <div class="card" style="margin-top:12px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%); border: 2px solid rgba(255, 215, 0, 0.3);" id="homeLastMonthCard">
         <h3 style="margin-top:0; color: #ffd700;">💰 Last Month Settlement (Paid 1st)</h3>
-        <div class="mini" style="margin-bottom: 12px;">Payouts processed on 1st of each month based on previous month contributions. Next payout: <b style="color: #00ff88;">February 1, 2026</b></div>
+        <div class="mini" style="margin-bottom: 12px;">Payouts processed on 1st of each month based on previous month contributions. Next payout: <b style="color: #00ff88;">not scheduled — no revenue yet</b></div>
         <table class="table" style="margin-top:8px">
           <tr><th>Metric</th><th>Value</th></tr>
           <tr><td>Last month received revenue</td><td><b id="home_last_rev">—</b></td></tr>
@@ -1265,6 +1265,8 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
     <section class="card">
       <h1>Liquidity Pools &amp; Vault</h1>
       <p class="sub">5 pools + Anunnaki Treasury Vault. Rewards by pool share. SENTINEL-enforced. Disclosed odds.</p>
+      <div class="notice warnNote" style="margin-bottom:10px"><b>Pools are not live.</b> No deposits are accepted and no real funds move. APR, TVL and capacity figures below are illustrative placeholders, not live data or guarantees.</div>
+      <div class="notice warnNote" style="margin-bottom:10px"><b>Pools are not live.</b> No deposits are accepted and no real funds move. APR, TVL and capacity figures below are illustrative placeholders, not live data or guarantees.</div>
 
       <div class="stack">
         <div class="card col-12"><div id="ad-pools-banner" class="ad-container" style="min-height: 90px;"></div></div>
@@ -1285,51 +1287,51 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
               <h3 style="margin-top:0;color:#c8b496">⬢ Dust</h3>
               <div class="mini">Entry-level pool. Lowest risk, lowest reward. Good for new participants.</div>
               <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                <span class="pill">Min: $10</span><span class="pill">Max: $50</span><span class="pill">Est APR: 4-8%</span>
+                <span class="pill">Min: $10</span><span class="pill">Max: $50</span><span class="pill">Target APR (illustrative): 4-8%</span>
               </div>
               <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:35%;background:rgba(200,180,150,.6)"></div></div>
-              <div class="mini" style="margin-top:4px">TVL: $— • 35% capacity</div>
+              <div class="mini" style="margin-top:4px">TVL: not live • 35% capacity (illustrative)</div>
             </div>
 
             <div class="card" style="border-color:rgba(139,90,43,.3);background:linear-gradient(135deg,rgba(139,90,43,.08),rgba(0,0,0,.1));">
               <h3 style="margin-top:0;color:#8b5a2b">⬢ Dung</h3>
               <div class="mini">Balanced pool. Moderate risk/reward. Standard participation.</div>
               <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                <span class="pill">Min: $10</span><span class="pill">Max: $75</span><span class="pill">Est APR: 8-14%</span>
+                <span class="pill">Min: $10</span><span class="pill">Max: $75</span><span class="pill">Target APR (illustrative): 8-14%</span>
               </div>
               <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:52%;background:rgba(139,90,43,.6)"></div></div>
-              <div class="mini" style="margin-top:4px">TVL: $— • 52% capacity</div>
+              <div class="mini" style="margin-top:4px">TVL: not live • 52% capacity (illustrative)</div>
             </div>
 
             <div class="card" style="border-color:rgba(220,80,80,.3);background:linear-gradient(135deg,rgba(220,80,80,.08),rgba(0,0,0,.1));">
               <h3 style="margin-top:0;color:#dc5050">⬢ Flesh</h3>
               <div class="mini">Higher-yield pool. Elevated risk. For experienced participants.</div>
               <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                <span class="pill">Min: $15</span><span class="pill">Max: $100</span><span class="pill">Est APR: 14-22%</span>
+                <span class="pill">Min: $15</span><span class="pill">Max: $100</span><span class="pill">Target APR (illustrative): 14-22%</span>
               </div>
               <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:28%;background:rgba(220,80,80,.6)"></div></div>
-              <div class="mini" style="margin-top:4px">TVL: $— • 28% capacity</div>
+              <div class="mini" style="margin-top:4px">TVL: not live • 28% capacity (illustrative)</div>
             </div>
 
             <div class="card" style="border-color:rgba(180,20,20,.3);background:linear-gradient(135deg,rgba(180,20,20,.08),rgba(0,0,0,.1));">
               <h3 style="margin-top:0;color:#b41414">⚫ BloodMoon</h3>
               <div class="mini">High-risk event pool. Volatile. Only during active events.</div>
               <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                <span class="pill">Min: $20</span><span class="pill">Max: $100</span><span class="pill">Est APR: 20-40%</span>
+                <span class="pill">Min: $20</span><span class="pill">Max: $100</span><span class="pill">Target APR (illustrative): 20-40%</span>
               </div>
               <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:15%;background:rgba(180,20,20,.6)"></div></div>
-              <div class="mini" style="margin-top:4px">TVL: $— • 15% capacity • Event: Inactive</div>
+              <div class="mini" style="margin-top:4px">TVL: not live • 15% capacity (illustrative) • Event: Inactive</div>
             </div>
 
             <div class="card" style="border-color:rgba(30,30,30,.5);background:linear-gradient(135deg,rgba(40,40,40,.15),rgba(0,0,0,.2));">
               <h3 style="margin-top:0;color:#888">◆ Obsidian</h3>
               <div class="mini">Maximum risk. Highest potential returns. SCAR continuity required (RETAINED+ tier).</div>
               <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                <span class="pill">Min: $25</span><span class="pill">Max: $100</span><span class="pill">Est APR: 30-60%</span>
+                <span class="pill">Min: $25</span><span class="pill">Max: $100</span><span class="pill">Target APR (illustrative): 30-60%</span>
                 <span class="pill" style="background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.4)">Requires RETAINED+ tier</span>
               </div>
               <div class="progressBar" style="margin-top:10px;height:8px"><div class="progressFill" style="width:8%;background:rgba(100,100,100,.6)"></div></div>
-              <div class="mini" style="margin-top:4px">TVL: $— • 8% capacity • Gated</div>
+              <div class="mini" style="margin-top:4px">TVL: not live • 8% capacity (illustrative) • Gated</div>
             </div>
           </div>
 
@@ -1486,7 +1488,7 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
             </div>
             <div class="card">
               <h3 style="margin-top:0">AD'AM</h3>
-              <div class="mini">Attention monetization: users receive 1/3 of net ad revenue, redeemable at $20. Completely isolated from odds and liquidity.</div>
+              <div class="mini">Attention monetization: users receive 13% of net ad revenue, redeemable at $20. Completely isolated from odds and liquidity.</div>
             </div>
           </div>
 
@@ -1494,7 +1496,7 @@ This system is <b>hands‑free</b>, <b>signup‑free</b>, and <b>idiot‑proof</
 
           <h2>Pools &amp; Vaults</h2>
           <div class="notice">
-            Dynamic pools accept any supported token/network. Users deposit $10–$100, see estimated returns, and earn rewards by pool share.
+            In the simulator, deposits of $10–$100 can be modelled to see estimated returns by pool share. No real deposits are accepted.
             Pool composition is shown transparently. Treasury tracks stability separately.
           </div>
           <div class="pillRow">
@@ -5261,6 +5263,8 @@ window.captureFullPageScreenshot = captureFullPageScreenshot;
   setTimeout(function(){ updateEstimator(); updateScarStatus(); updateSentinelStatus(); }, 500);
 })();
 </script>
+
+<footer class="site-footer" style="text-align:center;padding:18px 12px 28px;opacity:.75;font-size:13px;">© 2026 ADMENSION · <a href="privacy-policy.html">Privacy Policy</a></footer>
 
 </body>
 </html>

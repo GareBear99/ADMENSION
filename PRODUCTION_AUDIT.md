@@ -100,7 +100,7 @@ ADMENSION is **production-ready** with minor console.log cleanup recommended. Al
 - `src/anti-abuse-system.js` - 13 console.log statements
 - `src/page-validator.js` - 28 console.log statements
 - `src/engagement-system.js` - 8 console.log statements
-- `universal-ads/admension-ads.js` - 10 console.log statements
+- `universal-ads/admension-ads.js` - RETIRED 2026-11-03 (file deleted)
 - `scripts/compute_payouts.mjs` - 18 console.log statements (OK for scripts)
 - `index.html`, `interstitial.html`, `manage.html` - Various inline logs
 
@@ -207,14 +207,14 @@ adsenseSlot: '/XXXXXXX/sticky-footer', // Need real slot IDs
 - [ ] Optional: Remove console.logs (recommended but not required)
 
 ### Post-AdSense Approval
-- [ ] Update AdSense slot IDs in `src/ads-config.js`
+- [ ] Update AdSense slot IDs in `src/ad-loader.js` SLOT_IDS (src/ads-config.js was retired 2026-11-03)
 - [ ] Deploy Google Apps Script collector
 - [ ] Configure `window.ADMENSION_COLLECTOR_URL`
 - [ ] Test real ad serving
 - [ ] Verify tracking/analytics
 - [ ] Monitor initial traffic
 
-### First Payout (April 1, 2026)
+### First Payout (not scheduled — no payouts have been made yet)
 - [ ] Verify GitHub Secrets are configured
 - [ ] Test manual workflow dispatch
 - [ ] Validate payout calculations

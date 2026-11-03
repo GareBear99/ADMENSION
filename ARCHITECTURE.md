@@ -75,8 +75,7 @@ ADMENSION is a signup-free link shortener with integrated ad monetization and re
 
 ### 1. Universal Ads (UI Layer)
 
-**File:** `universal-ads/admension-ads.js`  
-**CSS:** `universal-ads/admension-ads.css`
+**File:** RETIRED 2026-11-03 — universal-ads/ deleted; the live systems are src/ad-loader.js (main site) and VALLIS/admension-ads.js (VALLIS pages).
 
 **Responsibilities:**
 - Inject sidebar and anchor bar HTML into page
@@ -280,7 +279,7 @@ monthly_pool = min($10,000, monthly_revenue × 13%)
 **During Bootstrap (Months 1-3):**
 - Pool capped at 6.5% (50% of normal rate)
 - No payouts until Month 3
-- First payout: April 1, 2026
+- First payout: not scheduled — no payouts have been made yet
 
 **Attribution:**
 - Only traffic with `?adm=CODE` parameter counts toward pool
@@ -315,7 +314,7 @@ your_payout = pool × (your_ad_units / total_ad_units)
 **Critical Files:**
 - `index.html` - Main application (must be in root)
 - `src/*.js` - System scripts (loaded in order)
-- `universal-ads/*` - Universal Ads system
+- `universal-ads/*` - RETIRED 2026-11-03 (deleted; see above)
 
 ---
 

@@ -519,7 +519,6 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <script src="./src/admin-auth.js"></script>
 <script src="./src/consent.js"></script>
 <script src="./src/ad-loader.js"></script>
-<script src="./src/ads-config.js"></script>
 <script src="./src/ad-impression-validator.js"></script>
 <script src="./src/event-collector.js"></script>
 <script src="./src/daily-quotes.js"></script>
@@ -580,7 +579,7 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <a class="btn" href="admin.html">Admin</a>
 </div>
 <div class="divider"></div>
-<div class="ad"><div class="adLabel">HOME — Top Banner</div></div>
+<div class="ad ad-container" id="ad-top-banner"><div class="adLabel">HOME — Top Banner</div></div>
 <div class="divider"></div>
 <h2>Try it (demo flow)</h2>
 <p class="sub">Use the buttons below to run the 3-step flow. This increases pages/session via <b>user intent</b> (policy-safe).</p>
@@ -608,13 +607,13 @@ canvas{width:100%;height:72px;border:1px solid rgba(255,255,255,.10);border-radi
 <div class="notice warnNote">
 <b>Reminder:</b> Do not add timer-based refresh. Only refresh ads on user intent (page/nav/step).
           </div>
-</section></section><section class="page" id="page-create"><section class="card"><h1>Create</h1><p class="sub">Create a share link in this browser (signup‑free).</p></section><div class="ad" id="createRail"><div class="adLabel">CREATE — Desktop Rail</div></div></section><section class="page" id="page-manage"><section class="card"><h1>Manage</h1><p class="sub">View links created in this browser and manage local data.</p><pre class="codebox" id="admList">—</pre></section><div class="ad" id="manageRail"><div class="adLabel">MANAGE — Desktop Rail</div></div></section><section class="page" id="page-docs">
+</section></section><section class="page" id="page-create"><section class="card"><h1>Create</h1><p class="sub">Create a share link in this browser (signup‑free).</p></section><div class="ad ad-container" id="createRail" data-ad-type="VERTICAL" data-ad-page="create"><div class="adLabel">CREATE — Desktop Rail</div></div></section><section class="page" id="page-manage"><section class="card"><h1>Manage</h1><p class="sub">View links created in this browser and manage local data.</p><pre class="codebox" id="admList">—</pre></section><div class="ad ad-container" id="manageRail" data-ad-type="VERTICAL" data-ad-page="manage"><div class="adLabel">MANAGE — Desktop Rail</div></div></section><section class="page" id="page-docs">
   <section class="card">
     <h1>Docs</h1>
     <p class="sub"><b>Idiot-proof, blunt, and accurate.</b> This explains exactly how CFAMM + ADMENSION works, what is measured locally, and what ad networks actually pay for.</p>
 
     <div class="stack">
-      <div class="card col-12"><div class="ad"><div class="adLabel">DOCS — Top Banner</div></div></div>
+      <div class="card col-12"><div class="ad ad-container" id="ad-docs-banner"><div class="adLabel">DOCS — Top Banner</div></div></div>
 
       <!-- TOC -->
       <div class="card col-4">
@@ -1196,12 +1195,12 @@ test('ADMENSION homepage loads', async ({ page }) => {
 </section></section></div>
 <div class="card col-4" id="homeRail">
 <div class="divider"></div>
-<div class="ad rail"><div class="adLabel">HOME — Desktop Rail</div></div>
+<div class="ad rail ad-container" id="ad-rail-right"><div class="adLabel">HOME — Desktop Rail</div></div>
 <div class="divider"></div>
 <div class="divider"></div>
-<div class="ad tall"><div class="adLabel">HOME — In-Content Tall (engagement-gated elsewhere)</div></div>
+<div class="ad tall ad-container" id="ad-in-content-tall"><div class="adLabel">HOME — In-Content Tall (engagement-gated elsewhere)</div></div>
 <div class="divider"></div>
-<div class="ad"><div class="adLabel">HOME — Footer Banner</div></div>
+<div class="ad ad-container" id="ad-footer-banner"><div class="adLabel">HOME — Footer Banner</div></div>
 
 
 <!-- ===== PAGE: DOCS ===== -->
@@ -1317,9 +1316,9 @@ test('ADMENSION homepage loads', async ({ page }) => {
 </br></br></br></br></div>
 </div>
 <div class="card col-4" id="adminRail">
-<div class="ad tall"><div class="adLabel">ADMIN — Desktop Rail</div></div>
+<div class="ad tall ad-container" id="ad-admin-rail"><div class="adLabel">ADMIN — Desktop Rail</div></div>
 </div>
-<div class="card col-12"><div class="ad tall"><div class="adLabel">ADMIN — In-Content Tall</div></div></div>
+<div class="card col-12"><div class="ad tall ad-container" id="ad-admin-tall"><div class="adLabel">ADMIN — In-Content Tall</div></div></div>
 
 <div class="card col-12" style="margin-top:14px">
 <h2>Ad Funnel &amp; Processing (How revenue happens)</h2>
@@ -1385,7 +1384,7 @@ test('ADMENSION homepage loads', async ({ page }) => {
 <ul class="tight">
 <li>Users earn <b>participation units</b> during the month (not dollars).</li>
 <li>After the month closes and ad networks actually pay, you enter the <b>received revenue</b> for settlement.</li>
-<li><b>33%</b> of net received ad revenue is allocated to the ADMENSION pool (cap applies).</li>
+<li><b>13%</b> of net received ad revenue is allocated to the ADMENSION pool (cap applies).</li>
 <li>User payout is proportional: <code>pool × (your_units / total_units)</code>.</li>
 <li>Minimum redeem threshold can be enforced (e.g., $20) and payouts are only from money already received.</li>
 </ul>
@@ -3479,5 +3478,7 @@ window.ADMENSION_API_URL = 'https://admension-api.admension.workers.dev';
 window.ADMENSION_COLLECTOR_URL = 'https://admension-api.admension.workers.dev/api/events';
 </script>
 <script src="./src/api-client.js"></script>
+<footer class="site-footer" style="text-align:center;padding:18px 12px 28px;opacity:.75;font-size:13px;">© 2026 ADMENSION · <a href="privacy-policy.html">Privacy Policy</a></footer>
+
 </body>
 </html>

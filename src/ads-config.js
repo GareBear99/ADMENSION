@@ -1,4 +1,18 @@
 /**
+ * RETIRED 2026-11-03 — DO NOT LOAD THIS FILE.
+ *
+ * AdManager (this file) was a SECOND ad system running alongside
+ * src/ad-loader.js on the standalone pages. Both systems wrote <ins>
+ * elements into the same containers and both loaded the AdSense script,
+ * with empty slot IDs in both places. ad-loader.js v3.0 (dynamic
+ * discovery) is now the single canonical ad system for the main site;
+ * VALLIS/admension-ads.js is the single system for VALLIS pages.
+ * The <script src="./src/ads-config.js"> tags were removed from
+ * admin/create/docs/manage/stats.html. This file is kept in git
+ * history only (Prebid/geo-tier code may be revived after AdSense
+ * approval, wired through ad-loader.js, never as a parallel loader).
+ */
+/**
  * ADMENSION Ad Configuration v2.0
  * Production-ready monetization with $6-20 RPM target
  * 

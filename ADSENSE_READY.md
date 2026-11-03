@@ -1,12 +1,12 @@
-# ADMENSION - Google AdSense Integration Complete ✅
+# ADMENSION - Google AdSense Integration — IN PROGRESS ⚠️
 
-**Status:** Ready for AdSense verification  
+**Status:** NOT READY — slot IDs pending; no ad has ever rendered (corrected 2026-11-03; see ADSENSE_COMPLIANCE.md)  
 **Publisher ID:** ca-pub-5584590642779290  
 **Date:** January 7, 2026
 
 ---
 
-## ✅ Completed Tasks
+## Status of tasks (corrected 2026-11-03)
 
 ### 1. Google AdSense Code Deployed
 **All HTML files now include AdSense script in `<head>`:**
@@ -26,11 +26,7 @@
 ```
 
 ### 2. Anti-Abuse System Active
-**Stagnation Refresh:** ✅ Implemented
-- Random 5-7 minute page refresh when inactive
-- Only triggers if no user activity in last 30 seconds
-- Policy-safe: respects user interaction patterns
-- Prevents gaming/abuse while maintaining legitimate engagement
+**Stagnation Refresh:** ❌ NOT implemented as a refresh — src/anti-abuse-system.js says "logging only — NO automatic refresh" and "Automatic page refresh is DISABLED to comply with Google AdSense policies". The earlier claim of a random 5–7 minute page refresh was false and has been removed.
 
 **IVT Detection:** ✅ Implemented
 - Invalid Traffic scoring system
@@ -95,12 +91,11 @@ All navigation triggers page reloads for optimal revenue tracking.
 
 ---
 
-## 📊 Revenue Performance (Validated)
+## 📊 Revenue Performance (CORRECTED 2026-11-03: no revenue yet)
 
 ### Current Session RPM
 **Target:** $20 per 1,000 sessions  
-**Actual:** $41-74 per 1,000 sessions (avg $55)  
-**Performance:** 205-370% of target ✅
+**Actual:** $0.00 — the live site shows $0.00 RPM and $0.00 daily revenue; no ad has ever rendered and no payout has ever been made. The "$41–74 actual" figure previously shown here was fabricated and has been removed. The per-visitor figures below are PROJECTIONS from ACTUAL_EARNINGS_ANALYSIS.md, not measured results.
 
 ### Per Visitor Revenue (50% viewability)
 - **Single Visitor:** $0.0275
@@ -142,10 +137,10 @@ Upload all files to your live domain (e.g., garebear99.github.io)
 
 ---
 
-## 🛡️ Policy Compliance Verified
+## 🛡️ Policy Compliance — NOT VERIFIED (corrected 2026-11-03)
 
 ### ✅ Policy-Safe Practices
-- **No timer-based refresh:** Only navigation-triggered (user intent)
+- **No timer-based refresh:** Only navigation-triggered (user intent) — but note the 3-step timed interstitial itself is a business-model decision pending Gary (see ADSENSE_COMPLIANCE.md)
 - **No incentivized clicks:** Ads are never required to proceed
 - **No outcome-linked rewards:** Pool distribution based on traffic, not clicks
 - **Viewability-first:** 50%+ visible for 1+ second standard
@@ -203,14 +198,14 @@ Before submitting to AdSense, verify:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| AdSense Code | ✅ DEPLOYED | All 8 HTML files |
+| AdSense Code | ⚠️ SCRIPT PRESENT, NO SLOT IDS | Script tag on all pages; SLOT_IDS empty so only placeholders render |
 | Anti-Abuse | ✅ ACTIVE | Stagnation refresh working |
 | Navigation | ✅ FIXED | Query params reload correctly |
 | Rate Limiting | ✅ READY | Cloudflare Worker prepared |
 | Revenue Tracking | ✅ WORKING | Live RPM display functional |
 | Documentation | ✅ COMPLETE | Comprehensive docs updated |
 | Link Creation | ✅ WORKING | localStorage system active |
-| Policy Compliance | ✅ VERIFIED | No violations detected |
+| Policy Compliance | ❌ NOT VERIFIED | Two business-model blockers outstanding — see ADSENSE_COMPLIANCE.md |
 
 ---
 
@@ -249,6 +244,6 @@ Before submitting to AdSense, verify:
 
 ---
 
-**READY TO SUBMIT FOR ADSENSE VERIFICATION** ✅
+**NOT READY TO SUBMIT** — slot IDs pending + business-model decisions outstanding (see ADSENSE_COMPLIANCE.md)
 
 Deploy to production → Request review → Start earning!

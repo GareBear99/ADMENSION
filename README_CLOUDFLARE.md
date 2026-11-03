@@ -88,7 +88,6 @@ ADMENSION/
 ├── src/
 │   ├── api-client.js      # Frontend API client (with offline fallback)
 │   └── daily-quotes.js    # 365 quotes + 27 GIF system
-├── universal-ads/
 │   ├── admension-ads.js   # Ad system integration
 │   └── admension-ads.css  # Ad styling
 └── docs/
@@ -120,7 +119,7 @@ ADMENSION/
 - 15-30 ad impressions (Tier 1 geo)
 
 ### Revenue Features
-- **5 ad placements per page**: Top banner, in-content tall, rail (desktop), footer, sticky anchor
+- **3–4 ad placements per page** (varies by page): top banner, in-content tall, rail (desktop), footer; the interstitial adds a sticky anchor. 31 loader containers total (see src/ad-loader.js v3.0).
 - **Geo-based density**: Tier 1 (all 5), Tier 2 (4), Tier 3 (3)
 - **CPM by tier**: $4.00 (T1), $2.60 (T2), $1.30 (T3)
 - **Navigation reload**: Every page change = new pageview

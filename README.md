@@ -40,7 +40,7 @@ No signup. No dashboard. No referrals. Share a link → people browse → ads ru
 - **Pool Distribution:** 6.5% during bootstrap (Months 1-2), then 13% from Month 3
 - **Wallet Cap:** Max 1% per wallet with transparent overflow redistribution
 - **Walletless Rule:** Proceeds from links without wallets go to founder (not pool)
-- **Bootstrap Phase:** No payouts until Month 3 (first payout April 1, 2026)
+- **Bootstrap Phase:** No payouts until Month 3 (no payouts have been made yet — first payout happens in Month 3 after live revenue starts)
 - **Daily Quotes:** 365 motivational money/hustle quotes with rotating GIF backgrounds
 
 ### 🛠️ Technical Stack
@@ -153,7 +153,6 @@ ADMENSION/
 ├── stats.html              # Transparency statistics
 ├── docs.html               # Comprehensive documentation
 ├── admin.html              # Admin controls (PIN protected)
-├── universal-ads/
 │   ├── admension-ads.css   # Universal ad system CSS
 │   └── admension-ads.js    # Universal ad system JS (attribution tracking)
 ├── cloud/
@@ -258,7 +257,7 @@ ADMENSION launched with a **3-month bootstrap phase** to ensure sustainable long
 
 **Bootstrap Policies:**
 - ⚠️ **No payouts during Months 1-2** (Jan-Feb 2026)
-- 📅 **First payout:** April 1, 2026 (for March activity)
+- 📅 **First payout:** Not scheduled — no payouts have been made yet
 - 💰 **Pool rate:** 6.5% during bootstrap (50% of normal 13%)
 - 📈 **After Month 3:** Full 13% pool + monthly payouts resume
 - 🔢 **Units tracked:** All contribution tracked during bootstrap for transparency

@@ -284,7 +284,7 @@ Here's how the complete payout flow works:
 
 ### Payout Rules
 
-1. **Pool Funding:** 33% of net AdSense revenue
+1. **Pool Funding:** 13% of net AdSense revenue
 2. **Wallet Cap:** Max 1% per wallet, enforced transparently
 3. **Overflow:** Redistributed to other eligible wallets
 4. **Walletless:** 100% to founder (not pool), acts as burn

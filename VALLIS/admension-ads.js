@@ -1,14 +1,71 @@
 /**
- * ADMENSION Ad Placements for VALLIS Pages
+ * ADMENSION Ad Placements for VALLIS Pages v2.0
  * Injects: bottom sticky anchor + left/right side stickies (desktop only)
  * Matches the ADMENSION main site style.
+ *
+ * v2.0 changes (2026-11-03, AdSense cleanup):
+ * - SLOT IDS: the injected <ins> tags now carry real data-ad-slot values
+ *   when they exist. Slots are read from window.ADMENSION_SLOT_IDS (the
+ *   single source of truth published by src/ad-loader.js on the main
+ *   site) and fall back to the local SLOT_IDS below. DO NOT INVENT slot
+ *   IDs: leave them empty until the real values are pasted in. Without a
+ *   slot the <ins> is still created (auto-format) and a console warning
+ *   is logged, exactly as before — but nothing fake is rendered.
+ * - PATH RESOLUTION: this file is now loaded by a path-helper snippet on
+ *   each VALLIS page (see the snippet: it resolves the script URL from
+ *   location.pathname, so it works on GitHub Pages /ADMENSION/... and on
+ *   a root-hosted copy alike). The EVE chatbot base is derived from
+ *   location.pathname too — the old document.currentScript trick broke
+ *   for dynamically injected scripts.
+ * - DOM READY: the injector now waits for DOMContentLoaded when the
+ *   document is still loading, so it is safe to inject at any point.
+ * - GUARD renamed to __ADMENSION_VALLIS_ADS_LOADED (it previously shared
+ *   the __ADMENSION_UNIVERSAL_ADS_LOADED name with the retired
+ *   universal-ads system, which could suppress this file entirely).
+ * - PRIVACY LINKS: any <a data-privacy-link> on the page has its href
+ *   normalised to <base>/privacy-policy.html, so VALLIS pages link the
+ *   policy correctly on both hosts.
  */
 (function(){
   'use strict';
-  if (window.__ADMENSION_UNIVERSAL_ADS_LOADED) return;
-  window.__ADMENSION_UNIVERSAL_ADS_LOADED = true;
+  if (window.__ADMENSION_VALLIS_ADS_LOADED) return;
+  window.__ADMENSION_VALLIS_ADS_LOADED = true;
   var CLIENT = 'ca-pub-5584590642779290';
-  var isDesktop = window.innerWidth >= 1100;
+
+  // ---- Slot IDs: single source of truth is window.ADMENSION_SLOT_IDS
+  // (published by src/ad-loader.js). Local fallback stays EMPTY on
+  // purpose — never invent a slot ID; fill these in only from the
+  // AdSense dashboard once the real ad units exist.
+  var SLOT_IDS = {
+    ANCHOR: '',  // VALLIS anchor bar — paste the BANNER slot ID here when it exists
+    SIDE:   '',  // VALLIS side stickies — paste the VERTICAL slot ID here when it exists
+  };
+  var shared = window.ADMENSION_SLOT_IDS || {};
+  var anchorSlotId = shared.BANNER || SLOT_IDS.ANCHOR || '';
+  var sideSlotId = shared.VERTICAL || SLOT_IDS.SIDE || '';
+  if (!anchorSlotId || !sideSlotId) {
+    console.warn('[ADMENSION VALLIS Ads] ⚠️ No slot IDs configured — VALLIS <ins> tags are created without data-ad-slot and will not fill. Paste real slot IDs into src/ad-loader.js SLOT_IDS (single source of truth).');
+  }
+
+  // ---- Site base: everything before "/VALLIS/" in the page URL.
+  // GitHub Pages: "/ADMENSION". Root-hosted copy (Netlify): "".
+  function siteBase() {
+    var p = location.pathname || '';
+    var i = p.indexOf('/VALLIS/');
+    return i >= 0 ? p.slice(0, i) : '';
+  }
+
+  function run() {
+    var isDesktop = window.innerWidth >= 1100;
+
+    // ---- Normalise privacy links on this page ----
+    try {
+      var base = siteBase();
+      var links = document.querySelectorAll('a[data-privacy-link]');
+      for (var li = 0; li < links.length; li++) {
+        links[li].setAttribute('href', base + '/privacy-policy.html');
+      }
+    } catch (e) {}
 
   // ---- Inject CSS ----
   var css = document.createElement('style');
@@ -77,11 +134,16 @@
   document.head.appendChild(css);
 
   // ---- Helper: create ad ins element ----
-  function makeAdIns(){
+  // slotId is '' until real AdSense slot IDs exist — the <ins> is still
+  // created (auto-format) so the layout is identical before/after.
+  function makeAdIns(slotId){
     var ins = document.createElement('ins');
     ins.className = 'adsbygoogle';
     ins.style.display = 'block';
     ins.setAttribute('data-ad-client', CLIENT);
+    if (slotId) {
+      ins.setAttribute('data-ad-slot', slotId);
+    }
     ins.setAttribute('data-ad-format', 'auto');
     ins.setAttribute('data-full-width-responsive', 'true');
     return ins;
@@ -105,7 +167,7 @@
 
   var anchorSlot = document.getElementById('adm-vallis-anchor-ad');
   if(anchorSlot){
-    var ins = makeAdIns();
+    var ins = makeAdIns(anchorSlotId);
     anchorSlot.appendChild(ins);
     pushAd();
   }
@@ -155,8 +217,8 @@
     // Fill with ad ins
     var lBody = document.getElementById('adm-side-left-body');
     var rBody = document.getElementById('adm-side-right-body');
-    if(lBody){ var li = makeAdIns(); lBody.innerHTML=''; lBody.appendChild(li); pushAd(); }
-    if(rBody){ var ri = makeAdIns(); rBody.innerHTML=''; rBody.appendChild(ri); pushAd(); }
+    if(lBody){ var li = makeAdIns(sideSlotId); lBody.innerHTML=''; lBody.appendChild(li); pushAd(); }
+    if(rBody){ var ri = makeAdIns(sideSlotId); rBody.innerHTML=''; rBody.appendChild(ri); pushAd(); }
 
     // Hide/show handlers
     document.getElementById('adm-hide-left').onclick = function(){
@@ -198,15 +260,30 @@
   }
 
   // ---- Load shared EVE chatbot on every VALLIS/wiki page ----
+  // Base is derived from the page URL (see siteBase above), not from
+  // document.currentScript — this file is injected dynamically now, and
+  // currentScript is null for dynamically injected scripts.
   try{
     if (!window.__ADMENSION_EVE_LOADED) {
-      var current = document.currentScript && document.currentScript.src ? document.currentScript.src : '';
-      if (current) {
-        var base = current.replace(/admension-ads\.js(?:\?.*)?$/, '');
-        var eve = document.createElement('script');
-        eve.src = base + 'eve-chatbot.js';
-        document.body.appendChild(eve);
-      }
+      var eve = document.createElement('script');
+      eve.src = siteBase() + '/VALLIS/eve-chatbot.js';
+      document.body.appendChild(eve);
     }
   }catch(e){}
+  }
+
+  // Run now if the DOM is ready, otherwise wait — this file is injected
+  // dynamically by the path-helper snippet and may execute before <body>.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+
+  // Public API (for debugging and for the future slot-ID fill-in)
+  window.ADMENSION_VALLIS_ADS = {
+    version: '2.0.0',
+    slotIds: { anchor: anchorSlotId, side: sideSlotId },
+    client: CLIENT,
+  };
 })();

@@ -347,7 +347,7 @@ else {
 
 **Bootstrap Rules:**
 - Months 1-2 (Jan-Feb 2026): No payouts, units tracked
-- Month 3 (Mar 2026): First payout on April 1, 2026
+- Month 3: First payout (only after live revenue starts; no payouts have been made yet)
 - Month 3: Users get 6.5% (50% of pool), founder gets 6.5%
 - Month 4+: Users get full 13% pool
 

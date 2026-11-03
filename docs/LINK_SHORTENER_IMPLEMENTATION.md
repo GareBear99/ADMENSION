@@ -68,7 +68,7 @@ Successfully transformed ADMENSION from a 3-step engagement flow into a **fully 
 - Redirects to homepage if invalid/expired code
 
 ### 3. Universal Ad System Integration
-**Location:** `universal-ads/` directory
+**Location:** `src/ad-loader.js` (main site) + `VALLIS/admension-ads.js` (VALLIS pages). universal-ads/ retired 2026-11-03.
 
 **Files:**
 - `admension-ads.css` (422 lines) - Consolidated ad styling
@@ -138,7 +138,6 @@ Successfully transformed ADMENSION from a 3-step engagement flow into a **fully 
 ADMENSION/
 ├── index.html                      # Main site (updated with Create page + demo)
 ├── interstitial.html              # NEW: 3-step timed interstitial
-├── universal-ads/
 │   ├── admension-ads.css          # EXISTING: Ad styling
 │   └── admension-ads.js           # EXISTING: Ad logic + attribution
 ├── docs/
@@ -295,7 +294,7 @@ ADMENSION/
 
 ### Dependencies
 - **Fonts:** Google Fonts (Space Grotesk)
-- **CSS:** Inline + `universal-ads/admension-ads.css`
+- **CSS:** Inline (universal-ads/admension-ads.css retired 2026-11-03)
 - **JS:** Vanilla JavaScript (no frameworks)
 - **Storage:** localStorage + sessionStorage only
 

@@ -1,17 +1,41 @@
 /**
- * ADMENSION Manual Ad Placement System v2.0
- * 
+ * ADMENSION Manual Ad Placement System v3.0
+ *
  * NO Auto Ads. Every placement is explicitly defined and validated.
- * 
- * SETUP INSTRUCTIONS:
+ *
+ * v3.0 — DYNAMIC DISCOVERY (2026-11-03)
+ * v2.0 kept a hardcoded CONTAINER_MAP of 31 containers. Every new page or
+ * section that was not in the map was silently skipped, so as content grew
+ * the validation report filled with "skipped" entries and no ad ever
+ * rendered on the new content. v3.0 discovers placements from the DOM
+ * instead: any <div class="ad-container" id="..."> on the page is picked
+ * up automatically. Adding a placement is now a markup-only change —
+ * no JavaScript edit, no map entry, nothing to get out of sync.
+ *
+ * HOW TO ADD A PLACEMENT (no JS change needed):
+ *   <div id="ad-<page>-<slot>" class="ad-container" style="min-height: 90px;"></div>
+ * The loader infers type/format from the id suffix:
+ *   -banner | -sticky | -bottom | -footer | -anchor  -> BANNER,    horizontal
+ *   -rail | -left | -right                          -> VERTICAL,  vertical (desktop only)
+ *   -tall | -in-content                             -> RECTANGLE, rectangle
+ * Or be explicit with data attributes (these win over inference):
+ *   <div class="ad-container" id="ad-x" data-ad-type="RECTANGLE"
+ *        data-ad-format="rectangle" data-ad-page="home"></div>
+ * Page attribution comes from data-ad-page, the legacy map, or the nearest
+ * ancestor <section id="page-X">. Containers that match none of these are
+ * reported as UNMAPPED in validation (visible, never silent).
+ *
+ * SETUP INSTRUCTIONS (slot IDs — DO NOT GUESS THESE):
  * 1. Go to AdSense → Ads → By ad unit → + New ad unit → Display ads
  * 2. Create THREE ad units:
  *    a) "ADMENSION Banner"    → Responsive → Horizontal → Copy slot ID
  *    b) "ADMENSION Rectangle" → Responsive → Square     → Copy slot ID
  *    c) "ADMENSION Vertical"  → Responsive → Vertical   → Copy slot ID
- * 3. Paste each slot ID into SLOT_IDS below
- * 4. Deploy. Ads will render in every container mapped to that type.
- * 
+ * 3. Paste each slot ID into SLOT_IDS below. Until then they stay empty
+ *    on purpose: the loader shows labelled placeholders and reports
+ *    NO SLOT ID instead of rendering anything fake. Never invent a slot ID.
+ * 4. Deploy. Ads will render in every discovered container of that type.
+ *
  * VALIDATION: After page load, open DevTools console and run:
  *   ADMENSION_AD_LOADER.diagnose()
  */
@@ -24,8 +48,10 @@
   // ============================================================
   const ADSENSE_CLIENT = 'ca-pub-5584590642779290';
 
-  // Create these 3 ad units in your AdSense dashboard, then paste the slot IDs:
-  // If left empty, auto-format ads will be used (works without specific slot IDs)
+  // Create these 3 ad units in your AdSense dashboard, then paste the slot IDs.
+  // DO NOT INVENT slot IDs: a wrong ID renders nothing and can flag the
+  // account. Leave them empty until the real values are pasted in.
+  // (A separate task is fetching the real IDs from the AdSense account.)
   const SLOT_IDS = {
     BANNER:    '',  // Paste your "Display ads → Horizontal" slot ID here (e.g. '1234567890')
     RECTANGLE: '',  // Paste your "Display ads → Square" slot ID here
@@ -37,10 +63,13 @@
   const USE_AUTO_FORMAT_FALLBACK = false;
 
   // ============================================================
-  // AD CONTAINER MAP — Every placement on the site
-  // Maps container div ID → ad type (BANNER, RECTANGLE, or VERTICAL)
+  // LEGACY CONTAINER MAP — DEPRECATED, kept as a fallback only
+  // v3.0 discovers containers from the DOM. This map is consulted only
+  // when a container carries no data attributes and its id matches no
+  // known suffix pattern. Do NOT add new entries here — add the
+  // container div to the page markup instead.
   // ============================================================
-  const CONTAINER_MAP = {
+  const LEGACY_CONTAINER_MAP = {
     // Homepage
     'ad-top-banner':       { type: 'BANNER',    page: 'home',   format: 'horizontal', sizes: '728x90' },
     'ad-rail-right':       { type: 'VERTICAL',  page: 'home',   format: 'vertical',   sizes: '160x600', desktopOnly: true },
@@ -91,6 +120,16 @@
     'ad-interstitial-bottom':  { type: 'BANNER',    page: 'interstitial', format: 'horizontal', sizes: '728x90' },
   };
 
+  // Id-suffix patterns used to infer type/format when a container has no
+  // data attributes and no legacy map entry. Order matters: first match wins.
+  const ID_PATTERNS = [
+    { re: /-(banner|sticky|bottom|footer|anchor)$/, type: 'BANNER',    format: 'horizontal', sizes: '728x90',  desktopOnly: false },
+    { re: /-(rail|left|right)$/,                    type: 'VERTICAL',  format: 'vertical',   sizes: '160x600', desktopOnly: true  },
+    { re: /-(tall|in-content)$/,                   type: 'RECTANGLE', format: 'rectangle',  sizes: '300x250', desktopOnly: false },
+  ];
+
+  const VALID_TYPES = ['BANNER', 'RECTANGLE', 'VERTICAL'];
+
   // ============================================================
   // LOADER SETTINGS
   // ============================================================
@@ -111,7 +150,109 @@
     adsenseBlocked: false,
     configured: false,
     placements: {},  // containerId → { status, ins, attempts, rendered }
+    discovered: [],  // [{ id, config }] from the last discovery pass
+    unmapped: [],    // container ids that matched no config source
   };
+
+  // ============================================================
+  // DYNAMIC DISCOVERY (v3.0)
+  // ============================================================
+
+  /**
+   * Resolve the ad config for one container element.
+   * Priority: data attributes > legacy map > id-suffix inference.
+   * Returns null when nothing can describe the container.
+   */
+  function resolveContainerConfig(el) {
+    var id = el.id;
+    var ds = el.dataset || {};
+
+    // 1. Explicit data attributes (authoritative when present)
+    if (ds.adType && VALID_TYPES.indexOf(ds.adType.toUpperCase()) !== -1) {
+      return {
+        type: ds.adType.toUpperCase(),
+        page: ds.adPage || pageFromAncestor(el),
+        format: ds.adFormat || formatForType(ds.adType.toUpperCase()),
+        sizes: ds.adSizes || '',
+        desktopOnly: ds.adDesktopOnly === 'true' || ds.adDesktopOnly === '1',
+      };
+    }
+
+    // 2. Legacy map (deprecated fallback)
+    if (LEGACY_CONTAINER_MAP[id]) {
+      return LEGACY_CONTAINER_MAP[id];
+    }
+
+    // 3. Id-suffix inference
+    for (var i = 0; i < ID_PATTERNS.length; i++) {
+      var p = ID_PATTERNS[i];
+      if (p.re.test(id)) {
+        return {
+          type: p.type,
+          page: pageFromAncestor(el),
+          format: p.format,
+          sizes: p.sizes,
+          desktopOnly: p.desktopOnly,
+        };
+      }
+    }
+
+    return null;
+  }
+
+  function formatForType(type) {
+    return type === 'BANNER' ? 'horizontal' : type === 'VERTICAL' ? 'vertical' : 'rectangle';
+  }
+
+  /**
+   * Page attribution: nearest ancestor <section id="page-X">, else 'unknown'.
+   * Keeps SPA navigation refresh working without a hardcoded page list.
+   */
+  function pageFromAncestor(el) {
+    var node = el;
+    while (node && node !== document.body) {
+      if (node.id && node.id.indexOf('page-') === 0) {
+        return node.id.slice('page-'.length);
+      }
+      node = node.parentElement;
+    }
+    return 'unknown';
+  }
+
+  /**
+   * Discover every ad container currently in the DOM.
+   * Duplicate ids are warned about and counted once (first wins) — a
+   * duplicate id is a markup bug, and silently double-placing would
+   * corrupt the placement state keyed by id.
+   */
+  function discoverContainers() {
+    var found = [];
+    var unmapped = [];
+    var seen = {};
+
+    var nodes = document.querySelectorAll('.ad-container[id]');
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      var id = el.id;
+
+      if (seen[id]) {
+        console.warn('[ADMENSION AdLoader] ⚠️ Duplicate ad container id #' + id + ' — ignoring the repeat. Fix the markup so ids are unique.');
+        continue;
+      }
+      seen[id] = true;
+
+      var config = resolveContainerConfig(el);
+      if (!config) {
+        unmapped.push(id);
+        continue;
+      }
+      found.push({ id: id, el: el, config: config });
+    }
+
+    state.discovered = found;
+    state.unmapped = unmapped;
+    return { containers: found, unmapped: unmapped };
+  }
 
   // ============================================================
   // INITIALIZATION
@@ -134,6 +275,11 @@
       console.log('  VERTICAL: ', SLOT_IDS.VERTICAL || '(not set)');
     }
 
+    // Single source of truth for the VALLIS injector (VALLIS/admension-ads.js),
+    // which reads these instead of keeping its own empty slot table.
+    window.ADMENSION_SLOT_IDS = SLOT_IDS;
+    window.ADMENSION_ADSENSE_CLIENT = ADSENSE_CLIENT;
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', onDomReady);
     } else {
@@ -142,7 +288,7 @@
   }
 
   function onDomReady() {
-    console.log('[ADMENSION AdLoader] DOM ready — scanning for ad containers...');
+    console.log('[ADMENSION AdLoader] DOM ready — discovering ad containers...');
 
     // Wait for AdSense script to be available
     waitForAdSense(function() {
@@ -188,21 +334,28 @@
   // AD PLACEMENT ENGINE
   // ============================================================
   function scanAndPlaceAds() {
-    var containerIds = Object.keys(CONTAINER_MAP);
+    var discovery = discoverContainers();
     var placed = 0;
     var skipped = 0;
 
-    containerIds.forEach(function(containerId) {
-      var container = document.getElementById(containerId);
-      var config = CONTAINER_MAP[containerId];
+    if (discovery.unmapped.length > 0) {
+      console.warn(
+        '[ADMENSION AdLoader] ⚠️ ' + discovery.unmapped.length +
+        ' ad container(s) could not be mapped to an ad type (no data-ad-type, ' +
+        'no legacy map entry, no recognised id suffix): ' + discovery.unmapped.join(', ') +
+        '. Add data-ad-type="BANNER|RECTANGLE|VERTICAL" to the container div.'
+      );
+    }
 
-      if (!container) {
-        return;
-      }
+    discovery.containers.forEach(function(item) {
+      var containerId = item.id;
+      var container = item.el;
+      var config = item.config;
 
       // Skip desktop-only placements on mobile
       if (config.desktopOnly && window.innerWidth < 980) {
         skipped++;
+        state.placements[containerId] = { status: 'skipped-mobile', ins: null, attempts: 0, rendered: false };
         return;
       }
 
@@ -227,7 +380,9 @@
       }
     });
 
-    console.log('[ADMENSION AdLoader] Scan complete: ' + placed + ' placed, ' + skipped + ' skipped (mobile)');
+    console.log('[ADMENSION AdLoader] Scan complete: ' + placed + ' placed, ' + skipped + ' skipped (mobile)' +
+      (discovery.unmapped.length ? ', ' + discovery.unmapped.length + ' unmapped' : '') +
+      ' — ' + discovery.containers.length + ' containers discovered');
   }
 
   /**
@@ -326,7 +481,7 @@
 
       // Retry if attempts remain
       var container = document.getElementById(containerId);
-      var config = CONTAINER_MAP[containerId];
+      var config = configForContainer(containerId);
       if (container && config && placement.attempts < CONFIG.retryAttempts) {
         setTimeout(function() { placeAd(containerId, container, config, placement.slotId, placement.attempts + 1); }, CONFIG.retryDelay);
       }
@@ -335,18 +490,27 @@
     }
   }
 
+  /** Look up the config for a container id from the last discovery pass. */
+  function configForContainer(containerId) {
+    for (var i = 0; i < state.discovered.length; i++) {
+      if (state.discovered[i].id === containerId) return state.discovered[i].config;
+    }
+    return LEGACY_CONTAINER_MAP[containerId] || null;
+  }
+
   /**
-   * Run validation across ALL placements and generate a report
+   * Run validation across ALL discovered placements and generate a report
    */
   function validateAllPlacements() {
     console.log('%c\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00ffff;');
     console.log('%c  ADMENSION AD VALIDATION REPORT', 'color: #00ffff; font-weight: bold; font-size: 14px;');
     console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00ffff;');
 
-    var report = { total: 0, rendered: 0, unfilled: 0, failed: 0, noSlotId: 0, skipped: 0, details: [] };
+    var report = { total: 0, rendered: 0, unfilled: 0, failed: 0, noSlotId: 0, skipped: 0, unmapped: state.unmapped.length, details: [] };
 
-    Object.keys(CONTAINER_MAP).forEach(function(containerId) {
-      var config = CONTAINER_MAP[containerId];
+    state.discovered.forEach(function(item) {
+      var containerId = item.id;
+      var config = item.config;
       report.total++;
       var placement = state.placements[containerId];
 
@@ -358,6 +522,9 @@
       if (placement.status === 'no-slot-id') {
         report.noSlotId++;
         console.log('%c  ⬜ ' + containerId + ' — NO SLOT ID (' + config.type + ')', 'color: #888;');
+      } else if (placement.status === 'skipped-mobile') {
+        report.skipped++;
+        console.log('%c  📱 ' + containerId + ' — SKIPPED (mobile, desktop-only) (' + config.type + ')', 'color: #888;');
       } else if (placement.rendered) {
         report.rendered++;
         console.log('%c  ✅ ' + containerId + ' — RENDERED (' + config.type + ')', 'color: #00ff00;');
@@ -372,12 +539,17 @@
       report.details.push({ container: containerId, type: config.type, page: config.page, status: placement.status, rendered: placement.rendered });
     });
 
+    state.unmapped.forEach(function(containerId) {
+      console.log('%c  ❓ ' + containerId + ' — UNMAPPED (no ad type could be inferred)', 'color: #ff00ff;');
+    });
+
     var scoreColor = report.rendered > 0 ? '#00ff00' : report.noSlotId === report.total ? '#888' : '#ff0000';
     console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00ffff;');
     console.log('%c  RENDERED: ' + report.rendered + '/' + report.total, 'color: ' + scoreColor + '; font-weight: bold;');
     if (report.noSlotId > 0) console.log('%c  NO SLOT ID: ' + report.noSlotId + ' (configure SLOT_IDS in ad-loader.js)', 'color: #ff6600;');
     if (report.unfilled > 0) console.log('%c  UNFILLED: ' + report.unfilled + ' (AdSense had no ads — normal for new sites)', 'color: #ff6600;');
     if (report.failed > 0) console.log('%c  FAILED: ' + report.failed, 'color: #ff0000;');
+    if (report.unmapped > 0) console.log('%c  UNMAPPED: ' + report.unmapped + ' (add data-ad-type to the container div)', 'color: #ff00ff;');
     console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n', 'color: #00ffff;');
 
     updateDebugPill(report);
@@ -433,16 +605,22 @@
   // ============================================================
   // PAGE NAVIGATION REFRESH
   // ============================================================
+  // NOTE (2026-11-03, AdSense review): re-placing ads on SPA navigation
+  // without a full reload is a policy grey area (see ADSENSE_COMPLIANCE.md
+  // recommendation). It is kept for now because the SPA has no other way
+  // to show ads on a new section; the compliance decision is Gary's.
   function refreshAdsForPage(pageName) {
     console.log('[ADMENSION AdLoader] Refreshing ads for page: ' + pageName);
 
-    Object.keys(CONTAINER_MAP).forEach(function(containerId) {
-      var config = CONTAINER_MAP[containerId];
+    // Re-discover: SPA section swaps can add/remove containers.
+    var discovery = discoverContainers();
+
+    discovery.containers.forEach(function(item) {
+      var containerId = item.id;
+      var config = item.config;
       if (config.page !== pageName) return;
 
-      var container = document.getElementById(containerId);
-      if (!container) return;
-
+      var container = item.el;
       var slotId = SLOT_IDS[config.type];
       if (!slotId) return;
 
@@ -495,36 +673,39 @@
   // PUBLIC API
   // ============================================================
   window.ADMENSION_AD_LOADER = {
-    version: '2.0.0',
+    version: '3.0.0',
     diagnose: function() {
-      console.log('\n=== ADMENSION AD LOADER v2.0 DIAGNOSTIC ===');
+      console.log('\n=== ADMENSION AD LOADER v3.0 DIAGNOSTIC ===');
       console.log('Publisher ID:', ADSENSE_CLIENT);
       console.log('AdSense Ready:', state.adsenseReady ? '✅' : '❌');
       console.log('AdSense Blocked:', state.adsenseBlocked ? '🚫 YES' : '✅ NO');
       console.log('Configured:', state.configured ? '✅' : '❌');
       console.log('Slot IDs:', JSON.stringify(SLOT_IDS));
+      console.log('Discovered containers:', state.discovered.length);
+      console.log('Unmapped containers:', JSON.stringify(state.unmapped));
       console.log('');
       return validateAllPlacements();
     },
     getState: function() {
-      return { adsenseReady: state.adsenseReady, adsenseBlocked: state.adsenseBlocked, configured: state.configured, slotIds: SLOT_IDS, placements: state.placements, containerCount: Object.keys(CONTAINER_MAP).length };
+      return { adsenseReady: state.adsenseReady, adsenseBlocked: state.adsenseBlocked, configured: state.configured, slotIds: SLOT_IDS, placements: state.placements, discovered: state.discovered.map(function(d) { return d.id; }), unmapped: state.unmapped, legacyMapSize: Object.keys(LEGACY_CONTAINER_MAP).length };
     },
     refreshPage: refreshAdsForPage,
     refreshSlot: function(containerId) {
       var container = document.getElementById(containerId);
-      var config = CONTAINER_MAP[containerId];
+      var config = configForContainer(containerId);
       var slotId = config ? SLOT_IDS[config.type] : null;
       if (container && config && slotId) placeAd(containerId, container, config, slotId, 1);
     },
     isRendered: function(containerId) { var p = state.placements[containerId]; return p ? p.rendered : false; },
+    discover: discoverContainers,
     config: CONFIG,
-    containerMap: CONTAINER_MAP,
+    containerMap: LEGACY_CONTAINER_MAP,
     slotIds: SLOT_IDS,
     adsenseClient: ADSENSE_CLIENT,
   };
 
   // Boot
   init();
-  console.log('[ADMENSION AdLoader] v2.0 loaded. Run ADMENSION_AD_LOADER.diagnose() in console for full status.');
+  console.log('[ADMENSION AdLoader] v3.0 loaded (dynamic discovery). Run ADMENSION_AD_LOADER.diagnose() in console for full status.');
 
 })();

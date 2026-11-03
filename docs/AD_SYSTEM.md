@@ -76,9 +76,9 @@ The bulletproof ad loading system **guarantees** that ads always render, with mu
 - `ad-admin-tall` - 300×600
 
 ### Anchor (Sticky Footer)
-- `ad-anchor` - 728×90 / 320×50 (always visible)
+- No loader container: the sticky anchor is sponsor-managed (`stickyBox` in the page markup), not an AdSense container.
 
-**Total:** 18 ad placements
+**Total:** 31 loader containers (discovered dynamically from the DOM — see src/ad-loader.js v3.0) + 3 injected VALLIS units per VALLIS page (anchor + 2 side stickies)
 
 ---
 
@@ -354,7 +354,7 @@ ADMENSION_AD_LOADER.refreshAllAds();
 
 ### Already Compliant ✅
 - [x] AdSense code installed
-- [x] Privacy policy (privacy.html)
+- [x] Privacy policy (privacy-policy.html)
 - [x] Original content
 - [x] Clear navigation
 - [x] No prohibited content

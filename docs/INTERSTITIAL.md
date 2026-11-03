@@ -161,8 +161,8 @@ Same pattern but 10 seconds instead of 3.
 ### Universal Ad System
 
 The interstitial page imports:
-- `universal-ads/admension-ads.css` — Styling for ads
-- `universal-ads/admension-ads.js` — Attribution tracking + auto-injection
+- (universal-ads/admension-ads.css — RETIRED 2026-11-03; styling lives in src/ad-loader.js placeholders and VALLIS/admension-ads.js)
+- (universal-ads/admension-ads.js — RETIRED 2026-11-03; attribution lives in src/ad-impression-validator.js)
 
 ### Ad Hierarchy
 
@@ -267,8 +267,8 @@ Events logged to Google Apps Script collector (if configured).
 
 ### Static Files
 - ✅ `interstitial.html` — Main interstitial page
-- ✅ `universal-ads/admension-ads.css` — Ad styling
-- ✅ `universal-ads/admension-ads.js` — Ad logic + attribution
+- (universal-ads/admension-ads.css — RETIRED 2026-11-03)
+- (universal-ads/admension-ads.js — RETIRED 2026-11-03)
 
 ### Configuration
 - ⚠️ Update `window.ADMENSION_COLLECTOR_URL` in ad JS for analytics
@@ -365,7 +365,7 @@ Events logged to Google Apps Script collector (if configured).
 
 ### Ads not showing?
 - Check AdSense approval status
-- Verify `universal-ads` files loaded correctly
+- (RETIRED 2026-11-03: universal-ads/ deleted — verify src/ad-loader.js + VALLIS/admension-ads.js instead)
 - Check browser console for ad blocker interference
 
 ### Timer stuck?

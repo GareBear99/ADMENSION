@@ -57,74 +57,74 @@ dailyRevenuePerUser = revenuePerSession * sessionsPerUserPerDay
 - Rail right (160x600): 1 ad (desktop only)
 - Footer banner (728x90): 1 ad
 - Sticky anchor bar: 1 ad
-- **Total per pageview:** 4-5 ad units
+- **Total per pageview:** 3–4 ad units (home 4, stats 3, create 4, manage 4, docs 3, admin 3, vallis 3, pools 3, interstitial 4 — see src/ad-loader.js v3.0). CORRECTED 2026-11-03: the old 5/page assumption overstated density. All figures below remain PROJECTIONS — the site has earned $0.00 to date.
 
 ### Calculated Ad Impressions
 
 #### Tier 1 Density (US, CA, UK, etc.)
-All placements active: **5 ads per pageview**
+All placements active: **3–4 ads per pageview** (3 on stats/docs/admin/vallis/pools, 4 on home/create/manage/interstitial)
 
 #### Tier 2 Density (EU, JP, etc.)
-Rail disabled: **4 ads per pageview**
+Rail disabled: **2–3 ads per pageview**
 
 #### Tier 3 Density (Rest of world)
-Rail + side disabled: **3 ads per pageview**
+Rail + side disabled: **2 ads per pageview**
 
 ### Revenue Per User Session (New Flow)
 
 #### Scenario 1: Demo Only
 **Assumptions:**
 - User views demo (3 pageviews)
-- Tier 1 geo (5 ads/page)
-- Total impressions: 3 × 5 = 15 ads
-- Revenue: (15/1000) × $4.00 = **$0.06 per session**
-- **Session RPM: $60.00**
+- Tier 1 geo (4 ads/page — interstitial)
+- Total impressions: 3 × 4 = 12 ads
+- Revenue: (12/1000) × $4.00 = **$0.048 per session**
+- **Session RPM: $48.00**
 
 #### Scenario 2: Demo + 2 Page Navigations
 **Assumptions:**
 - Demo: 3 pageviews
 - Navigation: 2 pageviews (Stats, Create)
 - Total: 5 pageviews
-- Tier 1 geo (5 ads/page)
-- Total impressions: 5 × 5 = 25 ads
-- Revenue: (25/1000) × $4.00 = **$0.10 per session**
-- **Session RPM: $100.00**
+- Tier 1 geo (3–4 ads/page by page)
+- Total impressions: demo 3×4=12 + Stats 3 + Create 4 = 19 ads
+- Revenue: (19/1000) × $4.00 = **$0.076 per session**
+- **Session RPM: $76.00**
 
 #### Scenario 3: Full User Journey (Link Creator)
 **Assumptions:**
 - Demo: 3 pageviews
 - Navigation: 3 pageviews (Stats, Create, Manage)
 - Total: 6 pageviews
-- Tier 1 geo (5 ads/page)
-- Total impressions: 6 × 5 = 30 ads
-- Revenue: (30/1000) × $4.00 = **$0.12 per session**
-- **Session RPM: $120.00**
+- Tier 1 geo (3–4 ads/page by page)
+- Total impressions: demo 3×4=12 + Stats 3 + Create 4 + Manage 4 = 23 ads
+- Revenue: (23/1000) × $4.00 = **$0.092 per session**
+- **Session RPM: $92.00**
 
 #### Scenario 4: Link Visitor (Interstitial)
 **Assumptions:**
 - Interstitial 3 steps: 3 pageviews
-- Tier 1 geo (5 ads/page)
-- Total impressions: 3 × 5 = 15 ads
-- Revenue: (15/1000) × $4.00 = **$0.06 per session**
-- **Session RPM: $60.00**
+- Tier 1 geo (4 ads/page — interstitial)
+- Total impressions: 3 × 4 = 12 ads
+- Revenue: (12/1000) × $4.00 = **$0.048 per session**
+- **Session RPM: $48.00**
 
 ### Blended Average Projections
 
 #### Conservative Mix (70% Tier 2/3, 30% Tier 1)
 **Average CPM:** (0.3 × $4.00) + (0.4 × $2.60) + (0.3 × $1.30) = **$2.63 CPM**
 **Average pageviews per session:** 4 (conservative)
-**Average ad density:** 4 ads/page
-**Impressions per session:** 4 × 4 = 16 ads
-**Revenue per session:** (16/1000) × $2.63 = **$0.042**
-**Session RPM:** **$42.00**
+**Average ad density:** 3.4 ads/page
+**Impressions per session:** 4 × 3.4 = 13.6 ads
+**Revenue per session:** (13.6/1000) × $2.63 = **$0.036**
+**Session RPM:** **$35.76**
 
 #### Realistic Mix (50% Tier 1, 30% Tier 2, 20% Tier 3)
 **Average CPM:** (0.5 × $4.00) + (0.3 × $2.60) + (0.2 × $1.30) = **$3.04 CPM**
 **Average pageviews per session:** 5 (realistic)
-**Average ad density:** 4.5 ads/page
-**Impressions per session:** 5 × 4.5 = 22.5 ads
-**Revenue per session:** (22.5/1000) × $3.04 = **$0.068**
-**Session RPM:** **$68.40**
+**Average ad density:** 3.4 ads/page
+**Impressions per session:** 5 × 3.4 = 17 ads
+**Revenue per session:** (17/1000) × $3.04 = **$0.052**
+**Session RPM:** **$51.68**
 
 ## Scaling Projections
 

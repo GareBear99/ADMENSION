@@ -49,3 +49,4 @@ capture-*.js
 screenshot*.js
 screenshot*.py
 screenshot*.sh
+*.orig
